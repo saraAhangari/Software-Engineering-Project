@@ -50,3 +50,23 @@ class LoginView(APIView):
         response.set_cookie('jwt_token', token)
 
         return response
+
+
+class LogoutView(APIView):
+    def post(self, request):
+        response = Response()
+        cookie = request.COOKIES.get('jwt_token')
+        if cookie is None:
+            response.data = {
+                'ok': False,
+                'message': 'login first'
+            }
+            return response
+
+        response.delete_cookie('jwt_token')
+        response.data = {
+            'ok': True,
+            'message': 'user logged out'
+        }
+
+        return response
