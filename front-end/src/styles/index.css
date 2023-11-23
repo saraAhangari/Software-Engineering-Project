@@ -1,3 +1,29 @@
+.form-container {
+  display: flex;
+  row-gap: 10px;
+  flex-direction: column;
+  max-width: 450px;
+  border-radius: 5px;
+  padding: 40px 50px;
+}
+.form-container .title {
+  font-weight: bold;
+  align-self: center;
+}
+.form-container .button {
+  margin-top: 20px;
+  text-transform: none;
+}
 
+.login-page {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.login-page .form-container {
+  width: 100%;
+}
 
 /*# sourceMappingURL=index.css.map */
