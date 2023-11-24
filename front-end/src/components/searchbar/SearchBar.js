@@ -21,7 +21,6 @@ function SearchBar(
             />
             <InputBase
                 className={'searchbar__input-bar'}
-                dir='rtl'
                 type={'text'}
                 inputProps={
                     {

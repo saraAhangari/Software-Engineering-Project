@@ -150,19 +150,26 @@ html, body, #root {
   font-weight: bold;
   src: local("IRYekan"), url("../assets/fonts/IRYekanBold.ttf") format("truetype");
 }
-.form-container {
-  display: flex;
-  row-gap: 10px;
-  flex-direction: column;
-  max-width: 450px;
-  border-radius: 5px;
-  padding: 40px 50px;
+.form {
+  padding: 10px;
+  border-radius: 15px;
+  background: rgba(249, 249, 249, 0.52);
 }
-.form-container .title {
+.form__container {
+  display: flex;
+  row-gap: 15px;
+  flex-direction: column;
+  padding: 60px 30px 40px 30px;
+  background: white;
+  border-radius: 15px;
+  border: 0 solid #000;
+  box-shadow: 3px 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+.form__container .title {
   font-weight: bold;
   align-self: center;
 }
-.form-container .button {
+.form__container .button {
   margin-top: 20px;
   text-transform: none;
 }
@@ -195,7 +202,6 @@ html, body, #root {
 }
 
 .home-page {
-  flex: 1;
   width: 100%;
   display: flex;
   align-items: center;
@@ -214,8 +220,12 @@ html, body, #root {
   width: 100%;
   display: flex;
   align-items: center;
+  align-content: center;
   flex-direction: column;
   justify-content: center;
+}
+.login-page .divider {
+  margin: 12px 0;
 }
 .login-page .form-container {
   width: 100%;
@@ -252,7 +262,7 @@ html, body, #root {
 }
 .template__gray-filter .container .appbar .toolbar .button {
   color: black;
-  padding: 5px 20px;
+  padding: 9px 25px;
   width: fit-content;
   font-size: 1.25rem;
   font-style: normal;

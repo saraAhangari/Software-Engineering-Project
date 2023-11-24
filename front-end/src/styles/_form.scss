@@ -1,22 +1,30 @@
-.form-container {
-  display: flex;
-  row-gap: 10px;
-  flex-direction: column;
-  max-width: 450px;
-  border-radius: 5px;
-  padding: 40px 50px;
+.form {
+  padding: 10px;
+  border-radius: 15px;
+  background: rgba(249, 249, 249, 0.52);
 
-  .title {
-    font-weight: bold;
-    align-self: center;
-  }
+  &__container {
+    display: flex;
+    row-gap: 15px;
+    flex-direction: column;
+    padding: 60px 30px 40px 30px;
+    background: white;
+    border-radius: 15px;
+    border: 0 solid #000;
+    box-shadow: 3px 4px 4px 0 rgba(0, 0, 0, 0.25);
 
-  .text-field {
+    .title {
+      font-weight: bold;
+      align-self: center;
+    }
 
-  }
+    .text-field {
 
-  .button {
-    margin-top: 20px;
-    text-transform: none;
+    }
+
+    .button {
+      margin-top: 20px;
+      text-transform: none;
+    }
   }
 }

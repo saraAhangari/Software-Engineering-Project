@@ -3,6 +3,8 @@ import {Box, Button} from "@mui/material";
 import {validateEmail, validatePassword, validateRePassword, validateUserName} from "./Validation";
 import CustomTextFiled from "../../components/text-field/CustomTextField";
 import CustomTextFiledWithPasswordToggle from "../../components/text-field/CustomTextFiledWithPasswordToggle";
+import CustomForm from "../../components/container/CustomForm";
+import PrimaryButton from "../../components/button/PrimaryButton";
 
 function SignUp() {
     const [inputs, setInputs] = useState(
@@ -53,53 +55,67 @@ function SignUp() {
     }
 
     return (
-        <div className={'login-page'}>
+        <div className={'signup-page'}>
             <form>
-                <Box className={'form-container'}>
+                <CustomForm>
 
                     <p className={'title'}>Sign Up</p>
 
                     <CustomTextFiled
                         type={'text'}
-                        name={'username'}
-                        label={'Username'}
-                        placeholder={'e.g, my_username'}
-                        errorMessage={errors.username}
+                        name={'name'}
+                        label={'نام'}
+                        errorMessage={errors.name}
+                        onTextChanged={handleInputs}
+                    />
+
+                    <CustomTextFiled
+                        type={'text'}
+                        name={'family'}
+                        label={'نام خانوادگی'}
+                        errorMessage={errors.family}
+                        onTextChanged={handleInputs}
+                    />
+
+                    <CustomTextFiled
+                        type={'text'}
+                        name={'gender'}
+                        label={'جنسیت'}
+                        errorMessage={errors.gender}
+                        onTextChanged={handleInputs}
+                    />
+
+                    <CustomTextFiled
+                        type={'number'}
+                        name={'national_code'}
+                        label={'کد ملی'}
+                        errorMessage={errors.national_code}
+                        onTextChanged={handleInputs}
+                    />
+
+
+                    <CustomTextFiled
+                        type={'date'}
+                        name={'birthday'}
+                        label={'تاریخ تولد'}
+                        errorMessage={errors.birthday}
                         onTextChanged={handleInputs}
                     />
 
                     <CustomTextFiled
                         type={'email'}
                         name={'email'}
-                        label={'Email'}
-                        placeholder={'e.g, my_email@email.com'}
+                        label={'ایمیل'}
                         errorMessage={errors.email}
                         onTextChanged={handleInputs}
                     />
 
-                    <CustomTextFiledWithPasswordToggle
-                        type={'password'}
-                        name={'password'}
-                        label={'Password'}
-                        errorMessage={errors.password}
-                        onTextChanged={handleInputs}
+                    <PrimaryButton
+                        text={'ثبت نام و دریافت کد تایید'}
+                        onButtonClicked={submitInputs}
                     />
 
-                    <CustomTextFiledWithPasswordToggle
-                        label={'Confirm password'}
-                        name={'re_password'}
-                        errorMessage={errors.re_password}
-                        onTextChanged={handleInputs}
-                    />
-
-                    <Button
-                        className={'button'}
-                        variant="contained"
-                        autoCapitalize={'false'}
-                        onClick={submitInputs}
-                    >Sign Up</Button>
-
-                </Box>
+                </CustomForm>
             </form>
         </div>
     )

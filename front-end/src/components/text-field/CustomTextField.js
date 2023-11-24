@@ -5,9 +5,11 @@ function CustomTextFiled(
     {
         label,
         name = label,
+        style = {},
         type = 'text',
         placeholder = '',
-        onTextChanged = {},
+        onTextChanged = () => {},
+        variant = 'outlined',
         errorMessage = undefined,
         inputProps = undefined,
     }
@@ -22,6 +24,8 @@ function CustomTextFiled(
                    onChange={onTextChanged}
                    placeholder={placeholder}
                    InputProps={inputProps}
+                   style={style}
+                   variant={variant}
         />
     )
 }

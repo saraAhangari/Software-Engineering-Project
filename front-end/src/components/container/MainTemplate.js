@@ -25,12 +25,13 @@ function MainTemplate(
                         </Toolbar>
                     </AppBar>
                     {
-                        cloneElement(
+                        children && cloneElement(
                             children,
                             {
                                 style: {
                                     ...children.props.style,
-                                    marginTop: children.marginTop + height
+                                    marginTop: (children.marginTop ? children.marginTop : 0) + height,
+                                    flexGrow: 1
                                 }
                             }
                         )

@@ -8,7 +8,7 @@ function CustomTextFiledWithPasswordToggle(
         label,
         name = label,
         placeholder = '',
-        onTextChanged = {},
+        onTextChanged = () => {},
         errorMessage = undefined,
     }
 ) {
