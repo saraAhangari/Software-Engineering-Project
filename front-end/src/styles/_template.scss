@@ -1,0 +1,51 @@
+.template {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-size: cover;
+  background-position: center 40px;
+  background-repeat: no-repeat;
+  background-image: url("../assets/images/main_background.png");
+
+  &__gray-filter {
+    width: 100%;
+    height: 100%;
+    background: rgba(217, 217, 217, 0.61);
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+
+    .container {
+      flex: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .appbar {
+        position: relative;
+        height: fit-content;
+
+        .toolbar {
+
+
+          .button {
+            color: black;     // TODO: replace with the corresponding attribute in the theme
+            padding: 5px 20px;
+            width: fit-content;
+            font-size: 1.25rem;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
+            border-radius: 5px;
+            background: var(--gray1, #D9D9D9);
+          }
+        }
+      }
+
+      .separator {
+      }
+
+      .children {
+      }
+    }
+  }
+}

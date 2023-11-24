@@ -1,0 +1,21 @@
+.home-page {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 20px;
+
+  h1 {
+    color: black;
+    font-size: 3rem;
+    font-weight: 700;
+    font-style: normal;
+    line-height: normal;
+  }
+
+  .searchbar {
+
+  }
+}

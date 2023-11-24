@@ -1,0 +1,27 @@
+.searchbar {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  height: fit-content;
+  flex-direction: row;
+  border-radius: 111px;
+  border: 1px solid black;
+  background: white;
+  align-items: center;
+  justify-content: right;
+  padding: 15px;
+  column-gap: 20px;
+
+  &__icon {
+    width: 100px;
+    height: 100px;
+  }
+
+  &__input-bar {
+    color: #747171;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+}
