@@ -186,6 +186,7 @@ html, body, #root {
   height: 100px;
 }
 .searchbar__input-bar {
+  flex-grow: 1;
   color: #747171;
   font-size: 28px;
   font-style: normal;
@@ -245,6 +246,9 @@ html, body, #root {
 .template__gray-filter .container .appbar {
   position: relative;
   height: fit-content;
+}
+.template__gray-filter .container .appbar .toolbar {
+  justify-content: left;
 }
 .template__gray-filter .container .appbar .toolbar .button {
   color: black;

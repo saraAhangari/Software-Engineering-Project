@@ -5,11 +5,20 @@ import {Search} from "@mui/icons-material";
 function SearchBar(
     {
         placeholder,
-        onTextChanged = {},
+        onTextChanged = () => {},
     }
 ) {
     return (
         <Box className={'searchbar'}>
+            <Search
+                className={'searchbar__icon'}
+                style={
+                    {
+                        width: '30px',
+                        height: '30px',
+                    }
+                }
+            />
             <InputBase
                 className={'searchbar__input-bar'}
                 dir='rtl'
@@ -26,15 +35,6 @@ function SearchBar(
                 }
                 placeholder={placeholder}
                 onChange={onTextChanged}
-            />
-            <Search
-                className={'searchbar__icon'}
-                style={
-                    {
-                        width: '30px',
-                        height: '30px',
-                    }
-                }
             />
         </Box>
     );

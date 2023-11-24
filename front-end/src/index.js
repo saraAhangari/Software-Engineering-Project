@@ -3,12 +3,23 @@ import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
 import './styles/index.css';
+import createCache from '@emotion/cache';
+import rtlPlugin from 'stylis-plugin-rtl';
+import {prefixer} from "stylis";
+import {CacheProvider} from "@emotion/react";
+
+const cacheRtl = createCache({
+    key: 'muirtl',
+    stylisPlugins: [prefixer, rtlPlugin],
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <CacheProvider value={cacheRtl}>
+        <React.StrictMode>
+            <App/>
+        </React.StrictMode>
+    </CacheProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
