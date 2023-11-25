@@ -10,6 +10,7 @@ media
 *.bak
 
 # If you are using PyCharm #
+.idea
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -97,7 +98,7 @@ celerybeat-schedule.*
 *.sage.py
 
 # Environments
-.env
+server/.env
 .venv
 env/
 venv/
