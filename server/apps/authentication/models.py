@@ -2,14 +2,16 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-# Create your models here.
 class User(AbstractUser):
-    username = models.CharField(max_length=255, unique=True)
-    email = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
+    national_id = models.CharField(max_length=10, unique=True)
+
+    phone_no = models.CharField(max_length=11, unique=True)
+
+    age = models.IntegerField(default=1)
+
     ROLE_CHOICES = [
         ('admin', 'admin'),
-        ('doctor', 'doctor'),
+        ('hospital', 'hospital'),
         ('patient', 'patient')
     ]
 
@@ -18,5 +20,15 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default='patient')
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = [username, email, password]
+    GENDER_CHOICES = [
+        ('m', 'male'),
+        ('f', 'female')
+    ]
+
+    gender = models.CharField(
+        choices=GENDER_CHOICES,
+        default='m'
+    )
+
+
+
