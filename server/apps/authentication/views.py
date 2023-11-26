@@ -7,6 +7,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from hospitalAppointment.settings import SECRET_KEY
 from .serializers import UserSerializer
 from .models import User
+from .utils import generate_confirmation_number
+from django.core.cache import cache
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class RegisterView(APIView):
@@ -17,35 +20,29 @@ class RegisterView(APIView):
         return Response(serializer.data)
 
 
-class LoginView(APIView):
+class GetToken(APIView):
     def post(self, request):
-        email = request.data['email']
-        password = request.data['password']
+        national_id = request.data['national_id']
+        user_otp = int(request.data['otp'])
 
-        user = User.objects.filter(email=email).first()
+        user = User.objects.filter(national_id=national_id).first()
         if user is None:
             raise AuthenticationFailed('user not found')
 
-        if not user.check_password(password):
-            raise AuthenticationFailed('password not correct')
+        valid_otp = cache.get(user.phone_no)
 
-        payload = {
-            'id': user.id,
-            'role': user.role,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=48),
-            'iat': datetime.datetime.utcnow()
-        }
+        if valid_otp != user_otp:
+            raise AuthenticationFailed('otp not correct')
 
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        refresh = RefreshToken.for_user(user)
 
         response = Response()
-
         response.data = {
-            'ok': True,
-            'token': token
+            'refresh_token': str(refresh),
+            'access_token': str(refresh.access_token),
         }
 
-        response.set_cookie('jwt_token', token)
+        response.set_cookie('jwt_token', str(refresh.access_token))
 
         return response
 
@@ -68,3 +65,23 @@ class LogoutView(APIView):
         }
 
         return response
+
+
+class OtpGenerator(APIView):
+    def post(self, request):
+        national_id = request.data['national_id']
+        if national_id is None:
+            raise AuthenticationFailed('national_id not found')
+
+        user = User.objects.filter(national_id=national_id).first()
+        if user is None:
+            raise AuthenticationFailed('user not found')
+
+        confirmation_code = generate_confirmation_number()
+        print(f'otp code is {confirmation_code}')  # TODO
+        cache.set(user.phone_no, confirmation_code, 120)
+
+        return Response({
+            'ok': True,
+            'message': 'otp sent to your phone number'
+        })
