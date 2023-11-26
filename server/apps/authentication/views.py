@@ -1,11 +1,10 @@
 import datetime
 
 import jwt
-import environ
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
+from hospitalAppointment.settings import SECRET_KEY
 from .serializers import UserSerializer
 from .models import User
 
@@ -37,8 +36,7 @@ class LoginView(APIView):
             'iat': datetime.datetime.utcnow()
         }
 
-        env = environ.Env()
-        token = jwt.encode(payload, env('SECRET_KEY'), algorithm='HS256')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         response = Response()
 

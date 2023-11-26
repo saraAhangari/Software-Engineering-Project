@@ -4,5 +4,5 @@ from .models import User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["username", "email", "password", "role"]
+    list_display = ["username", "email", "password"]
     # actions = []

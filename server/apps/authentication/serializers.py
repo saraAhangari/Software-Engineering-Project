@@ -1,19 +1,15 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Role
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+        fields = ['id', 'national_id', 'phone_no', 'birthdate', 'gender']
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
         user = self.Meta.model(**validated_data)
-        if password is not None:
-            user.set_password(password)
+        user.role = Role.objects.filter(name='doctor').first()
+
         user.save()
         return user
