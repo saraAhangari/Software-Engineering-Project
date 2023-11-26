@@ -8,6 +8,7 @@ from hospitalAppointment.settings import SECRET_KEY
 from .serializers import UserSerializer
 from .models import User
 from .utils import generate_confirmation_number
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.cache import cache
 
 
@@ -35,9 +36,10 @@ class GetToken(APIView):
 
         response = Response()
 
-        token, _ = Token.objects.get_or_create(user=user)
+        refresh = RefreshToken.for_user(user)
         response.data = {
-            'access_token': str(token),
+            'access_token': str(refresh.token),
+            'refresh_token': str(refresh.access_token)
         }
 
         return response
