@@ -1,31 +1,27 @@
 from django.contrib import admin
+from .models import Doctor, Speciality
+from ..authentication.models import Role
 
-from apps.appointment.models import Doctor, Speciality
-from apps.authentication.models import Role
 
-
-# Register your models here.
 class DoctorAdmin(admin.ModelAdmin):
-    class Meta:
-        model = Doctor
-        list_display = ("first_name", "last_name", "speciality", "medical_system_number", "fees", "slice")
-        list_filter = "_all_"
+    list_display = (
+        'id', 'username', 'email', 'description', 'fees', 'medical_system_number', 'display_specialities')
+    list_filter = ('speciality',)
+
+    def display_specialities(self, obj):
+        return ", ".join([speciality.name for speciality in obj.speciality.all()])
+
+    display_specialities.short_description = 'Specialities'
 
 
 class SpecialityAdmin(admin.ModelAdmin):
-    class Meta:
-        model = Speciality
-        list_display = [field.name for field in Speciality._meta.get_fields()]
-        list_filter = [field.name for field in Speciality._meta.get_fields()]
+    list_display = ('id', 'name')
 
 
 class RoleAdmin(admin.ModelAdmin):
-    class Meta:
-        model = Role
-        list_display = [field.name for field in Speciality._meta.get_fields()]
-        list_filter = [field.name for field in Speciality._meta.get_fields()]
+    list_display = ('id', 'name')
 
 
-admin.site.register(Doctor)
-admin.site.register(Speciality)
-admin.site.register(Role)
+admin.site.register(Speciality, SpecialityAdmin)
+admin.site.register(Doctor, DoctorAdmin)
+admin.site.register(Role, RoleAdmin)

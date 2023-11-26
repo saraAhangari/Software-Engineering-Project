@@ -5,6 +5,10 @@ from apps.authentication.models import User
 class Speciality(models.Model):
     name = models.CharField(max_length=30)
 
+    class Meta:
+        verbose_name = 'Speciality'
+        verbose_name_plural = 'Specialities'
+
     def __str__(self):
         return f'{self.name}'
 
@@ -58,7 +62,6 @@ class PatientMedicalHistory(models.Model):
 class Patient(User):
     assurance = models.ForeignKey(Assurance, on_delete=models.PROTECT, null=True)
     medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.CASCADE)
-
 
 class Medicine(models.Model):
     generic_name = models.CharField(null=True, blank=True)
