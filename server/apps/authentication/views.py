@@ -38,8 +38,8 @@ class GetToken(APIView):
 
         refresh = RefreshToken.for_user(user)
         response.data = {
-            'access_token': str(refresh.token),
-            'refresh_token': str(refresh.access_token)
+            'refresh_token': str(refresh),
+            'access_token': str(refresh.access_token)
         }
 
         return response
