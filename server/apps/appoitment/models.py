@@ -2,16 +2,30 @@ from django.db import models
 from apps.authentication.models import User
 
 
-# class Speciality(models.Model):
-#     name = models.CharField(max_length=30)
-#     about_me = models.TextField(null=True, blank=True)
-#
-#
-# class Doctor(User):
-#     medical_system_number = models.IntegerField()
-#     fees = models.FloatField(default=100)
-#     speciality = models.OneToOneField(Speciality, on_delete=models.CASCADE, blank=True, null=True)
-#     satisfaction_percentage = models.FloatField(default=10)
+class Speciality(models.Model):
+    name = models.CharField(max_length=30)
+
+
+class Doctor(User):
+    description = models.TextField(null=True, blank=True)
+    medical_system_number = models.IntegerField()
+    fees = models.FloatField()
+    slice = models.IntegerField(default=30)
+    speciality = models.ManyToManyField(Speciality)
+
+
+class TimeSlice(models.Model):
+    date = models.DateField(null=True)
+    start = models.TimeField(null=True)
+    end = models.TimeField(null=True)
+    TIME_STATUS = [
+        ('available', 'available'),
+        ('unavailable', 'unavailable')
+    ]
+
+    status = models.CharField(choices=TIME_STATUS, default='unavailable')
+
+
 #
 #
 # class Medicine(models.Model):
