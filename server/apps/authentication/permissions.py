@@ -6,25 +6,13 @@ from apps.authentication.models import Role
 
 class IsDoctor(permissions.BasePermission):
     def has_permission(self, request, view):
-        try:
-            cookie = request.COOKIES.get('jwt_token')
-            payload = jwt.decode(cookie, SECRET_KEY, algorithms=["HS256"])
-
-            if payload['role'] == 'doctor':
-                return True
-            return False
-        except:
-            return False
+        if request.user.role.name == 'doctor':
+            return True
+        return False
 
 
 class IsPatient(permissions.BasePermission):
     def has_permission(self, request, view):
-        try:
-            cookie = request.COOKIES.get('jwt_token')
-            payload = jwt.decode(cookie, SECRET_KEY, algorithms=["HS256"])
-
-            if payload['role'] == 'patient':
-                return True
-            return False
-        except:
-            return False
+        if request.user.role.name == 'patient':
+            return True
+        return False

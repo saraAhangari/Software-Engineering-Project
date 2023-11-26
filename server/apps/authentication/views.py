@@ -1,6 +1,6 @@
 import datetime
 
-import jwt
+from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -9,7 +9,6 @@ from .serializers import UserSerializer
 from .models import User
 from .utils import generate_confirmation_number
 from django.core.cache import cache
-from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class RegisterView(APIView):
@@ -34,15 +33,12 @@ class GetToken(APIView):
         if valid_otp != user_otp:
             raise AuthenticationFailed('otp not correct')
 
-        refresh = RefreshToken.for_user(user)
-
         response = Response()
-        response.data = {
-            'refresh_token': str(refresh),
-            'access_token': str(refresh.access_token),
-        }
 
-        response.set_cookie('jwt_token', str(refresh.access_token))
+        token, _ = Token.objects.get_or_create(user=user)
+        response.data = {
+            'access_token': str(token),
+        }
 
         return response
 
@@ -78,10 +74,11 @@ class OtpGenerator(APIView):
             raise AuthenticationFailed('user not found')
 
         confirmation_code = generate_confirmation_number()
+
         print(f'otp code is {confirmation_code}')  # TODO
         cache.set(user.phone_no, confirmation_code, 120)
 
         return Response({
             'ok': True,
-            'message': 'otp sent to your phone number'
+            'message': 'otp sent to the user phone number'
         })
