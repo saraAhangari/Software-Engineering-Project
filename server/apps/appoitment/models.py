@@ -1,8 +1,7 @@
-# from django.db import models
-#
-# from apps.authentication.models import User
-#
-#
+from django.db import models
+from apps.authentication.models import User
+
+
 # class Speciality(models.Model):
 #     name = models.CharField(max_length=30)
 #     about_me = models.TextField(null=True, blank=True)
@@ -22,5 +21,5 @@
 #     price = models.FloatField()
 #
 #
-# class Assurance(models.Model):
-#     name = models.CharField(max_length=32)
+class Assurance(models.Model):
+    name = models.CharField(max_length=32)
