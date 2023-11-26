@@ -24,6 +24,3 @@ class Medicine(models.Model):
 
 class Assurance(models.Model):
     name = models.CharField(max_length=32)
-
-
-
