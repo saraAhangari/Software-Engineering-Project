@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "corsheaders",
     "apps.authentication",
-    "apps.appoitment",
+    "apps.appointment",
 
 ]
 
