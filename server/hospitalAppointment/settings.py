@@ -19,9 +19,9 @@ environ.Env.read_env(env_file=BASE_DIR / '.env')
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG_MODE')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -119,6 +119,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "media/"
+
+STATIC_ROOT = BASE_DIR / "static"
+MEDIA_ROOT = BASE_DIR / "media"
+
+
 
 # override auth user
 AUTH_USER_MODEL = "authentication.User"
@@ -140,13 +146,6 @@ REST_FRAMEWORK = {
 }
 
 
-# SIMPLE_JWT = {
-#     "ACCESS_TOKEN_LIFETIME": timedelta(days=2),
-#     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
-#     "TOKEN_OBTAIN_SERIALIZER": "apps.authentication.serializers.CustomTokenObtainPairSerializer",
-#     "AUTH_HEADER_NAME": "Authorization",
-# }
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
@@ -157,7 +156,7 @@ SIMPLE_JWT = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/0",
+        "LOCATION": env('REDIS_URI'),
         "TIMEOUT": 120,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",

@@ -20,7 +20,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        breakpoint()
         token['id'] = user.id
         token['role'] = user.role.name
 

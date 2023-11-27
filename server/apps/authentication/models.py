@@ -17,6 +17,6 @@ class User(AbstractUser):
 
     national_id = models.CharField(max_length=10, unique=True)
     phone_no = models.CharField(max_length=11, unique=True, validators=[])
-    birthdate = models.DateTimeField(null=True)
+    birthdate = models.DateField(null=True)
     role = models.ForeignKey(Role, on_delete=models.PROTECT, default=1)
     gender = models.CharField(choices=GENDER_CHOICES, default='m')
