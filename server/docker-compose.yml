@@ -4,19 +4,10 @@ services:
   redis:
     image: redis
     container_name: 'redis'
-    env_file:
-      - .env
-
-    command: redis-server
     volumes:
       - redis:/var/lib/redis/data
-
     ports:
       - "6379:6379"
-
-    environment:
-      - REDIS_PORT=6379
-      - REDIS_DATABASES=0
 
   db:
     image: postgres
@@ -40,7 +31,6 @@ services:
     container_name: 'server'
     command: >
       sh -c "python manage.py migrate && 
-              python manage.py collectstatic --no-input --clear &&
               python manage.py runserver 0.0.0.0:8000"
 
     env_file:
@@ -54,8 +44,7 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_HOST=db
       - DB_PORT=5432
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_URI=${REDIS_URI}
 
     volumes:
       - .:/app
