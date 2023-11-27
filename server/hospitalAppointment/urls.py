@@ -7,5 +7,6 @@ from .views import Index
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('apps.authentication.urls')),
+    path('api/v1/', include('apps.appointment.urls')),
     path('', Index.as_view()),
 ]
