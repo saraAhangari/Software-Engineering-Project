@@ -20,3 +20,4 @@ class User(AbstractUser):
     birthdate = models.DateField(null=True)
     role = models.ForeignKey(Role, on_delete=models.PROTECT, default=1)
     gender = models.CharField(choices=GENDER_CHOICES, default='m')
+

@@ -129,6 +129,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 # override auth user
 AUTH_USER_MODEL = "authentication.User"
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

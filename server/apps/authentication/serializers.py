@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.Meta.model(**validated_data)
         user.role = Role.objects.filter(name='patient').first()
+        user.username = user.national_id
 
         user.save()
         return user
