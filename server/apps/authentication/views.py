@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from hospitalAppointment.settings import SECRET_KEY
 from .serializers import UserSerializer
-from .models import User
+from .models import User, Role
 from .utils import generate_confirmation_number
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.cache import cache
@@ -83,4 +83,34 @@ class OtpGenerator(APIView):
         return Response({
             'ok': True,
             'message': 'otp sent to the user phone number'
+        })
+
+
+class RoleView(APIView):
+    def post(self, request):
+        name = request.data['name']
+        Role.objects.create(name=name).save()
+
+        return Response({
+            'ok': True,
+            'message': 'role saved'
+        })
+
+    def get(self, request):
+        role_list = []
+        for role in Role.objects.all():
+            role_list.append({
+                'id': role.id,
+                'name': role.name
+            })
+
+        return Response({'roles': role_list})
+
+    def delete(self, request):
+        id = request.data['id']
+        Role.objects.filter(id=id).delete()
+
+        return Response({
+            'ok': True,
+            'message': 'role deleted'
         })
