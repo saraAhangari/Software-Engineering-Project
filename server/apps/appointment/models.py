@@ -60,7 +60,7 @@ class PatientMedicalHistory(models.Model):
 
 class Patient(User):
     assurance = models.ForeignKey(Assurance, on_delete=models.PROTECT, null=True)
-    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.CASCADE)
+    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.CASCADE, null=True)
 
 
 class Medicine(models.Model):

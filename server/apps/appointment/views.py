@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from hospitalAppointment.settings import SECRET_KEY
-from apps.authentication.serializers import UserSerializer
 from apps.authentication.models import User, Role
 from apps.authentication.utils import generate_confirmation_number
 from rest_framework_simplejwt.tokens import RefreshToken

@@ -1,20 +1,22 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import User, Role
+from apps.appointment.models import Patient
 
 
-class UserSerializer(serializers.ModelSerializer):
+class PatientSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'national_id', 'phone_no', 'birthdate', 'gender']
+        model = Patient
+        fields = ['id', 'first_name', 'last_name', 'national_id',
+                  'phone_no', 'birthdate', 'assurance', 'gender']
 
     def create(self, validated_data):
-        user = self.Meta.model(**validated_data)
-        user.role = Role.objects.filter(name='patient').first()
-        user.username = user.national_id
+        patient = self.Meta.model(**validated_data)
+        patient.role = Role.objects.filter(name='patient').first()
+        patient.username = patient.national_id
 
-        user.save()
-        return user
+        patient.save()
+        return patient
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
