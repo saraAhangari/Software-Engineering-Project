@@ -3,11 +3,13 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework_simplejwt.models import TokenUser
+from rest_framework import status
 from apps.appointment.models import Patient
 from .models import Role
 from .serializers import PatientSerializer
 from .utils import generate_confirmation_number, send_message
+from rest_framework.permissions import IsAuthenticated
 
 
 class RegisterView(APIView):
@@ -35,32 +37,39 @@ class GetToken(APIView):
         response = Response()
 
         refresh = RefreshToken.for_user(patient)
+        access = str(refresh.access_token)
+
         response.data = {
             'refresh_token': str(refresh),
-            'access_token': str(refresh.access_token)
+            'access_token': access
         }
 
         return response
 
 
 class LogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
-        response = Response()
-        cookie = request.COOKIES.get('jwt_token')
-        if cookie is None:
-            response.data = {
-                'ok': False,
-                'message': 'login first'
-            }
-            return response
+        try:
+            token = request.headers['Authorization'].split(" ")[1]
+            blocked = cache.get(token)
+            if blocked is not None and blocked:
+                return Response({
+                    'ok': False,
+                    'message': 'login first'
+                })
 
-        response.delete_cookie('jwt_token')
-        response.data = {
-            'ok': True,
-            'message': 'user logged out'
-        }
-
-        return response
+            cache.set(token, True, 5*24*60*60)
+            return Response({
+                'ok': True,
+                'message': 'user logged out'
+            })
+        except Exception as e:
+            print(e)
+            # Handle any exceptions that might occur during the logout process
+            return Response({'detail': 'An error occurred during logout.'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class OtpGenerator(APIView):
