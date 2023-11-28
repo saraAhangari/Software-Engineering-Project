@@ -15,11 +15,13 @@ const lightTheme = {
         secondary: {
             main: '#D9D9D9',
         },
+        divider: "#385399",
     },
     direction: "rtl",
 }
 
 const darkTheme = {
+    ...lightTheme,
     palette: {
         mode: Theme.DARK_THEME,
         primary: {

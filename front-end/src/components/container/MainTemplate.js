@@ -18,7 +18,14 @@ function MainTemplate(
     return (
         <div className={'template'}>
             <div className={'template__gray-filter'}>
-                <div className={'container'}>
+                <div
+                    className={'container'}
+                    style={
+                        {
+                            paddingTop: height,
+                        }
+                    }
+                >
                     <AppBar ref={ref} className={'appbar'}>
                         <Toolbar className={'toolbar'}>
                             {buttonTitle && <Button className={'button'} onClick={onButtonClicked}>{buttonTitle}</Button>}
@@ -30,7 +37,6 @@ function MainTemplate(
                             {
                                 style: {
                                     ...children.props.style,
-                                    marginTop: (children.marginTop ? children.marginTop : 0) + height,
                                     flexGrow: 1
                                 }
                             }

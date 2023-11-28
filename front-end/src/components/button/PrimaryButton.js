@@ -14,10 +14,10 @@ function PrimaryButton(
         <Button
             style={
                 {
-                    ...style,
                     backgroundColor: theme.palette.primary.main,
                     color: '#F9F9F9',
                     padding: `${buttonVerticalPadding} ${buttonHorizontalPadding}`,
+                    ...style,
                 }
             }
             onClick={onButtonClicked}

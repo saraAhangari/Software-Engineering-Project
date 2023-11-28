@@ -1,27 +1,56 @@
-import React, {useState} from "react";
-import {Box, Button} from "@mui/material";
-import {validateEmail, validatePassword, validateRePassword, validateUserName} from "./Validation";
+import React, {Fragment, useState} from "react";
 import CustomTextFiled from "../../components/text-field/CustomTextField";
-import CustomTextFiledWithPasswordToggle from "../../components/text-field/CustomTextFiledWithPasswordToggle";
-import CustomForm from "../../components/container/CustomForm";
+import CustomCard from "../../components/container/CustomCard";
 import PrimaryButton from "../../components/button/PrimaryButton";
+import MainTemplate from "../../components/container/MainTemplate";
+import Selector from "../../components/text-field/Selector";
+import JalaliDatePicker from "../../components/text-field/JalaliDatePicker";
+import {useNavigate} from "react-router-dom";
+import OptValidator from "./OptValidator";
+import {Divider, useTheme} from "@mui/material";
 
 function SignUp() {
+    const theme = useTheme()
+
+    const navigate = useNavigate()
+
+    function navigateToHome() {
+        navigate('/')
+    }
+
+    const [otpValidatorIsOpen, setOtpValidatorIsOpen] = useState(false)
+
+    function showOtpValidatorDialog() {
+        setOtpValidatorIsOpen(true)
+    }
+
+    function hideOtpValidatorDialog() {
+        setOtpValidatorIsOpen(false)
+    }
+
     const [inputs, setInputs] = useState(
         {
-            username: undefined,
+            name: undefined,
+            family: undefined,
+            gender: undefined,
+            national_code: undefined,
+            insurance: undefined,
+            birthday: undefined,
+            phone: undefined,
             email: undefined,
-            password: undefined,
-            re_password: undefined,
         }
     )
 
     const [errors, setErrors] = useState(
         {
-            username: undefined,
+            name: undefined,
+            family: undefined,
+            gender: undefined,
+            national_code: undefined,
+            insurance: undefined,
+            birthday: undefined,
+            phone: undefined,
             email: undefined,
-            password: undefined,
-            re_password: undefined,
         }
     )
 
@@ -30,7 +59,7 @@ function SignUp() {
     console.log("error:");
     console.log(errors);
 
-    const handleInputs = (event) => {
+    const handleTextFieldInputs = (event) => {
         console.log(`event: ${event.target.name} -> ${event.target.value}`)
         setInputs(
             prevState => ({
@@ -42,82 +71,125 @@ function SignUp() {
     const submitInputs = (event) => {
         event.preventDefault()
         const error = {
-            username: validateUserName(inputs.username),
-            email: validateEmail(inputs.email),
-            password: validatePassword(inputs.password),
-            re_password: validateRePassword(inputs.password, inputs.re_password),
+            // TODO: handle errors
         }
         setErrors(error)
-        if (!error.username && !error.email && !error.password && !error.re_password) {
+        if (error) {
             console.log("DONE :)")
             // TODO: send the inputs to the server.
+            return showOtpValidatorDialog()
         }
     }
 
     return (
-        <div className={'signup-page'}>
-            <form>
-                <CustomForm>
+        <Fragment>
+            <MainTemplate buttonTitle={'صفحه اصلی'} onButtonClicked={navigateToHome}>
+                <div className={'signup-page'}>
+                    <CustomCard>
 
-                    <p className={'title'}>Sign Up</p>
+                        <p className={'title'}>ثبت نام</p>
 
-                    <CustomTextFiled
-                        type={'text'}
-                        name={'name'}
-                        label={'نام'}
-                        errorMessage={errors.name}
-                        onTextChanged={handleInputs}
-                    />
+                        <Divider
+                            style={
+                                {
+                                    background: theme.palette.divider,
+                                }
+                            }
+                        />
 
-                    <CustomTextFiled
-                        type={'text'}
-                        name={'family'}
-                        label={'نام خانوادگی'}
-                        errorMessage={errors.family}
-                        onTextChanged={handleInputs}
-                    />
+                        <CustomTextFiled
+                            type={'text'}
+                            name={'name'}
+                            label={'نام'}
+                            errorMessage={errors.name}
+                            onTextChanged={handleTextFieldInputs}
+                        />
 
-                    <CustomTextFiled
-                        type={'text'}
-                        name={'gender'}
-                        label={'جنسیت'}
-                        errorMessage={errors.gender}
-                        onTextChanged={handleInputs}
-                    />
+                        <CustomTextFiled
+                            type={'text'}
+                            name={'family'}
+                            label={'نام خانوادگی'}
+                            errorMessage={errors.family}
+                            onTextChanged={handleTextFieldInputs}
+                        />
 
-                    <CustomTextFiled
-                        type={'number'}
-                        name={'national_code'}
-                        label={'کد ملی'}
-                        errorMessage={errors.national_code}
-                        onTextChanged={handleInputs}
-                    />
+                        <Selector
+                            label={'جنسیت'}
+                            name={'gender'}
+                            menuItems={
+                                ['مرد', 'زن']
+                            }
+                            onValueChanged={
+                                (newValue) => {
+                                    console.log(newValue);
+                                    // TODO: handle the gender.
+                                }
+                            }
+                        />
+
+                        <CustomTextFiled
+                            type={'number'}
+                            name={'national_code'}
+                            label={'کد ملی'}
+                            errorMessage={errors.national_code}
+                            onTextChanged={handleTextFieldInputs}
+                        />
 
 
-                    <CustomTextFiled
-                        type={'date'}
-                        name={'birthday'}
-                        label={'تاریخ تولد'}
-                        errorMessage={errors.birthday}
-                        onTextChanged={handleInputs}
-                    />
+                        <JalaliDatePicker
+                            type={'date'}
+                            name={'birthday'}
+                            label={'تاریخ تولد'}
+                            errorMessage={errors.birthday}
+                            onTextChanged={handleTextFieldInputs}
+                        />
 
-                    <CustomTextFiled
-                        type={'email'}
-                        name={'email'}
-                        label={'ایمیل'}
-                        errorMessage={errors.email}
-                        onTextChanged={handleInputs}
-                    />
+                        <Selector
+                            label={'نوع بیمه'}
+                            name={'insurance'}
+                            menuItems={
+                                [ // TODO: replace with the server response
+                                    'بیمه درمان تامین اجتماعی',
+                                    'بیمه درمان تکمیلی',
+                                    'بیمه نیروهای مسلح',
+                                    'بیمه‌ی خدمات درمانی',
+                                ]
+                            }
+                            onValueChanged={
+                                (newValue) => {
+                                    console.log(newValue);
+                                    // TODO: handle the insurance.
+                                }
+                            }
+                        />
 
-                    <PrimaryButton
-                        text={'ثبت نام و دریافت کد تایید'}
-                        onButtonClicked={submitInputs}
-                    />
+                        <CustomTextFiled
+                            type={'tel'}
+                            name={'phone'}
+                            label={'شماره موبایل'}
+                            errorMessage={errors.phone}
+                            onTextChanged={handleTextFieldInputs}
+                        />
 
-                </CustomForm>
-            </form>
-        </div>
+                        <PrimaryButton
+                            style={
+                                {
+                                    width: 'fit-content',
+                                    alignSelf: 'center',
+                                }
+                            }
+                            text={'ثبت نام و دریافت کد تایید'}
+                            onButtonClicked={submitInputs}
+                        />
+
+                    </CustomCard>
+                </div>
+            </MainTemplate>
+
+            {
+                otpValidatorIsOpen && <OptValidator onClose={hideOtpValidatorDialog}/>
+            }
+        </Fragment>
     )
 }
 

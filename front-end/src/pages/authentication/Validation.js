@@ -14,18 +14,3 @@ export function validateEmail(email) {
     }
     return undefined;
 }
-
-export function validatePassword(password) {
-    if (password === undefined || password.length < 8) {
-        return 'Password must not be less than 8 characters.'
-    }
-    return undefined;
-}
-
-export function validateRePassword(password, rePassword) {
-    if (password !== rePassword) {
-        return 'Confirmation password doesn\'t match the password.'
-    }
-    return undefined;
-}
-

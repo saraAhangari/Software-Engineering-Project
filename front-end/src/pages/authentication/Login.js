@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import MainTemplate from "../../components/container/MainTemplate";
 import {useNavigate} from "react-router-dom";
-import CustomForm from "../../components/container/CustomForm";
+import CustomCard from "../../components/container/CustomCard";
 import {Button, Divider, Link, makeStyles, styled, useTheme} from "@mui/material";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
@@ -43,7 +43,7 @@ function Login() {
     return (
         <MainTemplate buttonTitle={'صفحه اصلی'} onButtonClicked={navigateToHome}>
             <div className={'login-page'}>
-                <CustomForm>
+                <CustomCard>
 
                     <h1 className={'title'}>ورود به حساب کاربری</h1>
 
@@ -56,6 +56,7 @@ function Login() {
                                 flexDirection: 'row',
                                 columnGap: '20px',
                                 flexWrap: 'wrap',
+                                justifyContent: 'center',
                             }
                         }
                     >
@@ -79,12 +80,21 @@ function Login() {
                                 marginTop: '40px',
                             }
                         }
+                        inputProps={
+                            {
+                                style: {
+                                    background: 'var(--gray1, #D9D9D9)',
+                                }
+                            }
+                        }
                     />
 
                     <PrimaryButton
                         style={
                             {
-                                marginTop: '40px'
+                                marginTop: '40px',
+                                borderRadius: '15px',
+                                padding: '15px'
                             }
                         }
                         text={'دریافت کد تایید'}
@@ -109,7 +119,7 @@ function Login() {
                         onClick={navigateToSignUp}
                     >حساب کاربری ندارید؟  ثبت نام</a>
 
-                </CustomForm>
+                </CustomCard>
             </div>
         </MainTemplate>
     )

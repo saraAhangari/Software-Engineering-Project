@@ -1,5 +1,6 @@
 import React from "react";
 import {TextField} from "@mui/material";
+import {TextFieldStyle} from "./Styles";
 
 function CustomTextFiled(
     {
@@ -23,7 +24,12 @@ function CustomTextFiled(
                    helperText={<span>{errorMessage}</span>}
                    onChange={onTextChanged}
                    placeholder={placeholder}
-                   InputProps={inputProps}
+                   InputProps={
+                       {
+                           ...TextFieldStyle,
+                           ...inputProps,
+                       }
+                   }
                    style={style}
                    variant={variant}
         />

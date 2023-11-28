@@ -150,12 +150,13 @@ html, body, #root {
   font-weight: bold;
   src: local("IRYekan"), url("../assets/fonts/IRYekanBold.ttf") format("truetype");
 }
-.form {
+.card {
+  width: min(500px, 100%);
   padding: 10px;
   border-radius: 15px;
   background: rgba(249, 249, 249, 0.52);
 }
-.form__container {
+.card__container {
   display: flex;
   row-gap: 15px;
   flex-direction: column;
@@ -165,11 +166,11 @@ html, body, #root {
   border: 0 solid #000;
   box-shadow: 3px 4px 4px 0 rgba(0, 0, 0, 0.25);
 }
-.form__container .title {
+.card__container .title {
   font-weight: bold;
   align-self: center;
 }
-.form__container .button {
+.card__container .button {
   margin-top: 20px;
   text-transform: none;
 }
@@ -230,6 +231,25 @@ html, body, #root {
 .login-page .form-container {
   width: 100%;
 }
+.login-page .card {
+  width: min(350px, 100%);
+}
+
+.signup-page {
+  width: 100%;
+  display: flex;
+  padding: 20px 0;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.signup-page .title {
+  color: black;
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
 
 .template {
   width: 100%;
@@ -254,7 +274,7 @@ html, body, #root {
   flex-direction: column;
 }
 .template__gray-filter .container .appbar {
-  position: relative;
+  position: fixed;
   height: fit-content;
 }
 .template__gray-filter .container .appbar .toolbar {
