@@ -86,7 +86,7 @@ class OtpGenerator(APIView):
 
         print(patient.phone_no)
         print(f'otp code is {confirmation_code}')  # TODO
-        # send_message(confirmation_code, patient.phone_no)
+        send_message(confirmation_code, patient.phone_no)
 
         cache.set(patient.phone_no, confirmation_code, 120)
 

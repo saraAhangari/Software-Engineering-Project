@@ -11,8 +11,8 @@ def send_message(confirmation_code, receiver_phone_number):
     api_key = PANEL_API_KEY
     sms = Client(api_key)
     try:
-        message_id = sms.send("+9850002040000", ['+98' + receiver_phone_number],
-                              f" به سامانه مدیریت نوبت دهی بیمارستان شهید بهشتی خوش آمدید. کد یکبار مصرف: ${confirmation_code}",
+        message_id = sms.send("+989981801484", ['+98' + receiver_phone_number],
+                              f" به سامانه مدیریت نوبت دهی بیمارستان شهید بهشتی خوش آمدید. کد یکبار مصرف: {confirmation_code}",
                               f'${confirmation_code}')
     except Error as e:  # ippanel sms error
         print(f"Error handled => code: {e.code}, message: {e.message}")
