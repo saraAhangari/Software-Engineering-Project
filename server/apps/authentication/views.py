@@ -1,16 +1,13 @@
-import datetime
-
-from rest_framework.authtoken.models import Token
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed
-from hospitalAppointment.settings import SECRET_KEY
-from .serializers import PatientSerializer
-from .models import Role
-from apps.appointment.models import Patient
-from .utils import generate_confirmation_number
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.cache import cache
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from apps.appointment.models import Patient
+from .models import Role
+from .serializers import PatientSerializer
+from .utils import generate_confirmation_number, send_message
 
 
 class RegisterView(APIView):
@@ -78,7 +75,10 @@ class OtpGenerator(APIView):
 
         confirmation_code = generate_confirmation_number()
 
+        print(patient.phone_no)
         print(f'otp code is {confirmation_code}')  # TODO
+        # send_message(confirmation_code, patient.phone_no)
+
         cache.set(patient.phone_no, confirmation_code, 120)
 
         return Response({

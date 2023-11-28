@@ -168,3 +168,6 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
+# panel config
+PANEL_API_KEY = env('PANEL_API_KEY')
+
