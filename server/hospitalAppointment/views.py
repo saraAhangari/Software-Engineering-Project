@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 class Index(APIView):
     permission_classes = (IsAuthenticated, IsNotInBlackedList,)
+
     def get(self, request):
         return Response({
             'ok': True,

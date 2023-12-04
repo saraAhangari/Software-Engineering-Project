@@ -1,6 +1,7 @@
 from ippanel import Client, HTTPError, Error, ResponseCode
 import random
 from hospitalAppointment.settings import PANEL_API_KEY
+from django.core.cache import cache
 
 
 def generate_confirmation_number():
@@ -21,3 +22,18 @@ def send_message(confirmation_code, receiver_phone_number):
                 print(f"Field: {field} , Errors: {e.message[field]}")
     except HTTPError as e:  # http error like network error, not found, ...
         print(f"Error handled => code: {e}")
+
+
+def send_otp(phone_no):
+    try:
+        confirmation_code = generate_confirmation_number()
+
+        print(phone_no)
+        print(f'otp code is {confirmation_code}')  # TODO
+
+        send_message(confirmation_code, phone_no)
+        cache.set(phone_no, confirmation_code, 120)
+        return True
+
+    except:
+        return False
