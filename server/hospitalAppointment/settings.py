@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "apps.authentication",
     "apps.appointment",
+    "import_export",
 ]
 
 MIDDLEWARE = [
