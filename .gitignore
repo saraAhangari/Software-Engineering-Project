@@ -139,11 +139,5 @@ GitHub.sublime-settings
 
 .dockerignore
 
-# Ignore Django Migrations in Development if you are working on team
-# Only for Development only
-**/migrations/**
-!**/migrations
-!**/migrations/__init__.py
-
 server/apps/appointment/migrations/
 server/apps/authentication/migrations/
