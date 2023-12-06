@@ -18,10 +18,5 @@ class SpecialityAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
 
-class RoleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
-
-
 admin.site.register(Speciality, SpecialityAdmin)
 admin.site.register(Doctor, DoctorAdmin)
-admin.site.register(Role, RoleAdmin)
