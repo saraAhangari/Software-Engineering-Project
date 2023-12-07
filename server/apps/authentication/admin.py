@@ -6,7 +6,7 @@ from import_export.admin import ImportExportModelAdmin
 @admin.register(User)
 class UserAdmin(ImportExportModelAdmin):
     list_display = ('id', 'username', 'national_id', 'phone_no', 'birthdate', 'role', 'gender')
-    list_filter = ('id', 'national_id', 'birthdate', 'role', 'gender')
+    list_filter = ('role', 'gender')
     search_fields = ('national_id', 'phone_no', 'birthdate', 'role', 'gender')
 
     class Meta:
@@ -17,7 +17,7 @@ class UserAdmin(ImportExportModelAdmin):
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('id', 'name')
-    list_filter = ('name',)
+    list_filter = ('id', 'name',)
 
     class Meta:
         model = Role
