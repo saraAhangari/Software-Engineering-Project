@@ -138,3 +138,6 @@ GitHub.sublime-settings
 .history
 
 .dockerignore
+
+server/apps/appointment/migrations/
+server/apps/authentication/migrations/
