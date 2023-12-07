@@ -9,7 +9,14 @@ from apps.authentication.models import User, Role
 from apps.authentication.utils import generate_confirmation_number
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.cache import cache
-from .models import Assurance
+from .models import Assurance, Doctor, Patient
+from django.db.models import Q
+from .pagination import CustomLimitOffsetPagination
+from django.core import serializers
+from apps.authentication.serializers import PatientSerializer
+from rest_framework.generics import ListAPIView
+from .serializers import DoctorSerializer
+
 
 
 class AssuranceView(APIView):
@@ -48,9 +55,21 @@ class AssuranceView(APIView):
         })
 
     def delete(self, request):
-        pass
+        pass  # TODO
 
 
+class DoctorView(ListAPIView):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q', '')
+
+        doctors = Doctor.objects.filter(Q(first_name__startswith=query) | Q(speciality__name__startswith=query))
+
+        pagination = self.pagination_class()
+        paginated_set = pagination.paginate_queryset(doctors, request)
+
+        serializer = DoctorSerializer(paginated_set, many=True)
+
+        return Response(serializer.data)
 
 
 

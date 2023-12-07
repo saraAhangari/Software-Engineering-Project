@@ -4,6 +4,7 @@ from apps.authentication.models import User
 
 class Speciality(models.Model):
     name = models.CharField(max_length=30)
+
     class Meta:
         verbose_name = 'Speciality'
         verbose_name_plural = 'Specialities'
