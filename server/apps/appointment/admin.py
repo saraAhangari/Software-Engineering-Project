@@ -18,6 +18,7 @@ class DoctorAdmin(admin.ModelAdmin):
     display_specialities.short_description = 'Specialities'
 
     search_fields = ('speciality',)
+    exclude = ('password', 'groups', 'last_login', 'is_active', 'date_joined', 'is_staff')
 
     class Meta:
         model = Doctor
