@@ -61,8 +61,9 @@ class AssuranceView(APIView):
 class DoctorView(ListAPIView):
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q', '')
-
-        doctors = Doctor.objects.filter(Q(first_name__startswith=query) | Q(speciality__name__startswith=query))
+        doctors = Doctor.objects.filter(Q(first_name__startswith=query)
+                                        | Q(last_name__startswith=query)
+                                        | Q(speciality__name__startswith=query))
 
         pagination = self.pagination_class()
         paginated_set = pagination.paginate_queryset(doctors, request)
