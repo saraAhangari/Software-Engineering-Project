@@ -24,6 +24,9 @@ class Doctor(User):
         verbose_name = 'doctor'
         verbose_name_plural = 'doctors'
 
+    def __str__(self):
+        return f'{self.id} - {self.last_name}'
+
 
 class TimeSlice(models.Model):
     date = models.DateField(null=True)
@@ -40,6 +43,9 @@ class TimeSlice(models.Model):
 class Assurance(models.Model):
     name = models.CharField(max_length=32)
 
+    def __str__(self):
+        return f'{self.name}'
+
 
 class PatientMedicalHistory(models.Model):
     BLOOD_GROUP_CHOICES = (
@@ -53,15 +59,30 @@ class PatientMedicalHistory(models.Model):
         ('AB+', 'AB Positive'),
     )
 
-    height = models.FloatField(),
-    weight = models.FloatField(),
+    height = models.FloatField()
+    weight = models.FloatField()
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
     blood_pressure = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'medical history'
+        verbose_name_plural = 'medical histories'
+
+    def __str__(self):
+        return f'{self.id}'
 
 
 class Patient(User):
     assurance = models.ForeignKey(Assurance, on_delete=models.PROTECT, null=True)
     medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        verbose_name = 'patient'
+        verbose_name_plural = 'patients'
+
+    def __str__(self):
+        return f'{self.id} - {self.last_name}'
+
 
 
 class Medicine(models.Model):
