@@ -1,7 +1,8 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Doctor, Speciality, TimeSlice, Assurance, PatientMedicalHistory, Patient, Medicine, Appointment
+from .models import Doctor, Speciality, TimeSlice, Assurance, PatientMedicalHistory, Patient, Medicine, Appointment, \
+    Prescription, Comment, DoctorTime, AppointmentTime
 
 
 @admin.register(Doctor)
@@ -93,4 +94,38 @@ class AppointmentAdmin(ImportExportModelAdmin):
         model = Appointment
 
 
+@admin.register(Prescription)
+class PrescriptionAdmin(ImportExportModelAdmin):
+    list_display = ('description', 'is_expired', 'date')
+    list_filter = ('is_expired', 'date')
+    ordering = ('-date',)
+    list_per_page = 25
 
+    class Meta:
+        model = Prescription
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('doctor_id', 'patient_id', 'treatment_experience', 'recommend_to_other', 'point')
+    search_fields = ('point',)
+    list_per_page = 25
+
+    class Meta:
+        model = Comment
+
+
+@admin.register(DoctorTime)
+class DoctorTimeAdmin(admin.ModelAdmin):
+    list_display = ('doctor_id',)
+
+    class Meta:
+        model = DoctorTime
+
+
+@admin.register(AppointmentTime)
+class AppointmentTimeAdmin(admin.ModelAdmin):
+    list_display = ('appointment_id',)
+
+    class Meta:
+        model = AppointmentTime
