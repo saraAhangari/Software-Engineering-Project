@@ -113,25 +113,19 @@ class CommentView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class PatientView(generics.UpdateAPIView):
+class PatientDetailView(generics.UpdateAPIView):
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
+        return self.request.user.patient
 
-        try:
-            return self.request.user
-        except Patient.DoesNotExist:
-            return Response({
-                'ok': False,
-                'message': 'patient does not exist'
-            })
+    def partial_update(self, request, *args, **kwargs):
+        partial_exclude_fields = ['phone_no', 'national_id']
+        for field in partial_exclude_fields:
+            if field in request.data:
+                del request.data[field]
 
-    def patch(self, request, *args, **kwargs):
-        instance = self.get_object()
+        return super().partial_update(request, *args, **kwargs)
 
-        if instance:
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
