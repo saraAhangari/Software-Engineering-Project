@@ -19,8 +19,6 @@ class PatientSerializer(serializers.ModelSerializer):
         return patient
 
 
-
-
 class LoginSerializer(serializers.Serializer):
     national_id = serializers.CharField(max_length=10)
 
