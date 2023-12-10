@@ -9,6 +9,12 @@ class SpecialitySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['doctor_id', 'patient_id', 'treatment_experience', 'recommend_to_other', 'point']
+
+
 class DoctorSerializer(serializers.ModelSerializer):
     speciality = serializers.SerializerMethodField()
 
@@ -19,11 +25,16 @@ class DoctorSerializer(serializers.ModelSerializer):
         model = Doctor
         fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'fees', 'medical_system_number',
                   'speciality',
-                  'phone_no', 'birthdate', 'gender']
+                  'phone_no', 'birthdate', 'gender', 'comments']
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class DoctorListSerializer(serializers.ModelSerializer):
+    speciality = SpecialitySerializer(many=True)
+
+    def get_speciality(self, obj):
+        return SpecialitySerializer(obj.speciality.all(), many=True).data
 
     class Meta:
-        model = Comment
-        fields = ['doctor_id', 'patient_id', 'treatment_experience', 'recommend_to_other', 'point']
+        model = Doctor
+        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'fees', 'medical_system_number',
+                  'speciality', 'phone_no', 'birthdate', 'gender']
