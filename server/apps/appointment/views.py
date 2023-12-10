@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -8,6 +9,7 @@ from .models import Assurance, Doctor, Comment, Patient
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .serializers import DoctorSerializer, CommentSerializer
+from ..authentication.serializers import PatientSerializer
 
 
 class AssuranceView(APIView):
@@ -84,6 +86,13 @@ class DoctorView(ListAPIView, RetrieveAPIView):
 
 class CommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        patient_id = request.user.id
+        comments = Comment.objects.filter(patient_id=patient_id)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, doctor_id, *args, **kwargs):
 
