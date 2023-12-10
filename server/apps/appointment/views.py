@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from .models import Assurance, Doctor, Comment, Patient
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .serializers import DoctorSerializer, CommentSerializer
+from .serializers import DoctorSerializer, CommentSerializer, DoctorListSerializer
 from ..authentication.serializers import PatientSerializer
 
 
@@ -51,29 +51,30 @@ class AssuranceView(APIView):
         pass  # TODO
 
 
-class DoctorView(ListAPIView, RetrieveAPIView):
+class DoctorListView(ListAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorListSerializer
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q', '')
+        doctors = Doctor.objects.filter(
+            Q(first_name__startswith=query) |
+            Q(last_name__startswith=query) |
+            Q(speciality__name__startswith=query)
+        )
+
+        pagination = self.pagination_class()
+        paginated_set = pagination.paginate_queryset(doctors, request)
+
+        serializer = DoctorListSerializer(paginated_set, many=True)
+        return Response(serializer.data)
+
+
+class DoctorDetailView(RetrieveAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
 
     def get(self, request, *args, **kwargs):
-        doctor_id = kwargs.get('doctor_id')
-
-        if doctor_id:
-            return self.retrieve(request, *args, **kwargs)
-        else:
-            query = request.GET.get('q', '')
-            doctors = Doctor.objects.filter(Q(first_name__startswith=query)
-                                            | Q(last_name__startswith=query)
-                                            | Q(speciality__name__startswith=query))
-
-            pagination = self.pagination_class()
-            paginated_set = pagination.paginate_queryset(doctors, request)
-
-            serializer = DoctorSerializer(paginated_set, many=True)
-
-            return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
         doctor_id = kwargs.get('doctor_id')
 
         try:
@@ -111,3 +112,26 @@ class CommentView(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+
+class PatientView(generics.UpdateAPIView):
+    serializer_class = PatientSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+
+        try:
+            return self.request.user
+        except Patient.DoesNotExist:
+            return Response({
+                'ok': False,
+                'message': 'patient does not exist'
+            })
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance:
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
