@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Doctor, Speciality
+from .models import Doctor, Speciality, Comment
+from ..authentication.serializers import PatientSerializer
 
 
 class SpecialitySerializer(serializers.ModelSerializer):
@@ -19,3 +20,10 @@ class DoctorSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'fees', 'medical_system_number',
                   'speciality',
                   'phone_no', 'birthdate', 'gender']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ['doctor_id', 'patient_id', 'treatment_experience', 'recommend_to_other', 'point']
