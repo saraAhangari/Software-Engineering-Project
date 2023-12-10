@@ -84,7 +84,6 @@ class Patient(User):
         return f'{self.id} - {self.last_name}'
 
 
-
 class Medicine(models.Model):
     generic_name = models.CharField(null=True, blank=True)
     infant_safe = models.BooleanField(default=True)
@@ -109,12 +108,18 @@ class Appointment(models.Model):
     status = models.CharField(choices=APPOINTMENT_STATUS, default='canceled')
     type = models.CharField(choices=APPOINTMENT_TYPE, default='online')
 
+    def __str__(self):
+        return f'{self.id} - {self.type}'
+
 
 class Prescription(models.Model):
     appointment_id = models.ForeignKey(Appointment, on_delete=models.PROTECT)
     description = models.TextField(null=True, blank=True)
     is_expired = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=False)
+
+    def __str__(self):
+        return f'{self.appointment_id} - {self.date}'
 
 
 class Comment(models.Model):
@@ -125,11 +130,21 @@ class Comment(models.Model):
     point = models.IntegerField()
 
 
-class DoctorTime(models.Model):
+class DoctorTime(TimeSlice):
     doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    timeslice_id = models.ForeignKey(TimeSlice, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'doctor times'
+
+    def __str__(self):
+        return f'{self.id}'
 
 
-class AppointmentTime(models.Model):
+class AppointmentTime(TimeSlice):
     appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE)
-    timeslice_id = models.ForeignKey(TimeSlice, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'appointment times'
+
+    def __str__(self):
+        return f'{self.id}'
