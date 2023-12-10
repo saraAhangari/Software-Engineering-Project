@@ -1,10 +1,12 @@
-from rest_framework import  generics, status
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Assurance, Doctor, Comment, Patient
 from django.db.models import Q
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .serializers import DoctorSerializer, CommentSerializer
 
 
@@ -47,19 +49,37 @@ class AssuranceView(APIView):
         pass  # TODO
 
 
-class DoctorView(ListAPIView):
+class DoctorView(ListAPIView, RetrieveAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+
     def get(self, request, *args, **kwargs):
-        query = request.GET.get('q', '')
-        doctors = Doctor.objects.filter(Q(first_name__startswith=query)
-                                        | Q(last_name__startswith=query)
-                                        | Q(speciality__name__startswith=query))
+        doctor_id = kwargs.get('doctor_id')
 
-        pagination = self.pagination_class()
-        paginated_set = pagination.paginate_queryset(doctors, request)
+        if doctor_id:
+            return self.retrieve(request, *args, **kwargs)
+        else:
+            query = request.GET.get('q', '')
+            doctors = Doctor.objects.filter(Q(first_name__startswith=query)
+                                            | Q(last_name__startswith=query)
+                                            | Q(speciality__name__startswith=query))
 
-        serializer = DoctorSerializer(paginated_set, many=True)
+            pagination = self.pagination_class()
+            paginated_set = pagination.paginate_queryset(doctors, request)
 
-        return Response(serializer.data)
+            serializer = DoctorSerializer(paginated_set, many=True)
+
+            return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        doctor_id = kwargs.get('doctor_id')
+
+        try:
+            doctor = get_object_or_404(Doctor, id=doctor_id)
+            serializer = DoctorSerializer(doctor)
+            return Response(serializer.data)
+        except Http404:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class CommentView(generics.CreateAPIView):
@@ -81,3 +101,4 @@ class CommentView(generics.CreateAPIView):
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+

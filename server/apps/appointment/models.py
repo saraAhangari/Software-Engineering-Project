@@ -80,8 +80,8 @@ class Patient(User):
         verbose_name = 'patient'
         verbose_name_plural = 'patients'
 
-    # def __str__(self):
-    #     return f'{self.national_id}'
+    def __str__(self):
+        return f'{self.national_id}'
 
 
 class Medicine(models.Model):
@@ -142,7 +142,7 @@ class Comment(models.Model):
 
 
 class DoctorTime(TimeSlice):
-    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='doctor_times')
 
     class Meta:
         verbose_name_plural = 'doctor times'
@@ -152,7 +152,7 @@ class DoctorTime(TimeSlice):
 
 
 class AppointmentTime(TimeSlice):
-    appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE)
+    appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name="appointment_times")
 
     class Meta:
         verbose_name_plural = 'appointment times'
