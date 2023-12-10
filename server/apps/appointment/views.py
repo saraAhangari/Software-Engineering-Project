@@ -1,22 +1,11 @@
-import datetime
-
-from rest_framework.authtoken.models import Token
+from rest_framework import  generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed
-from hospitalAppointment.settings import SECRET_KEY
-from apps.authentication.models import User, Role
-from apps.authentication.utils import generate_confirmation_number
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.core.cache import cache
-from .models import Assurance, Doctor, Patient
-from django.db.models import Q
-from .pagination import CustomLimitOffsetPagination
-from django.core import serializers
-from apps.authentication.serializers import PatientSerializer
-from rest_framework.generics import ListAPIView
-from .serializers import DoctorSerializer
 
+from .models import Assurance, Doctor, Comment, Patient
+from django.db.models import Q
+from rest_framework.generics import ListAPIView
+from .serializers import DoctorSerializer, CommentSerializer
 
 
 class AssuranceView(APIView):
@@ -73,5 +62,22 @@ class DoctorView(ListAPIView):
         return Response(serializer.data)
 
 
+class CommentView(generics.CreateAPIView):
+    serializer_class = CommentSerializer
 
+    def create(self, request, doctor_id, *args, **kwargs):
 
+        try:
+            doctor = Doctor.objects.get(pk=doctor_id)
+        except Doctor.DoesNotExist:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        request.data['patient_id'] = request.user.id
+        request.data['doctor_id'] = doctor.id
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
