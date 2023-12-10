@@ -80,8 +80,8 @@ class Patient(User):
         verbose_name = 'patient'
         verbose_name_plural = 'patients'
 
-    def __str__(self):
-        return f'{self.id} - {self.last_name}'
+    # def __str__(self):
+    #     return f'{self.national_id}'
 
 
 class Medicine(models.Model):
@@ -123,11 +123,22 @@ class Prescription(models.Model):
 
 
 class Comment(models.Model):
-    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="comments")
+    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="comments")
     treatment_experience = models.TextField(blank=True, null=True)
     recommend_to_other = models.BooleanField(blank=False)
     point = models.IntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created']
+        indexes = [
+            models.Index(fields=['created']),
+        ]
+
+    def __str__(self):
+        return f'Comment by {self.patient_id} on {self.doctor_id}'
 
 
 class DoctorTime(TimeSlice):
