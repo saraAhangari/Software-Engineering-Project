@@ -107,8 +107,8 @@ class PrescriptionAdmin(ImportExportModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'doctor_id', 'patient_id', 'treatment_experience', 'recommend_to_other', 'point',
-                    'created', 'updated')
+    list_display = ('id', 'doctor_id', 'patient_id', 'treatment_experience', 'point',
+                    'created')
     search_fields = ('point',)
     list_per_page = 25
 

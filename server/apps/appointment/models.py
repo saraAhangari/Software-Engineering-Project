@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from apps.authentication.models import User
 
@@ -126,10 +127,8 @@ class Comment(models.Model):
     doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="comments")
     patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="comments")
     treatment_experience = models.TextField(blank=True, null=True)
-    recommend_to_other = models.BooleanField(blank=False)
-    point = models.IntegerField()
+    point = models.IntegerField(default=1, validators=[MaxValueValidator(5), MinValueValidator(1)])
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['created']
