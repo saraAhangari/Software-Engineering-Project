@@ -1,10 +1,7 @@
-
 from django.contrib import admin
 from django.urls import path, include
 from .views import Index
 from schema_graph.views import Schema
-
-
 
 urlpatterns = [
     path("schema/", Schema.as_view()),
