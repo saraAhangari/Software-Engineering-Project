@@ -8,7 +8,10 @@ from rest_framework.response import Response
 from .models import Assurance, Doctor, Comment, Patient
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+
+from .permissions import IsPermittedToComment
 from .serializers import DoctorSerializer, CommentSerializer, DoctorListSerializer
+from ..authentication.permissions import IsNotInBlackedList
 from ..authentication.serializers import PatientSerializer
 
 
@@ -85,18 +88,11 @@ class DoctorDetailView(RetrieveAPIView):
             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-class CommentView(generics.CreateAPIView):
+class AddCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        patient_id = request.user.id
-        comments = Comment.objects.filter(patient_id=patient_id)
-        serializer = CommentSerializer(comments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    permission_classes = [IsAuthenticated, IsPermittedToComment, IsNotInBlackedList]
 
     def create(self, request, doctor_id, *args, **kwargs):
-
         try:
             doctor = Doctor.objects.get(pk=doctor_id)
         except Doctor.DoesNotExist:
@@ -113,6 +109,27 @@ class CommentView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
+class GetCommentView(generics.CreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated, IsNotInBlackedList]
+
+    def get(self, request, *args, **kwargs):
+        patient_id = request.user.id
+        comments = Comment.objects.filter(patient_id=patient_id)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CommentPermissionView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, IsPermittedToComment, IsNotInBlackedList]
+
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'ok': True,
+            'description': 'patient has permission to comment'
+        })
+
+
 class PatientDetailView(generics.UpdateAPIView):
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
@@ -127,5 +144,3 @@ class PatientDetailView(generics.UpdateAPIView):
                 del request.data[field]
 
         return super().partial_update(request, *args, **kwargs)
-
-
