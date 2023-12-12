@@ -1,9 +1,7 @@
-
 import os
 from pathlib import Path
 import environ
 from datetime import timedelta
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +38,7 @@ INSTALLED_APPS = [
     "apps.authentication",
     "apps.appointment",
     "import_export",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -127,36 +126,30 @@ MEDIA_URL = "media/"
 STATIC_ROOT = BASE_DIR / "static"
 MEDIA_ROOT = BASE_DIR / "media"
 
-
-
 # override auth user
 AUTH_USER_MODEL = "authentication.User"
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'apps.appointment.pagination.CustomLimitOffsetPagination'
+    'DEFAULT_PAGINATION_CLASS': 'apps.appointment.pagination.CustomLimitOffsetPagination',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
-
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
     "TOKEN_OBTAIN_SERIALIZER": "apps.authentication.serializers.CustomTokenObtainPairSerializer",
 }
-
 
 CACHES = {
     "default": {
@@ -175,3 +168,10 @@ SESSION_CACHE_ALIAS = "default"
 # panel config
 PANEL_API_KEY = env('PANEL_API_KEY')
 
+# swagger spectacular config
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SBU Hospital API',
+    'DESCRIPTION': 'crud rest api',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
