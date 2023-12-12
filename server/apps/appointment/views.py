@@ -131,6 +131,7 @@ class CommentPermissionView(generics.CreateAPIView):
 
 
 class PatientDetailView(generics.UpdateAPIView):
+    queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     permission_classes = [IsAuthenticated]
 
@@ -138,12 +139,16 @@ class PatientDetailView(generics.UpdateAPIView):
         return self.request.user.patient
 
     def partial_update(self, request, *args, **kwargs):
-        partial_exclude_fields = ['phone_no', 'national_id']
-        for field in partial_exclude_fields:
-            if field in request.data:
-                del request.data[field]
+        patient = self.get_object()
+        serializer = self.get_serializer(patient, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
-        return super().partial_update(request, *args, **kwargs)
+    def get(self, request):
+        patient = Patient.objects.get(id=request.user.id)
+        serializer = PatientSerializer(patient)
+        return Response(serializer.data)
 
 
 class MedicalHistoryView(generics.CreateAPIView):

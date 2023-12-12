@@ -1,19 +1,49 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
-from .models import User, Role
+from .models import Role
 from apps.appointment.models import Patient
+from apps.appointment.serializers import MedicalHistorySerializer
 
 
 class PatientSerializer(serializers.ModelSerializer):
+    medical_history = MedicalHistorySerializer()
+
+    def get_medical_history(self, obj):
+        return MedicalHistorySerializer(obj.mediaclHistory.all()).data
+
     class Meta:
         model = Patient
         fields = ['id', 'first_name', 'last_name', 'national_id',
-                  'phone_no', 'birthdate', 'assurance', 'gender']
+                  'phone_no', 'birthdate', 'assurance', 'gender',
+                  'medical_history']
 
     def create(self, validated_data):
         patient = self.Meta.model(**validated_data)
         patient.role = Role.objects.filter(name='patient').first()
         patient.username = patient.national_id
+
+        patient.save()
+        return patient
+
+    def update(self, patient, validated_data):
+        validated_data.pop('phone_no', None)
+        validated_data.pop('national_id', None)
+
+        patient.first_name = validated_data.get('first_name', patient.first_name)
+        patient.last_name = validated_data.get('last_name', patient.last_name)
+        patient.birthdate = validated_data.get('birthdate', patient.birthdate)
+        patient.assurance = validated_data.get('assurance', patient.assurance)
+        patient.gender = validated_data.get('gender', patient.gender)
+
+        medical_history_data = validated_data.get('medical_history', {})
+        if medical_history_data:
+            patient.medical_history.height = medical_history_data.get('height', patient.medical_history.height)
+            patient.medical_history.weight = medical_history_data.get('weight', patient.medical_history.weight)
+            patient.medical_history.blood_group = medical_history_data.get('blood_group',
+                                                                           patient.medical_history.blood_group)
+            patient.medical_history.blood_pressure = medical_history_data.get('blood_pressure',
+                                                                              patient.medical_history.blood_pressure)
+            patient.medical_history.save()
 
         patient.save()
         return patient

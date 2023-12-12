@@ -16,7 +16,7 @@ class Speciality(models.Model):
 
 class Doctor(User):
     description = models.TextField(null=True, blank=True)
-    medical_system_number = models.IntegerField()
+    medical_system_number = models.IntegerField(unique=True)
     fees = models.FloatField()
     slice = models.IntegerField(default=30)
     speciality = models.ManyToManyField(Speciality)

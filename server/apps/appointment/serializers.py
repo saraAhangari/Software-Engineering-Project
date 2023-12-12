@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Doctor, Speciality, Comment, PatientMedicalHistory
-from ..authentication.serializers import PatientSerializer
 
 
 class SpecialitySerializer(serializers.ModelSerializer):
