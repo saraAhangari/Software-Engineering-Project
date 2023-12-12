@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=10, null=False)
+    name = models.CharField(max_length=10, null=False, unique=True)
 
     def __str__(self):
         return f'{self.name}'
