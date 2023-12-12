@@ -6,10 +6,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from apps.appointment.models import Patient
 from .models import Role
-from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer
+from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer
 from .utils import send_otp
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsNotInBlackedList
+from rest_framework import generics
+from django.shortcuts import get_object_or_404
+
 
 
 class PatientValidationView(APIView):
@@ -118,7 +121,7 @@ class GetTokenView(APIView):
         return response
 
 
-class LogoutView(APIView):
+class LogoutView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated, IsNotInBlackedList,)
 
     def post(self, request):
@@ -143,31 +146,39 @@ class LogoutView(APIView):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class RoleView(APIView):
-    def post(self, request):
-        name = request.data['name']
-        Role.objects.create(name=name).save()
+class RoleView(generics.CreateAPIView):
+    serializer_class = RoleSerializer
+    queryset = Role.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return Response({
             'ok': True,
             'message': 'role saved'
         })
 
-    def get(self, request):
-        role_list = []
-        for role in Role.objects.all():
-            role_list.append({
-                'id': role.id,
-                'name': role.name
-            })
+    def get(self, request, pk=None):
+        serializer = self.serializer_class(self.queryset, many=True)
+        if pk:
+            serializer = self.serializer_class(get_object_or_404(self.queryset, id=pk))
 
-        return Response({'roles': role_list})
+        return Response(serializer.data)
 
-    def delete(self, request):
-        id = request.data['id']
-        Role.objects.filter(id=id).delete()
+    def delete(self, request, pk=None, *args, **kwargs):
+        get_object_or_404(self.queryset, id=pk).delete()
 
         return Response({
             'ok': True,
             'message': 'role deleted'
         })
+
+    def put(self, request, pk, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        role = self.queryset.get(id=pk)
+        role.name = request.data.get('name')
+        role.save()
+        return Response({'ok': True, 'message': 'updated successfully'})
