@@ -5,12 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Assurance, Doctor, Comment, Patient
+from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
-from .serializers import DoctorSerializer, CommentSerializer, DoctorListSerializer
+from .serializers import DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer
 from ..authentication.permissions import IsNotInBlackedList
 from ..authentication.serializers import PatientSerializer
 
@@ -144,3 +144,31 @@ class PatientDetailView(generics.UpdateAPIView):
                 del request.data[field]
 
         return super().partial_update(request, *args, **kwargs)
+
+
+class MedicalHistoryView(generics.CreateAPIView):
+    serializer_class = MedicalHistorySerializer
+    permission_classes = [IsAuthenticated, IsNotInBlackedList]
+
+    def post(self, request):
+        user = Patient.objects.get(national_id=request.user.national_id)
+
+        if user.role.name == "patient":
+            height = request.data.get('height')
+            weight = request.data.get('weight')
+            blood_group = request.data.get('blood_group')
+            blood_pressure = request.data.get('blood_pressure')
+
+            medical_history = PatientMedicalHistory.objects.create(
+                height=height,
+                weight=weight,
+                blood_group=blood_group,
+                blood_pressure=blood_pressure,
+            )
+
+            user.medical_history = medical_history
+            user.save()
+
+            return Response({'message': 'Medical history added successfully'}, status=status.HTTP_201_CREATED)
+
+        return Response({'message': 'Invalid user type'}, status=status.HTTP_400_BAD_REQUEST)

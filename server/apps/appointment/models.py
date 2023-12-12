@@ -75,7 +75,7 @@ class PatientMedicalHistory(models.Model):
 
 class Patient(User):
     assurance = models.ForeignKey(Assurance, on_delete=models.PROTECT, null=True)
-    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.CASCADE, null=True)
+    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name = 'patient'
@@ -102,8 +102,8 @@ class Appointment(models.Model):
         ('face to face', 'face to face'),
         ('online', 'online')
     ]
-    patient_id = models.ForeignKey(Patient, on_delete=models.PROTECT)
-    doctor_id = models.ForeignKey(Doctor, on_delete=models.PROTECT)
+    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=False)
     description = models.TextField(null=True, blank=True)
     status = models.CharField(choices=APPOINTMENT_STATUS, default='canceled')
@@ -114,7 +114,7 @@ class Appointment(models.Model):
 
 
 class Prescription(models.Model):
-    appointment_id = models.ForeignKey(Appointment, on_delete=models.PROTECT)
+    appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
     is_expired = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=False)
