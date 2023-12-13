@@ -8,5 +8,6 @@ urlpatterns = [
     path('get_token', GetTokenView.as_view()),
     path('login', LoginView.as_view()),
     path('logout', LogoutView.as_view()),
-    path('role', RoleView.as_view())
+    path('role', RoleView.as_view(http_method_names=['get', 'post'])),
+    path('role/<int:pk>/', RoleView.as_view(http_method_names=['get', 'put', 'delete'])),
 ]
