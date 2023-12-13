@@ -11,32 +11,77 @@ paths:
       - jwtAuth: []
       responses:
         '200':
+<<<<<<< HEAD
           description: No response body
+=======
+          description: get message
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/assurance:
     get:
       operationId: api_v1_assurance_retrieve
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Assurance
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
         '200':
+<<<<<<< HEAD
           description: No response body
     post:
       operationId: api_v1_assurance_create
       tags:
       - api
+=======
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assurance'
+          description: ''
+    post:
+      operationId: api_v1_assurance_create
+      tags:
+      - Assurance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assurance'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Assurance'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Assurance'
+        required: true
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
+<<<<<<< HEAD
         '200':
           description: No response body
     delete:
       operationId: api_v1_assurance_destroy
       tags:
       - api
+=======
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assurance'
+          description: ''
+    delete:
+      operationId: api_v1_assurance_destroy
+      tags:
+      - Assurance
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -85,7 +130,11 @@ paths:
           type: integer
         required: true
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Comment
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       responses:
@@ -100,7 +149,11 @@ paths:
           type: integer
         required: true
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Comment
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       responses:
@@ -198,34 +251,94 @@ paths:
     post:
       operationId: api_v1_get_token_create
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GetToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GetToken'
+        required: true
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
+<<<<<<< HEAD
         '200':
           description: No response body
+=======
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetToken'
+          description: ''
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/login:
     post:
       operationId: api_v1_login_create
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
+<<<<<<< HEAD
         '200':
           description: No response body
+=======
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/logout:
     post:
       operationId: api_v1_logout_create
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Authentication
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       responses:
         '201':
+<<<<<<< HEAD
           description: No response body
+=======
+          description: user logged out successfully
+        '400':
+          description: login first
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/patient/medical_history:
     post:
       operationId: api_v1_patient_medical_history_create
@@ -319,18 +432,47 @@ paths:
     post:
       operationId: api_v1_register_create
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+        required: true
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
+<<<<<<< HEAD
         '200':
           description: No response body
+=======
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/role:
     get:
       operationId: api_v1_role_retrieve
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Role
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -344,7 +486,11 @@ paths:
     post:
       operationId: api_v1_role_create
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Role
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       requestBody:
         content:
           application/json:
@@ -377,7 +523,43 @@ paths:
           type: integer
         required: true
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Role
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    put:
+      operationId: api_v1_role_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Role'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Role'
+        required: true
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -397,7 +579,11 @@ paths:
           type: integer
         required: true
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Role
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -408,15 +594,54 @@ paths:
     post:
       operationId: api_v1_validate_create
       tags:
+<<<<<<< HEAD
       - api
+=======
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+        required: true
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
+<<<<<<< HEAD
         '200':
           description: No response body
 components:
   schemas:
+=======
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+components:
+  schemas:
+    Assurance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 32
+      required:
+      - id
+      - name
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
     BloodGroupEnum:
       enum:
       - A+
@@ -556,6 +781,29 @@ components:
       description: |-
         * `m` - male
         * `f` - female
+<<<<<<< HEAD
+=======
+    GetToken:
+      type: object
+      properties:
+        national_id:
+          type: string
+          maxLength: 10
+        otp:
+          type: string
+          maxLength: 6
+      required:
+      - national_id
+      - otp
+    Login:
+      type: object
+      properties:
+        national_id:
+          type: string
+          maxLength: 10
+      required:
+      - national_id
+>>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
     MedicalHistory:
       type: object
       properties:
