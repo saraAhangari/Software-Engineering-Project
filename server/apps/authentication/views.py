@@ -6,14 +6,20 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from apps.appointment.models import Patient
 from .models import Role
-from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer
+from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer
 from .utils import send_otp
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsNotInBlackedList
+from rest_framework import generics
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, extend_schema_serializer, OpenApiResponse, OpenApiRequest
 
 
-class PatientValidationView(APIView):
-    def post(self, request):
+@extend_schema(tags=['Authentication'])
+class PatientValidationView(generics.CreateAPIView):
+    serializer_class = PatientSerializer
+
+    def post(self, request, *args, **kwargs):
         serializer = PatientSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_phone_no = serializer.data.get('phone_no')
@@ -33,8 +39,11 @@ class PatientValidationView(APIView):
         }, status=200)
 
 
-class RegisterView(APIView):
-    def post(self, request):
+@extend_schema(tags=['Authentication'])
+class RegisterView(generics.CreateAPIView):
+    serializer_class = PatientSerializer
+
+    def post(self, request, *args, **kwargs):
         serializer = PatientSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_otp = request.data.get('otp')
@@ -64,8 +73,11 @@ class RegisterView(APIView):
         return Response(serializer.data)
 
 
-class LoginView(APIView):
-    def post(self, request):
+@extend_schema(tags=['Authentication'])
+class LoginView(generics.CreateAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = Patient.objects.get(national_id=serializer.data['national_id'])
@@ -82,8 +94,11 @@ class LoginView(APIView):
         })
 
 
-class GetTokenView(APIView):
-    def post(self, request):
+@extend_schema(tags=['Authentication'])
+class GetTokenView(generics.CreateAPIView):
+    serializer_class = GetTokenSerializer
+
+    def post(self, request, *args, **kwargs):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -118,10 +133,14 @@ class GetTokenView(APIView):
         return response
 
 
-class LogoutView(APIView):
+@extend_schema(tags=['Authentication'], request=None, responses={
+    201: OpenApiResponse(description='user logged out successfully'),
+    400: OpenApiResponse(description='login first'),
+})
+class LogoutView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated, IsNotInBlackedList,)
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         try:
             token = request.headers['Authorization'].split(" ")[1]
             blocked = cache.get(token)
@@ -129,13 +148,14 @@ class LogoutView(APIView):
                 return Response({
                     'ok': False,
                     'message': 'login first'
-                })
+                }, status=status.HTTP_400_BAD_REQUEST)
 
             cache.set(token, True, 5 * 24 * 60 * 60)
             return Response({
                 'ok': True,
-                'message': 'user logged out'
+                'message': 'user logged out successfully'
             })
+
         except Exception as e:
             print(e)
             # Handle any exceptions that might occur during the logout process
@@ -143,31 +163,37 @@ class LogoutView(APIView):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class RoleView(APIView):
-    def post(self, request):
-        name = request.data['name']
-        Role.objects.create(name=name).save()
+@extend_schema(tags=['Role'])
+class RoleView(generics.CreateAPIView):
+    serializer_class = RoleSerializer
+    queryset = Role.objects.all()
 
-        return Response({
-            'ok': True,
-            'message': 'role saved'
-        })
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-    def get(self, request):
-        role_list = []
-        for role in Role.objects.all():
-            role_list.append({
-                'id': role.id,
-                'name': role.name
-            })
+        return Response(serializer.data)
 
-        return Response({'roles': role_list})
+    def get(self, request, pk=None):
+        serializer = self.serializer_class(self.queryset.all(), many=True)
+        if pk:
+            serializer = self.serializer_class(get_object_or_404(self.queryset, id=pk))
 
-    def delete(self, request):
-        id = request.data['id']
-        Role.objects.filter(id=id).delete()
+        return Response(serializer.data)
+
+    def delete(self, request, pk=None, *args, **kwargs):
+        get_object_or_404(self.queryset, id=pk).delete()
 
         return Response({
             'ok': True,
             'message': 'role deleted'
         })
+
+    def put(self, request, pk, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        role = get_object_or_404(self.queryset, id=pk)
+        role.name = request.data.get('name')
+        role.save()
+        return Response({'ok': True, 'message': 'updated successfully'})
