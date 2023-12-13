@@ -9,7 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('apps.authentication.urls')),
     path('api/v1/', include('apps.appointment.urls')),
-    path('', Index.as_view()),
+    path('', Index.as_view(http_method_names=['get'])),
     # Swagger
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
