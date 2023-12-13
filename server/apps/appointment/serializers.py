@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Doctor, Speciality, Comment, PatientMedicalHistory
+from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Appointment
 
 
 class SpecialitySerializer(serializers.ModelSerializer):
@@ -43,3 +43,9 @@ class MedicalHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PatientMedicalHistory
         fields = ['height', 'weight', 'blood_group', 'blood_pressure']
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['patient_id', 'doctor_id', 'date', 'description', 'status', 'type']

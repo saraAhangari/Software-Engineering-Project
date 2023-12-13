@@ -5,12 +5,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory
+from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
-from .serializers import DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer
+from .serializers import DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer, \
+    AppointmentSerializer
 from ..authentication.permissions import IsNotInBlackedList
 from ..authentication.serializers import PatientSerializer
 
@@ -133,7 +134,7 @@ class CommentPermissionView(generics.CreateAPIView):
 class PatientDetailView(generics.UpdateAPIView):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList]
 
     def get_object(self):
         return self.request.user.patient
@@ -177,3 +178,14 @@ class MedicalHistoryView(generics.CreateAPIView):
             return Response({'message': 'Medical history added successfully'}, status=status.HTTP_201_CREATED)
 
         return Response({'message': 'Invalid user type'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AppointmentDetailView(generics.RetrieveAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated, IsNotInBlackedList]
+
+    def get(self, request):
+        appointment = Appointment.objects.filter(patient_id=request.user.id).first()
+        serializer = AppointmentSerializer(appointment)
+        return Response(serializer.data)
