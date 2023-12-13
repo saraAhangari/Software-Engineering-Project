@@ -163,6 +163,7 @@ class LogoutView(generics.CreateAPIView):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 @extend_schema(tags=['Role'])
 class RoleView(generics.CreateAPIView):
     serializer_class = RoleSerializer

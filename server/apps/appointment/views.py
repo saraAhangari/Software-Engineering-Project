@@ -1,54 +1,38 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory
+from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
-from .serializers import DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer
-from ..authentication.permissions import IsNotInBlackedList
+from .serializers import (DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer,
+                          AppointmentSerializer, AssuranceSerializer)
+from ..authentication.permissions import IsNotInBlackedList, IsPatient
 from ..authentication.serializers import PatientSerializer
 
 
-class AssuranceView(APIView):
-    def post(self, request):
-        name = request.data['name']
-        if name is None:
-            return Response({
-                'ok': False,
-                'message': 'name not found'
-            })
+@extend_schema(tags=['Assurance'])
+class AssuranceView(generics.CreateAPIView):
+    serializer_class = AssuranceSerializer
+    queryset = Assurance.objects.all()
 
-        obj = Assurance.objects.filter(name=name).first()
-        if obj is not None:
-            return Response({
-                'ok': False,
-                'message': 'duplicate name in database'
-            })
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        Assurance.objects.create(name=name).save()
-
-        return Response({
-            'ok': True,
-            'message': 'assurance added'
-        })
+        return Response(serializer.data)
 
     def get(self, request):
-        assurances = []
-        for assurance in Assurance.objects.all():
-            assurances.append({
-                'id': assurance.id,
-                'name': assurance.name
-            })
+        assurances = self.serializer_class(self.queryset.all(), many=True)
 
-        return Response({
-            'assurances': assurances
-        })
+        return Response(assurances.data)
 
     def delete(self, request):
         pass  # TODO
@@ -120,8 +104,9 @@ class GetCommentView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@extend_schema(tags=['Comment'], request=None, responses=None)
 class CommentPermissionView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated, IsPermittedToComment, IsNotInBlackedList]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment, ]
 
     def get(self, request, *args, **kwargs):
         return Response({
@@ -133,7 +118,7 @@ class CommentPermissionView(generics.CreateAPIView):
 class PatientDetailView(generics.UpdateAPIView):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList]
 
     def get_object(self):
         return self.request.user.patient
@@ -153,27 +138,26 @@ class PatientDetailView(generics.UpdateAPIView):
 
 class MedicalHistoryView(generics.CreateAPIView):
     serializer_class = MedicalHistorySerializer
-    permission_classes = [IsAuthenticated, IsNotInBlackedList]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPatient]
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         user = Patient.objects.get(national_id=request.user.national_id)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if user.role.name == "patient":
-            height = request.data.get('height')
-            weight = request.data.get('weight')
-            blood_group = request.data.get('blood_group')
-            blood_pressure = request.data.get('blood_pressure')
-
-            medical_history = PatientMedicalHistory.objects.create(
-                height=height,
-                weight=weight,
-                blood_group=blood_group,
-                blood_pressure=blood_pressure,
-            )
-
-            user.medical_history = medical_history
-            user.save()
-
-            return Response({'message': 'Medical history added successfully'}, status=status.HTTP_201_CREATED)
+        medical_history = serializer.save()
+        user.medical_history = medical_history
+        user.save()
 
         return Response({'message': 'Invalid user type'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AppointmentDetailView(generics.RetrieveAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated, IsNotInBlackedList]
+
+    def get(self, request):
+        appointment = Appointment.objects.filter(patient_id=request.user.id).first()
+        serializer = AppointmentSerializer(appointment)
+        return Response(serializer.data)
