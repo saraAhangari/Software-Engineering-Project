@@ -1,11 +1,18 @@
 import React, {cloneElement, useEffect, useRef, useState} from "react";
-import {AppBar, Button, Toolbar} from "@mui/material";
+import {AppBar, Button, IconButton, Toolbar, useTheme} from "@mui/material";
+import ICON_HOME from "../../assets/images/icon_home.svg";
+import ICON_LOGOUT from "../../assets/images/icon_logout.svg";
+import ICON_PROFILE from "../../assets/images/icon_profile_circled.svg"
+import {useNavigate} from "react-router-dom";
+import DEFAULT_BACKGROUND from "../../assets/images/main_background.png";
 
 function MainTemplate(
     {
         children,
         buttonTitle = undefined,
         onButtonClicked = () => {},
+        showDefaultBackground = true,
+        hasLoggedIn = false, // TODO: read from current state
     }
 ) {
     const ref = useRef(null);
@@ -15,8 +22,29 @@ function MainTemplate(
         setHeight(ref.current.clientHeight)
     })
 
+    const theme = useTheme();
+    const navigation = useNavigate()
+
+    function navigateToHome() {
+        navigation('/')
+    }
+
+    function navigateToProfile() {
+        navigation('/patient-panel')
+    }
+
+    function logout() {
+        // TODO: logout
+    }
+
     return (
-        <div className={'template'}>
+        <div className={'template'}
+             style={
+                 {
+                     backgroundImage: `url(${showDefaultBackground && DEFAULT_BACKGROUND})`
+                 }
+             }
+        >
             <div className={'template__gray-filter'}>
                 <div
                     className={'container'}
@@ -28,7 +56,35 @@ function MainTemplate(
                 >
                     <AppBar ref={ref} className={'appbar'}>
                         <Toolbar className={'toolbar'}>
-                            {buttonTitle && <Button className={'button'} onClick={onButtonClicked}>{buttonTitle}</Button>}
+                            <IconButton onClick={navigateToHome}>
+                                <img className={'toolbar__icon'}
+                                     src={ICON_HOME}
+                                />
+                            </IconButton>
+                            <div className={'toolbar__icon-spacer'}/>
+                            {
+                                hasLoggedIn ? (
+                                    <>
+                                        <IconButton onClick={navigateToProfile}>
+                                            <img className={'toolbar__icon'}
+                                                 src={ICON_PROFILE}
+                                            />
+                                        </IconButton>
+                                        <div
+                                            className={'toolbar__icon-divider'}
+                                            style={{backgroundColor: theme.palette.divider}}
+                                        />
+                                        <IconButton onClick={logout}>
+                                            <img className={'toolbar__icon'}
+                                                 src={ICON_LOGOUT}
+                                            />
+                                        </IconButton>
+                                    </>
+                                ) : (
+                                    buttonTitle && <Button className={'toolbar__button'}
+                                                           onClick={onButtonClicked}>{buttonTitle}</Button>
+                                )
+                            }
                         </Toolbar>
                     </AppBar>
                     {

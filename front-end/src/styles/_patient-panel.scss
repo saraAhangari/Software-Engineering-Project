@@ -1,0 +1,35 @@
+.patient-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 20px;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+
+  .searchbar {
+    max-width: min(100%, 900px);
+    margin-bottom: 20px;
+  }
+
+  &__item {
+    $item_horizontal_margin: 20px;
+
+    width: calc(100% - #{$item_horizontal_margin} * 2);
+    max-width: min(100%, 700px);
+    display: flex;
+    flex-direction: row;
+    margin: 0 $item_horizontal_margin;
+
+    img {
+      width: 24px;
+      height: 24px;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+}

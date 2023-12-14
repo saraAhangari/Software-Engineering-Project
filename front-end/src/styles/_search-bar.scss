@@ -4,8 +4,7 @@
   display: flex;
   height: fit-content;
   flex-direction: row;
-  border-radius: 111px;
-  border: 1px solid black;
+  border-radius: 20px;
   background: white;
   align-items: center;
   justify-content: right;
@@ -13,8 +12,8 @@
   column-gap: 20px;
 
   &__icon {
-    width: 100px;
-    height: 100px;
+    width: 40px;
+    height: 40px;
   }
 
   &__input-bar {

@@ -181,8 +181,7 @@ html, body, #root {
   display: flex;
   height: fit-content;
   flex-direction: row;
-  border-radius: 111px;
-  border: 1px solid black;
+  border-radius: 20px;
   background: white;
   align-items: center;
   justify-content: right;
@@ -190,8 +189,8 @@ html, body, #root {
   column-gap: 20px;
 }
 .searchbar__icon {
-  width: 100px;
-  height: 100px;
+  width: 40px;
+  height: 40px;
 }
 .searchbar__input-bar {
   flex-grow: 1;
@@ -258,7 +257,6 @@ html, body, #root {
   background-size: cover;
   background-position: center 40px;
   background-repeat: no-repeat;
-  background-image: url("../assets/images/main_background.png");
 }
 .template__gray-filter {
   width: 100%;
@@ -278,9 +276,9 @@ html, body, #root {
   height: fit-content;
 }
 .template__gray-filter .container .appbar .toolbar {
-  justify-content: left;
+  display: flex;
 }
-.template__gray-filter .container .appbar .toolbar .button {
+.template__gray-filter .container .appbar .toolbar__button {
   color: black;
   padding: 9px 25px;
   width: fit-content;
@@ -291,6 +289,48 @@ html, body, #root {
   border-radius: 5px;
   background: var(--gray1, #D9D9D9);
 }
+.template__gray-filter .container .appbar .toolbar__icon-spacer {
+  flex-grow: 1;
+}
+.template__gray-filter .container .appbar .toolbar__icon-divider {
+  width: 2px;
+  height: 30px;
+  margin: 0 10px;
+}
+.template__gray-filter .container .appbar .toolbar__icon {
+  width: 30px;
+  height: 30px;
+}
+.patient-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 20px;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+.patient-panel .searchbar {
+  max-width: min(100%, 900px);
+  margin-bottom: 20px;
+}
+.patient-panel__item {
+  width: calc(100% - 20px * 2);
+  max-width: min(100%, 700px);
+  display: flex;
+  flex-direction: row;
+  margin: 0 20px;
+}
+.patient-panel__item img {
+  width: 24px;
+  height: 24px;
+}
+.patient-panel__item p {
+  font-size: 1rem;
+}
+
 * {
   font-family: "IRYekan", sans-serif;
 }

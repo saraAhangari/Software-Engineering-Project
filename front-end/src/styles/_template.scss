@@ -5,7 +5,6 @@
   background-size: cover;
   background-position: center 40px;
   background-repeat: no-repeat;
-  background-image: url("../assets/images/main_background.png");
 
   &__gray-filter {
     width: 100%;
@@ -25,9 +24,9 @@
         height: fit-content;
 
         .toolbar {
-          justify-content: left;
+          display: flex;
 
-          .button {
+          &__button {
             color: black;     // TODO: replace with the corresponding attribute in the theme
             padding: 9px 25px;
             width: fit-content;
@@ -37,6 +36,21 @@
             line-height: normal;
             border-radius: 5px;
             background: var(--gray1, #D9D9D9);
+          }
+
+          &__icon-spacer {
+            flex-grow: 1;
+          }
+
+          &__icon-divider {
+            width: 2px;
+            height: 30px;
+            margin: 0 10px;
+          }
+
+          &__icon {
+            width: 30px;
+            height: 30px;
           }
         }
       }

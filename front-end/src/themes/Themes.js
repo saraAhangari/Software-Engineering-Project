@@ -18,6 +18,9 @@ const lightTheme = {
         divider: "#385399",
     },
     direction: "rtl",
+    shape: {
+        borderRadius: '15px',
+    }
 }
 
 const darkTheme = {
