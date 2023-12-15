@@ -85,7 +85,7 @@ class MedicineAdmin(ImportExportModelAdmin):
 
 @admin.register(Appointment)
 class AppointmentAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'patient_id', 'doctor_id', 'date', 'description', 'status', 'type')
+    list_display = ('id', 'patient_id', 'doctor_id', 'description', 'status', 'type')
     search_fields = ('type', 'status')
     list_per_page = 25
     list_filter = ('type', 'status')
@@ -126,7 +126,7 @@ class DoctorTimeAdmin(admin.ModelAdmin):
 
 @admin.register(AppointmentTime)
 class AppointmentTimeAdmin(admin.ModelAdmin):
-    list_display = ('appointment_id',)
+    # list_display = ('appointment_id',)
 
     class Meta:
         model = AppointmentTime

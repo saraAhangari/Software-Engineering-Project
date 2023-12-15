@@ -1,3 +1,6 @@
+import datetime
+
+import django
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from apps.authentication.models import User
@@ -30,15 +33,25 @@ class Doctor(User):
 
 
 class TimeSlice(models.Model):
-    date = models.DateField(null=True)
-    start = models.TimeField(null=True)
-    end = models.TimeField(null=True)
+    date = models.DateField(default=datetime.date.today)
+    start = models.IntegerField(default=-1)
+    end = models.IntegerField(default=-1)
     TIME_STATUS = [
         ('available', 'available'),
         ('unavailable', 'unavailable')
     ]
 
     status = models.CharField(choices=TIME_STATUS, default='unavailable')
+
+
+class AppointmentTime(TimeSlice):
+    # appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name="appointment_times")
+
+    class Meta:
+        verbose_name_plural = 'appointment times'
+
+    def __str__(self):
+        return f'{self.id}'
 
 
 class Assurance(models.Model):
@@ -104,10 +117,11 @@ class Appointment(models.Model):
     ]
     patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
     doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=False)
     description = models.TextField(null=True, blank=True)
     status = models.CharField(choices=APPOINTMENT_STATUS, default='canceled')
     type = models.CharField(choices=APPOINTMENT_TYPE, default='online')
+    appointment_time = models.ForeignKey(AppointmentTime, on_delete=models.CASCADE, related_name='appointments',
+                                         default=-1)
 
     def __str__(self):
         return f'{self.id} - {self.type}'
@@ -145,16 +159,6 @@ class DoctorTime(TimeSlice):
 
     class Meta:
         verbose_name_plural = 'doctor times'
-
-    def __str__(self):
-        return f'{self.id}'
-
-
-class AppointmentTime(TimeSlice):
-    appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name="appointment_times")
-
-    class Meta:
-        verbose_name_plural = 'appointment times'
 
     def __str__(self):
         return f'{self.id}'
