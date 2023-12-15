@@ -11,32 +11,17 @@ paths:
       - jwtAuth: []
       responses:
         '200':
-<<<<<<< HEAD
-          description: No response body
-=======
           description: get message
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/assurance:
     get:
       operationId: api_v1_assurance_retrieve
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Assurance
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
         '200':
-<<<<<<< HEAD
-          description: No response body
-    post:
-      operationId: api_v1_assurance_create
-      tags:
-      - api
-=======
           content:
             application/json:
               schema:
@@ -58,19 +43,10 @@ paths:
             schema:
               $ref: '#/components/schemas/Assurance'
         required: true
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
-<<<<<<< HEAD
-        '200':
-          description: No response body
-    delete:
-      operationId: api_v1_assurance_destroy
-      tags:
-      - api
-=======
         '201':
           content:
             application/json:
@@ -81,7 +57,6 @@ paths:
       operationId: api_v1_assurance_destroy
       tags:
       - Assurance
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -130,11 +105,7 @@ paths:
           type: integer
         required: true
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Comment
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       responses:
@@ -149,11 +120,7 @@ paths:
           type: integer
         required: true
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Comment
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       responses:
@@ -251,9 +218,6 @@ paths:
     post:
       operationId: api_v1_get_token_create
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Authentication
       requestBody:
         content:
@@ -267,29 +231,20 @@ paths:
             schema:
               $ref: '#/components/schemas/GetToken'
         required: true
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
-<<<<<<< HEAD
-        '200':
-          description: No response body
-=======
         '201':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetToken'
           description: ''
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/login:
     post:
       operationId: api_v1_login_create
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Authentication
       requestBody:
         content:
@@ -303,42 +258,42 @@ paths:
             schema:
               $ref: '#/components/schemas/Login'
         required: true
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
-<<<<<<< HEAD
-        '200':
-          description: No response body
-=======
         '201':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Login'
           description: ''
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/logout:
     post:
       operationId: api_v1_logout_create
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Authentication
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       responses:
         '201':
-<<<<<<< HEAD
-          description: No response body
-=======
           description: user logged out successfully
         '400':
           description: login first
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
+  /api/v1/patient/appointment:
+    get:
+      operationId: api_v1_patient_appointment_retrieve
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
   /api/v1/patient/medical_history:
     post:
       operationId: api_v1_patient_medical_history_create
@@ -355,7 +310,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/MedicalHistory'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -432,9 +386,6 @@ paths:
     post:
       operationId: api_v1_register_create
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Authentication
       requestBody:
         content:
@@ -448,31 +399,21 @@ paths:
             schema:
               $ref: '#/components/schemas/Patient'
         required: true
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
-<<<<<<< HEAD
-        '200':
-          description: No response body
-=======
         '201':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Patient'
           description: ''
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
   /api/v1/role:
     get:
       operationId: api_v1_role_retrieve
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Role
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -486,11 +427,7 @@ paths:
     post:
       operationId: api_v1_role_create
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Role
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       requestBody:
         content:
           application/json:
@@ -523,9 +460,6 @@ paths:
           type: integer
         required: true
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Role
       security:
       - jwtAuth: []
@@ -559,7 +493,6 @@ paths:
             schema:
               $ref: '#/components/schemas/Role'
         required: true
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -579,11 +512,7 @@ paths:
           type: integer
         required: true
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Role
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
@@ -594,9 +523,6 @@ paths:
     post:
       operationId: api_v1_validate_create
       tags:
-<<<<<<< HEAD
-      - api
-=======
       - Authentication
       requestBody:
         content:
@@ -610,17 +536,10 @@ paths:
             schema:
               $ref: '#/components/schemas/Patient'
         required: true
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
       security:
       - jwtAuth: []
       - {}
       responses:
-<<<<<<< HEAD
-        '200':
-          description: No response body
-components:
-  schemas:
-=======
         '201':
           content:
             application/json:
@@ -629,6 +548,27 @@ components:
           description: ''
 components:
   schemas:
+    Appointment:
+      type: object
+      properties:
+        patient_id:
+          type: integer
+        doctor_id:
+          type: integer
+        date:
+          type: string
+          format: date-time
+        description:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+      required:
+      - date
+      - doctor_id
+      - patient_id
     Assurance:
       type: object
       properties:
@@ -641,7 +581,9 @@ components:
       required:
       - id
       - name
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
+    BlankEnum:
+      enum:
+      - ''
     BloodGroupEnum:
       enum:
       - A+
@@ -754,9 +696,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         speciality:
-          type: array
-          items:
-            $ref: '#/components/schemas/Speciality'
+          $ref: '#/components/schemas/Speciality'
         phone_no:
           type: string
           maxLength: 11
@@ -781,8 +721,6 @@ components:
       description: |-
         * `m` - male
         * `f` - female
-<<<<<<< HEAD
-=======
     GetToken:
       type: object
       properties:
@@ -803,27 +741,36 @@ components:
           maxLength: 10
       required:
       - national_id
->>>>>>> 791ec22bb10f71f35050beb2f812b59fc46d3130
     MedicalHistory:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         height:
           type: number
           format: double
+          nullable: true
         weight:
           type: number
           format: double
+          nullable: true
         blood_group:
-          $ref: '#/components/schemas/BloodGroupEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/BloodGroupEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         blood_pressure:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
+          nullable: true
       required:
-      - blood_group
-      - blood_pressure
-      - height
-      - weight
+      - id
+    NullEnum:
+      enum:
+      - null
     PaginatedDoctorListList:
       type: object
       properties:
@@ -931,6 +878,24 @@ components:
       required:
       - id
       - name
+    StatusEnum:
+      enum:
+      - completed
+      - canceled
+      - reserved
+      type: string
+      description: |-
+        * `completed` - completed
+        * `canceled` - canceled
+        * `reserved` - reserved
+    TypeEnum:
+      enum:
+      - face to face
+      - online
+      type: string
+      description: |-
+        * `face to face` - face to face
+        * `online` - online
   securitySchemes:
     jwtAuth:
       type: http
