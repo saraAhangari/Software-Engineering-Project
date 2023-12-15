@@ -1,5 +1,5 @@
 import React, {cloneElement, useEffect, useRef, useState} from "react";
-import {AppBar, Button, IconButton, Toolbar, useTheme} from "@mui/material";
+import {AppBar, Button, Divider, IconButton, Menu, MenuItem, Toolbar, useTheme} from "@mui/material";
 import ICON_HOME from "../../assets/images/icon_home.svg";
 import ICON_LOGOUT from "../../assets/images/icon_logout.svg";
 import ICON_PROFILE from "../../assets/images/icon_profile_circled.svg"
@@ -23,6 +23,9 @@ function MainTemplate(
         setHeight(ref.current.clientHeight)
     })
 
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+
     const theme = useTheme();
     const navigation = useNavigate()
 
@@ -30,8 +33,19 @@ function MainTemplate(
         navigation('/')
     }
 
-    function navigateToProfile() {
-        navigation('/patient-panel')
+    function handleProfileIconClick(event) {
+        setAnchorEl(event.currentTarget);
+        setIsMenuOpen(true);
+    }
+
+    function handleMenuItemClick(item) {
+        // TODO: handle action based on item
+        setAnchorEl(null);
+        setIsMenuOpen(false);
+    }
+
+    function handleCloseMenu() {
+        setIsMenuOpen(false);
     }
 
     function logout() {
@@ -67,7 +81,7 @@ function MainTemplate(
                         {
                             hasLoggedIn ? (
                                 <>
-                                    <IconButton onClick={navigateToProfile}>
+                                    <IconButton onClick={handleProfileIconClick}>
                                         <img className={'toolbar__icon'}
                                              src={ICON_PROFILE}
                                         />
@@ -88,6 +102,30 @@ function MainTemplate(
                             )
                         }
                     </Toolbar>
+
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={isMenuOpen}
+                        onClose={handleCloseMenu}
+                        sx={
+                            {
+                                "& .MuiMenu-paper": {
+                                    padding: '0',
+                                    borderRadius: '5px',
+                                }
+                            }
+                        }
+                    >
+                        <MenuItem>اسم کاربر</MenuItem>
+                        <Divider
+                            style={
+                                {
+                                    margin: '0',
+                                }
+                            }
+                        />
+                        <MenuItem onClick={handleMenuItemClick}>پروفایل</MenuItem>
+                    </Menu>
                 </AppBar>
                 {
                     children && cloneElement(
