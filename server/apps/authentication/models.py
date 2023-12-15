@@ -20,7 +20,6 @@ class User(AbstractUser):
         MinLengthValidator(limit_value=10, message="National ID should be exactly 10 characters.")
     ])
     phone_no = models.CharField(max_length=11, unique=True)
-    # TODO:
     # phone_no = models.CharField(max_length=11, unique=True, validators=[
     #     MaxLengthValidator(limit_value=11, message="Phone Number should be exactly 11 characters."),
     #     MinLengthValidator(limit_value=11, message="Phone Number should be exactly 11 characters.")
