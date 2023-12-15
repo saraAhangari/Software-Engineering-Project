@@ -96,7 +96,7 @@ class AppointmentAdmin(ImportExportModelAdmin):
 
 @admin.register(Prescription)
 class PrescriptionAdmin(ImportExportModelAdmin):
-    list_display = ('description', 'is_expired', 'date')
+    list_display = ('appointment_id', 'description', 'is_expired', 'date')
     list_filter = ('is_expired', 'date')
     ordering = ('-date',)
     list_per_page = 25

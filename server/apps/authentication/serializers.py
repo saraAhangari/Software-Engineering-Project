@@ -2,24 +2,35 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import Role
 from apps.appointment.models import Patient
-from apps.appointment.serializers import MedicalHistorySerializer
+from apps.appointment.serializers import MedicalHistorySerializer, AppointmentSerializer
 
 
 class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer()
+    appointments = AppointmentSerializer(many=True, read_only=True)
 
     def get_medical_history(self, obj):
         return MedicalHistorySerializer(obj.medical_history.all()).data
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        appointments_data = representation.get('appointments', [])
+        completed_appointments = [appt for appt in appointments_data if appt.get('status') == 'completed']
+        representation['appointments'] = completed_appointments
+
+        return representation
 
     class Meta:
         model = Patient
         fields = ['id', 'first_name', 'last_name', 'national_id',
                   'phone_no', 'birthdate', 'assurance', 'gender',
-                  'medical_history'
+                  'medical_history', 'appointments'
                   ]
 
     def create(self, validated_data):
         validated_data.pop('medical_history', [])
+        validated_data.pop('appointments', [])
         patient = Patient.objects.create(**validated_data)
         patient.role = Role.objects.filter(name='patient').first()
         patient.username = patient.national_id
@@ -47,8 +58,19 @@ class PatientSerializer(serializers.ModelSerializer):
                                                                               patient.medical_history.blood_pressure)
             patient.medical_history.save()
 
-        patient.save()
-        return patient
+        representation = {
+            'id': patient.id,
+            'first_name': patient.first_name,
+            'last_name': patient.last_name,
+            'national_id': patient.national_id,
+            'phone_no': patient.phone_no,
+            'birthdate': patient.birthdate,
+            'assurance': patient.assurance,
+            'gender': patient.gender,
+            'medical_history': MedicalHistorySerializer(patient.medical_history).data,
+        }
+
+        return representation
 
 
 class LoginSerializer(serializers.Serializer):
