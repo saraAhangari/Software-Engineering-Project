@@ -5,6 +5,7 @@ import Login from "../pages/authentication/Login";
 import SignUp from "../pages/authentication/SignUp";
 import PatientPanel from "../pages/patient-panel/PatientPanel";
 import AllDoctors from "../pages/all-doctors/AllDoctors";
+import DoctorInfo from "../pages/doctor-info/DoctorInfo";
 
 function Router() {
     return (
@@ -15,6 +16,7 @@ function Router() {
                 <Route path='/signup' element={<SignUp />} />
                 <Route path='/patient-panel/:patient_id?' element={<PatientPanel />} />
                 <Route path='/all-doctors' element={<AllDoctors />} />
+                <Route path='/doctor-info/:doctor_id?' element={<DoctorInfo />} />
             </Routes>
         </BrowserRouter>
     )

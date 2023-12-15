@@ -13,6 +13,7 @@ function MainTemplate(
         onButtonClicked = () => {},
         showDefaultBackground = true,
         hasLoggedIn = false, // TODO: read from current state
+        style = {},
     }
 ) {
     const ref = useRef(null);

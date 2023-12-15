@@ -3,22 +3,26 @@ import {Avatar, ListItemButton, useTheme} from "@mui/material";
 import PrimaryButton from "../button/PrimaryButton";
 
 function Doctor(props) {
-    const {name, expertise, imagePath, buttonTitle, onItemClicked, maxWidth} = props;
+    const {id, name, expertise, imagePath, buttonTitle, onItemClicked, maxWidth, style} = props;
     const theme = useTheme();
 
     return (
         <ListItemButton
+            key={id}
             style={
                 {
+                    flex: '0',
                     width: '100%',
                     display: 'flex',
                     padding: '15px',
                     columnGap: '15px',
                     flexDirection: 'row',
+                    height: 'fit-content',
                     backgroundColor: '#fff',
                     maxWidth: `min(100%, ${maxWidth ? maxWidth : '450px'})`,
                     borderRadius: theme.shape.borderRadius,
                     boxShadow: '0 4px 4px 0 rgba(0, 0, 0, 0.25)',
+                    ...style,
                 }
             }
         >
