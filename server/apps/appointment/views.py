@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
@@ -157,7 +159,20 @@ class AppointmentDetailView(generics.RetrieveAPIView):
     serializer_class = AppointmentSerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList]
 
-    def get(self, request):
-        appointment = Appointment.objects.filter(patient_id=request.user.id).first()
-        serializer = AppointmentSerializer(appointment)
-        return Response(serializer.data)
+    def get(self, request, *args, **kwargs):
+        appointments = Appointment.objects.filter(patient_id=request.user.id)
+        serializer = AppointmentSerializer(appointments, many=True)
+        data = serializer.data
+
+        for appointment_data in data:
+            date_time_str = appointment_data['date']
+            date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%SZ")
+
+            appointment_data['date'] = date_time_obj.date().isoformat()
+            appointment_data['time'] = date_time_obj.time().isoformat()
+
+            doctor_id = appointment_data['doctor_id']
+            doctor = Doctor.objects.get(id=doctor_id)
+            appointment_data['doctor_full_name'] = f"{doctor.first_name} {doctor.last_name}"
+
+        return Response(data, status=status.HTTP_200_OK)
