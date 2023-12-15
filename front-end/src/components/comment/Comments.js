@@ -3,13 +3,14 @@ import Comment from "./Comment";
 import {useTheme} from "@mui/material";
 
 function Comments(props) {
-    const {comments, style} = props;
+    const {title, comments, style} = props;
     const theme = useTheme();
 
     return (
         <div
             style={
                 {
+                    flex: '0',
                     alignSelf: 'center',
                     display: 'flex',
                     padding: '20px 40px',
@@ -26,11 +27,11 @@ function Comments(props) {
             <p
                 style={
                     {
-                        fontSize: '0.75rem',
+                        fontSize: '1.25rem',
                         fontWeight: 'bold',
                     }
                 }
-            >نظرات</p>
+            >{title}</p>
 
             <div
                 style={
@@ -51,6 +52,7 @@ function Comments(props) {
                                 rate={comment.rate}
                                 date={comment.date}
                                 content={comment.content}
+                                doctorName={comment.doctorName}
                             />
                             {
                                 (index < comments.length - 1) && <div

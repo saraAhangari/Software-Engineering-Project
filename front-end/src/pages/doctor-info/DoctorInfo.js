@@ -4,7 +4,7 @@ import MainTemplate from "../../components/container/MainTemplate";
 import Doctor from "../../components/doctor/Doctor";
 import Biography from "../../components/doctor/Biography";
 import AppointmentChooser from "../../components/doctor/AppointmentChooser";
-import Comments from "../../components/doctor/Comments";
+import Comments from "../../components/comment/Comments";
 
 function DoctorInfo(props) {
     const {doctor_id} = useParams();
@@ -143,7 +143,10 @@ function DoctorInfo(props) {
                     />
                 </div>
 
-                <Comments comments={comments}/>
+                <Comments
+                    title={'نظرات'}
+                    comments={comments}
+                />
             </div>
         </MainTemplate>
     )

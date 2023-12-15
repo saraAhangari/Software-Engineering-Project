@@ -1,4 +1,5 @@
 import React from "react";
+import {ReactComponent as CalendarLogo} from "../../assets/images/icon_calendar.svg";
 
 function Rating(props) {
     const {rate} = props;
@@ -45,7 +46,9 @@ function getRatingColor(rate) {
 }
 
 function Comment(props) {
-    const {date, content, rate, style} = props;
+    const {date, content, rate, doctorName, style} = props;
+
+    const hasDoctorName = doctorName !== undefined;
 
     return (
         <div
@@ -60,7 +63,32 @@ function Comment(props) {
                 }
             }
         >
+            {
+                hasDoctorName && <p
+                    style={
+                        {
+                            color: 'black',
+                            flexGrow: '1',
+                            fontSize: '0.95rem',
+                        }
+                    }
+                >{doctorName}</p>
+            }
             <Rating rate={rate}/>
+            {
+                hasDoctorName && <div style={ { flexBasis: '100%', height: '0' } } />
+            }
+            {
+                hasDoctorName && <CalendarLogo
+                    style={
+                        {
+                            width: '20px',
+                            height: '20px',
+                            stroke: '#D9D9D9', //TODO: stroke doesnt work :(
+                        }
+                    }
+                />
+            }
             <p
                 style={
                     {
@@ -75,7 +103,7 @@ function Comment(props) {
                         color: 'black',
                         flexBasis: '100%',
                         fontSize: '0.85rem',
-                        marginRight: '50px',
+                        marginRight: hasDoctorName ? '0' : '50px',
                     }
                 }
             >{content}</p>

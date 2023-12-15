@@ -66,7 +66,8 @@ function MainTemplate(
                 className={'container'}
                 style={
                     {
-                        paddingTop: height,
+                        ...style,
+                        paddingTop: height + (style.paddingTop ? style.paddingTop : 0),
                     }
                 }
             >
