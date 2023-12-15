@@ -8,15 +8,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment
+from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment, DoctorTime
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
 from .serializers import (DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer,
-                          AppointmentSerializer, AssuranceSerializer)
-from ..authentication.permissions import IsNotInBlackedList, IsPatient
+                          AppointmentSerializer, AssuranceSerializer, TimeSliceListSerializer)
+from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer
+from .utils import split_datetime, time_to_minutes, minutes_to_time
 
 
 @extend_schema(tags=['Assurance'])
@@ -176,3 +177,42 @@ class AppointmentDetailView(generics.RetrieveAPIView):
             appointment_data['doctor_full_name'] = f"{doctor.first_name} {doctor.last_name}"
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=['timeSlice'])
+class DoctorTimeSliceView(generics.CreateAPIView):
+    serializer_class = TimeSliceListSerializer
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        available_time_slices = serializer.data.get('available_time_slices')
+
+        for available_time_slice in available_time_slices:
+            start_data, start_time = split_datetime(available_time_slice['start'])
+            end_date, end_time = split_datetime(available_time_slice['end'])
+
+            if start_data != end_date:
+                # TODO
+                return Response({'ok': False, 'message': 'start time and end time not equal'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            doctor = Doctor.objects.get(user_ptr_id=request.user.id)
+            DoctorTime.objects.get_or_create(doctor_id=doctor,
+                                             date=start_data,
+                                             start=time_to_minutes(start_time),
+                                             end=time_to_minutes(end_time),
+                                             status='available')
+
+        return Response({'ok': True, 'message': 'saved successfully'})
+
+
+class TimeSliceView(generics.CreateAPIView):
+    serializer_class = TimeSliceListSerializer
+
+    def get(self, request,  doctor_id, *args, **kwargs):
+        pass
+
+

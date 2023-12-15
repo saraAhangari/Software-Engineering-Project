@@ -126,6 +126,7 @@ class GetTokenView(generics.CreateAPIView):
         access = str(refresh.access_token)
 
         response.data = {
+            'national_id': user_national_id,
             'refresh_token': str(refresh),
             'access_token': access
         }

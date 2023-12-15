@@ -63,3 +63,12 @@ class AssuranceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assurance
         fields = '__all__'
+
+
+class TimeSliceSerializer(serializers.Serializer):
+    start = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    end = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+
+
+class TimeSliceListSerializer(serializers.Serializer):
+    available_time_slices = serializers.ListField(child=TimeSliceSerializer())
