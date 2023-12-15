@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Assurance, Appointment
 
 
-
 class SpecialitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Speciality
@@ -29,7 +28,7 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 
 class DoctorListSerializer(serializers.ModelSerializer):
-    speciality = SpecialitySerializer(many=True)
+    speciality = SpecialitySerializer()
 
     def get_speciality(self, obj):
         return SpecialitySerializer(obj.speciality.all(), many=True).data

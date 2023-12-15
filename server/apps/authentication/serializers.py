@@ -9,20 +9,22 @@ class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer()
 
     def get_medical_history(self, obj):
-        return MedicalHistorySerializer(obj.mediaclHistory.all()).data
+        return MedicalHistorySerializer(obj.medical_history.all()).data
 
     class Meta:
         model = Patient
         fields = ['id', 'first_name', 'last_name', 'national_id',
                   'phone_no', 'birthdate', 'assurance', 'gender',
-                  'medical_history']
+                  'medical_history'
+                  ]
 
     def create(self, validated_data):
-        patient = self.Meta.model(**validated_data)
+        validated_data.pop('medical_history', [])
+        patient = Patient.objects.create(**validated_data)
         patient.role = Role.objects.filter(name='patient').first()
         patient.username = patient.national_id
-
         patient.save()
+
         return patient
 
     def update(self, patient, validated_data):
@@ -100,4 +102,3 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
-
