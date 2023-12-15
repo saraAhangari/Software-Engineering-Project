@@ -1,10 +1,8 @@
 from django.core.cache import cache
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from apps.appointment.models import Patient
+from apps.appointment.models import User
 from .models import Role
 from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer
 from .utils import send_otp
@@ -12,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsNotInBlackedList
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, extend_schema_serializer, OpenApiResponse, OpenApiRequest
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
 @extend_schema(tags=['Authentication'])
@@ -28,7 +26,7 @@ class PatientValidationView(generics.CreateAPIView):
             return Response({
                 'ok': False,
                 'message': 'otp has already been sent.'
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         # send the otp and cache it in redis
         send_otp(user_phone_no)
@@ -36,7 +34,7 @@ class PatientValidationView(generics.CreateAPIView):
         return Response({
             'ok': True,
             'message': 'otp sent to the user'
-        }, status=200)
+        }, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['Authentication'])
@@ -55,19 +53,19 @@ class RegisterView(generics.CreateAPIView):
             return Response({
                 'ok': False,
                 'message': 'otp not provided'
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp is None:
             return Response({
                 'ok': False,
                 'message': 'first call get otp function'
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if int(user_otp) != int(valid_otp):
             return Response({
                 'ok': False,
                 'message': 'otp is not correct'
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data)
@@ -80,18 +78,20 @@ class LoginView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = Patient.objects.get(national_id=serializer.data['national_id'])
+
+        user_national_id = serializer.data['national_id']
+        user = User.objects.get(national_id=user_national_id)
 
         if not send_otp(user.phone_no):
             return Response({
                 'ok': False,
                 'message': 'cant send otp'
-            })
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         return Response({
             'ok': True,
             'message': 'otp sent to the user'
-        })
+        }, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['Authentication'])
@@ -102,27 +102,27 @@ class GetTokenView(generics.CreateAPIView):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        national_id = serializer.data['national_id']
+        user_national_id = serializer.data['national_id']
         user_otp = int(serializer.data['otp'])
 
-        patient = Patient.objects.filter(national_id=national_id).first()
-        valid_otp = cache.get(patient.phone_no)
+        user = User.objects.filter(national_id=user_national_id).first()
+        valid_otp = cache.get(user.phone_no)
 
         if valid_otp is None:
             return Response({
                 'ok': False,
                 'message': 'login first'
-            })
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp != user_otp:
             return Response({
                 'ok': False,
                 'message': 'otp is not correct'
-            })
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         response = Response()
 
-        refresh = RefreshToken.for_user(patient)
+        refresh = RefreshToken.for_user(user)
         access = str(refresh.access_token)
 
         response.data = {
@@ -150,18 +150,17 @@ class LogoutView(generics.CreateAPIView):
                     'message': 'login first'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            cache.set(token, True, 5 * 24 * 60 * 60)
+            cache.set(token, True, 5 * 60)
             return Response({
                 'ok': True,
                 'message': 'user logged out successfully'
-            })
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(e)
             # Handle any exceptions that might occur during the logout process
             return Response({'detail': 'An error occurred during logout.'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @extend_schema(tags=['Role'])

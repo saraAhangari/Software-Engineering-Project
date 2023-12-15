@@ -1,8 +1,10 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import Role
-from apps.appointment.models import Patient
+
 from apps.appointment.serializers import MedicalHistorySerializer, AppointmentSerializer
+from apps.appointment.models import Patient, User
+
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -85,18 +87,17 @@ class LoginSerializer(serializers.Serializer):
         if len(national_id) != 10:
             raise serializers.ValidationError('national_id not valid pattern')
 
-        if Patient.objects.filter(national_id=national_id).first() is None:
+        if User.objects.filter(national_id=national_id).first() is None:
             raise serializers.ValidationError('login first')
 
         return data
-
 
 class GetTokenSerializer(serializers.Serializer):
     national_id = serializers.CharField(max_length=10)
     otp = serializers.CharField(max_length=6)
 
     def validate(self, data):
-        patient = Patient.objects.filter(national_id=data['national_id']).first()
+        user = User.objects.filter(national_id=data['national_id']).first()
 
         if not data['national_id']:
             raise serializers.ValidationError('national_id not provided')
@@ -104,7 +105,7 @@ class GetTokenSerializer(serializers.Serializer):
         if not data['otp']:
             raise serializers.ValidationError('otp not provided')
 
-        if patient is None:
+        if user is None:
             raise serializers.ValidationError('user not found')
 
         return data
