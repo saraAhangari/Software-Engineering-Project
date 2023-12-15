@@ -60,10 +60,10 @@ class PatientMedicalHistory(models.Model):
         ('AB+', 'AB Positive'),
     )
 
-    height = models.FloatField()
-    weight = models.FloatField()
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    blood_pressure = models.IntegerField()
+    height = models.FloatField(blank=True, null=True)
+    weight = models.FloatField(blank=True, null=True)
+    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, default="A+", blank=True, null=True)
+    blood_pressure = models.IntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'medical history'
@@ -75,7 +75,7 @@ class PatientMedicalHistory(models.Model):
 
 class Patient(User):
     assurance = models.ForeignKey(Assurance, on_delete=models.PROTECT, null=True)
-    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.SET_NULL, null=True)
+    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = 'patient'

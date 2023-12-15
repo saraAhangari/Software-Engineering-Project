@@ -74,7 +74,7 @@ class DoctorDetailView(RetrieveAPIView):
 
 class AddCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsPermittedToComment, IsNotInBlackedList]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment]
 
     def create(self, request, doctor_id, *args, **kwargs):
         try:
@@ -149,7 +149,7 @@ class MedicalHistoryView(generics.CreateAPIView):
         user.medical_history = medical_history
         user.save()
 
-        return Response({'message': 'Invalid user type'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'ok': True, 'message': 'medical history saved'}, status=status.HTTP_201_CREATED)
 
 
 class AppointmentDetailView(generics.RetrieveAPIView):

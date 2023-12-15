@@ -17,7 +17,7 @@ urlpatterns = [
 
     # patient
     path('patient/profile', PatientDetailView.as_view(), name='patient-profile'),
-    path('patient/medical_history', MedicalHistoryView.as_view(), name='patient-profile'),
+    path('patient/medical_history', MedicalHistoryView.as_view(), name='patient-medical-history'),
 
     # appointment
     path('patient/appointment', AppointmentDetailView.as_view(), name='patient-appointment')
