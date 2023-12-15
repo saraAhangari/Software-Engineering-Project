@@ -102,7 +102,7 @@ class Appointment(models.Model):
         ('face to face', 'face to face'),
         ('online', 'online')
     ]
-    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
     doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=False)
     description = models.TextField(null=True, blank=True)
@@ -114,7 +114,7 @@ class Appointment(models.Model):
 
 
 class Prescription(models.Model):
-    appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE)
+    appointment_id = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name='prescription')
     description = models.TextField(null=True, blank=True)
     is_expired = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=False)
