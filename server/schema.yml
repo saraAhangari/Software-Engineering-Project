@@ -519,6 +519,33 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/timeslices:
+    post:
+      operationId: api_v1_timeslices_create
+      tags:
+      - timeSlice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSliceList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TimeSliceList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TimeSliceList'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSliceList'
+          description: ''
   /api/v1/validate:
     post:
       operationId: api_v1_validate_create
@@ -565,10 +592,15 @@ components:
           $ref: '#/components/schemas/StatusEnum'
         type:
           $ref: '#/components/schemas/TypeEnum'
+        prescription:
+          allOf:
+          - $ref: '#/components/schemas/Prescription'
+          readOnly: true
       required:
       - date
       - doctor_id
       - patient_id
+      - prescription
     Assurance:
       type: object
       properties:
@@ -636,6 +668,7 @@ components:
         national_id:
           type: string
           maxLength: 10
+          minLength: 10
         description:
           type: string
           nullable: true
@@ -685,6 +718,7 @@ components:
         national_id:
           type: string
           maxLength: 10
+          minLength: 10
         description:
           type: string
           nullable: true
@@ -806,6 +840,7 @@ components:
         national_id:
           type: string
           maxLength: 10
+          minLength: 10
         phone_no:
           type: string
           maxLength: 11
@@ -820,6 +855,11 @@ components:
           $ref: '#/components/schemas/GenderEnum'
         medical_history:
           $ref: '#/components/schemas/MedicalHistory'
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+          readOnly: true
     Patient:
       type: object
       properties:
@@ -835,6 +875,7 @@ components:
         national_id:
           type: string
           maxLength: 10
+          minLength: 10
         phone_no:
           type: string
           maxLength: 11
@@ -849,11 +890,37 @@ components:
           $ref: '#/components/schemas/GenderEnum'
         medical_history:
           $ref: '#/components/schemas/MedicalHistory'
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+          readOnly: true
       required:
+      - appointments
       - id
       - medical_history
       - national_id
       - phone_no
+    Prescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+          nullable: true
+        is_expired:
+          type: boolean
+        date:
+          type: string
+          format: date
+        appointment_id:
+          type: integer
+      required:
+      - appointment_id
+      - date
+      - id
     Role:
       type: object
       properties:
@@ -888,6 +955,27 @@ components:
         * `completed` - completed
         * `canceled` - canceled
         * `reserved` - reserved
+    TimeSlice:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+      required:
+      - end
+      - start
+    TimeSliceList:
+      type: object
+      properties:
+        available_time_slices:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlice'
+      required:
+      - available_time_slices
     TypeEnum:
       enum:
       - face to face
