@@ -14,7 +14,8 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
 from .serializers import (DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer,
-                          AppointmentSerializer, AssuranceSerializer, TimeSliceListSerializer, DateSerializer)
+                          AppointmentDetailSerializer, AssuranceSerializer, TimeSliceListSerializer,
+                          AppointmentSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer
 from .utils import split_datetime, time_to_minutes, minutes_to_time
@@ -157,12 +158,12 @@ class MedicalHistoryView(generics.CreateAPIView):
 
 class AppointmentDetailView(generics.RetrieveAPIView):
     queryset = Appointment.objects.all()
-    serializer_class = AppointmentSerializer
+    serializer_class = AppointmentDetailSerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList]
 
     def get(self, request, *args, **kwargs):
         appointments = Appointment.objects.filter(patient_id=request.user.id)
-        serializer = AppointmentSerializer(appointments, many=True)
+        serializer = AppointmentDetailSerializer(appointments, many=True)
         data = serializer.data
 
         for appointment_data in data:
@@ -212,13 +213,25 @@ class DoctorTimeSliceView(generics.CreateAPIView):
 @extend_schema(tags=['timeSlice'], responses=TimeSliceListSerializer, request=None)
 class TimeSliceView(generics.CreateAPIView):
 
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "date",
-                type=datetime, style="form", explode=False,
-            )
-        ])
+    @staticmethod
+    def is_date_free(doctor: Doctor, requested_date: datetime, start, end):
+        is_time_doctor_free = False
+        is_time_appointment_free = True
+        for av_time in doctor.available_time_slices.filter(date=requested_date):
+            if start >= av_time.start and end <= av_time.end:
+                is_time_doctor_free = True
+
+        for appointment in Appointment.objects.filter(doctor_id=doctor.id,
+                                                      appointment_time__date=requested_date):
+            if (appointment.appointment_time.start <= start < appointment.appointment_time.end
+                    or appointment.appointment_time.start < end <= appointment.appointment_time.end
+                    or (appointment.appointment_time.start == start and appointment.appointment_time.end == end)):
+                is_time_appointment_free = False
+
+        if is_time_appointment_free and is_time_doctor_free:
+            return True
+
+    @extend_schema(parameters=[OpenApiParameter("date", type=datetime, style="form", explode=False, )])
     def get(self, request, doctor_id, *args, **kwargs):
         doctor = Doctor.objects.get(id=doctor_id)
         requested_date = request.GET.get('date')
@@ -228,22 +241,7 @@ class TimeSliceView(generics.CreateAPIView):
             start = minutes
             end = minutes + doctor.slice
 
-            print(start, end)
-
-            is_time_doctor_free = False
-            is_time_appointment_free = True
-            for av_time in doctor.available_time_slices.filter(date=requested_date):
-                if start >= av_time.start and end <= av_time.end:
-                    is_time_doctor_free = True
-
-            for appointment in Appointment.objects.filter(doctor_id=doctor_id,
-                                                          appointment_time__date=requested_date):
-                if (appointment.appointment_time.start <= start < appointment.appointment_time.end
-                        or appointment.appointment_time.start < end <= appointment.appointment_time.end
-                        or (appointment.appointment_time.start == start and appointment.appointment_time.end == end)):
-                    is_time_appointment_free = False
-
-            if is_time_appointment_free and is_time_doctor_free:
+            if self.is_date_free(doctor, requested_date, start, end):
                 available_time_slices.append({
                     'date': requested_date,
                     'start': minutes_to_time(start),
@@ -253,3 +251,42 @@ class TimeSliceView(generics.CreateAPIView):
         return Response({
             'available_time_slices': available_time_slices
         })
+
+
+class AppointmentView(generics.CreateAPIView):
+    serializer_class = AppointmentSerializer
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsPatient)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        doctor = Doctor.objects.get(id=serializer.validated_data.get('doctor_id').id)
+        start_date, start_time = split_datetime(serializer.validated_data.get('appointment_time').get('start'))
+        end_date, end_time = split_datetime(serializer.validated_data.get('appointment_time').get('end'))
+
+        if not TimeSliceView.is_date_free(doctor, start_date, time_to_minutes(start_time), time_to_minutes(end_time)):
+            return Response({'ok': False, 'message': 'the requested time is full'})
+
+        patient = Patient.objects.get(id=request.user.id)
+        appointment_time = TimeSlice.objects.create(
+            date=start_date,
+            start=time_to_minutes(start_time),
+            end=time_to_minutes(end_time),
+            status='unavailable',
+            doctor_id=doctor.id
+        )
+        appointment_time.save()
+
+        appointment = Appointment.objects.create(
+            patient_id=patient,
+            doctor_id=doctor,
+            description=serializer.validated_data.get('description'),
+            status=serializer.validated_data.get('status'),
+            type=serializer.validated_data.get('type'),
+            appointment_time=appointment_time
+        )
+
+        appointment.save()
+
+        return Response(AppointmentDetailSerializer(appointment).data)
