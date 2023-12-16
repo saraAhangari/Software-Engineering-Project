@@ -19,7 +19,7 @@ const lightTheme = {
     },
     direction: "rtl",
     shape: {
-        borderRadius: '15px',
+        borderRadius: 15,
     }
 }
 

@@ -7,7 +7,8 @@ function JalaliDatePicker(
     {
         label,
         views = ['year', 'month', 'day'],
-        onDateChanged = () => {}
+        onDateChanged = () => {},
+        style = {},
     }
 ) {
     return (
@@ -20,6 +21,7 @@ function JalaliDatePicker(
                                 ...TextFieldStyle.sx,
                             },
                         },
+                        ...style,
                     }
                 }
                 label={label}

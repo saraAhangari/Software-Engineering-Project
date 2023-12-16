@@ -133,8 +133,8 @@ function MainTemplate(
                         children,
                         {
                             style: {
+                                flexGrow: 1,
                                 ...children.props.style,
-                                flexGrow: 1
                             }
                         }
                     )

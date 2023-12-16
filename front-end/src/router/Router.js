@@ -7,6 +7,7 @@ import PatientPanel from "../pages/patient-panel/PatientPanel";
 import AllDoctors from "../pages/all-doctors/AllDoctors";
 import DoctorInfo from "../pages/doctor-info/DoctorInfo";
 import MyComments from "../pages/my-comments/MyComments";
+import EditInformation from "../pages/EditInformation";
 
 function Router() {
     return (
@@ -19,6 +20,7 @@ function Router() {
                 <Route path='/all-doctors' element={<AllDoctors />} />
                 <Route path='/doctor-info/:doctor_id?' element={<DoctorInfo />} />
                 <Route path='/my-comments' element={<MyComments />} />
+                <Route path='/edit-information' element={<EditInformation />} />
             </Routes>
         </BrowserRouter>
     )

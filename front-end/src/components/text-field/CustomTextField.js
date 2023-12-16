@@ -13,12 +13,16 @@ function CustomTextFiled(
         variant = 'outlined',
         errorMessage = undefined,
         inputProps = undefined,
+        disabled = false,
+        defaultValue = undefined,
     }
 ) {
     return (
         <TextField className={'text-field'}
+                   disabled={disabled}
                    type={type}
                    name={name}
+                   defaultValue={defaultValue}
                    label={label}
                    error={errorMessage}
                    helperText={<span>{errorMessage}</span>}

@@ -7,6 +7,8 @@ function Selector(
         name,
         menuItems,
         onValueChanged = () => {},
+        style = {},
+        defaultValue = undefined,
     }
 ) {
     const [value, setValue] = useState();
@@ -18,7 +20,7 @@ function Selector(
     }
 
     return (
-        <FormControl fullWidth>
+        <FormControl style={style}>
             <InputLabel>{label}</InputLabel>
             <Select
                 // TODO: fix the icon and replace the default one
@@ -32,6 +34,7 @@ function Selector(
                 value={value}
                 label={label}
                 name={name}
+                defaultValue={defaultValue}
                 onChange={handleChange}
                 style={
                     {

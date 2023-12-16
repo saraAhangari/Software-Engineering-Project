@@ -37,7 +37,6 @@ function SignUp() {
             insurance: undefined,
             birthday: undefined,
             phone: undefined,
-            email: undefined,
         }
     )
 
@@ -50,7 +49,6 @@ function SignUp() {
             insurance: undefined,
             birthday: undefined,
             phone: undefined,
-            email: undefined,
         }
     )
 
