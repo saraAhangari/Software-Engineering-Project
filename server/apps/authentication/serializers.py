@@ -2,14 +2,14 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import Role
 
-from apps.appointment.serializers import MedicalHistorySerializer, AppointmentSerializer
+from apps.appointment.serializers import MedicalHistorySerializer, AppointmentDetailSerializer
 from apps.appointment.models import Patient, User
 
 
 
 class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer()
-    appointments = AppointmentSerializer(many=True, read_only=True)
+    appointments = AppointmentDetailSerializer(many=True, read_only=True)
 
     def get_medical_history(self, obj):
         return MedicalHistorySerializer(obj.medical_history.all()).data

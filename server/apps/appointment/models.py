@@ -97,9 +97,9 @@ class Medicine(models.Model):
 
 class Appointment(models.Model):
     APPOINTMENT_STATUS = [
+        ('reserved', 'reserved'),
         ('completed', 'completed'),
         ('canceled', 'canceled'),
-        ('reserved', 'reserved')
     ]
 
     APPOINTMENT_TYPE = [
@@ -108,9 +108,9 @@ class Appointment(models.Model):
     ]
     patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
     doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    description = models.TextField(null=True, blank=True)
-    status = models.CharField(choices=APPOINTMENT_STATUS, default='canceled')
-    type = models.CharField(choices=APPOINTMENT_TYPE, default='online')
+    description = models.TextField(null=True, blank=True, default='-')
+    status = models.CharField(choices=APPOINTMENT_STATUS, default='reserved')
+    type = models.CharField(choices=APPOINTMENT_TYPE, default='face to face')
     appointment_time = models.OneToOneField(TimeSlice, on_delete=models.CASCADE, related_name='appointment')
 
     def __str__(self):
