@@ -1,8 +1,9 @@
 from datetime import datetime, time
 
 
-def split_datetime(dt: str):
-    dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S")
+def split_datetime(dt):
+    if type(dt) == str:
+        dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S")
     return dt.date(), dt.time()
 
 

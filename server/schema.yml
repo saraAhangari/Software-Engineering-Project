@@ -12,6 +12,64 @@ paths:
       responses:
         '200':
           description: get message
+  /api/v1/appointments:
+    post:
+      operationId: api_v1_appointments_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/appointments/{appointment_id}:
+    post:
+      operationId: api_v1_appointments_create_2
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
   /api/v1/assurance:
     get:
       operationId: api_v1_assurance_retrieve
@@ -292,7 +350,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Appointment'
+                $ref: '#/components/schemas/AppointmentDetail'
           description: ''
   /api/v1/patient/medical_history:
     post:
@@ -605,6 +663,28 @@ components:
     Appointment:
       type: object
       properties:
+        doctor_id:
+          type: integer
+        status:
+          type: string
+          nullable: true
+          default: reserved
+        description:
+          type: string
+          nullable: true
+          default: '-'
+        type:
+          type: string
+          nullable: true
+          default: face to face
+        appointment_time:
+          $ref: '#/components/schemas/DateTimeSlice'
+      required:
+      - appointment_time
+      - doctor_id
+    AppointmentDetail:
+      type: object
+      properties:
         patient_id:
           type: integer
         doctor_id:
@@ -620,7 +700,11 @@ components:
           allOf:
           - $ref: '#/components/schemas/Prescription'
           readOnly: true
+        appointment_time:
+          type: string
+          readOnly: true
       required:
+      - appointment_time
       - doctor_id
       - patient_id
       - prescription
@@ -676,6 +760,18 @@ components:
       required:
       - doctor_id
       - patient_id
+    DateTimeSlice:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+      required:
+      - end
+      - start
     Doctor:
       type: object
       properties:
@@ -881,7 +977,7 @@ components:
         appointments:
           type: array
           items:
-            $ref: '#/components/schemas/Appointment'
+            $ref: '#/components/schemas/AppointmentDetail'
           readOnly: true
     Patient:
       type: object
@@ -916,7 +1012,7 @@ components:
         appointments:
           type: array
           items:
-            $ref: '#/components/schemas/Appointment'
+            $ref: '#/components/schemas/AppointmentDetail'
           readOnly: true
       required:
       - appointments
@@ -970,33 +1066,21 @@ components:
       - name
     StatusEnum:
       enum:
+      - reserved
       - completed
       - canceled
-      - reserved
       type: string
       description: |-
+        * `reserved` - reserved
         * `completed` - completed
         * `canceled` - canceled
-        * `reserved` - reserved
-    TimeSlice:
-      type: object
-      properties:
-        start:
-          type: string
-          format: date-time
-        end:
-          type: string
-          format: date-time
-      required:
-      - end
-      - start
     TimeSliceList:
       type: object
       properties:
         available_time_slices:
           type: array
           items:
-            $ref: '#/components/schemas/TimeSlice'
+            $ref: '#/components/schemas/DateTimeSlice'
       required:
       - available_time_slices
     TypeEnum:
