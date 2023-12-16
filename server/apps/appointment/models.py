@@ -42,16 +42,7 @@ class TimeSlice(models.Model):
     ]
 
     status = models.CharField(choices=TIME_STATUS, default='unavailable')
-
-
-class AppointmentTime(TimeSlice):
-    # appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name="appointment_times")
-
-    class Meta:
-        verbose_name_plural = 'appointment times'
-
-    def __str__(self):
-        return f'{self.id}'
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='available_time_slices')
 
 
 class Assurance(models.Model):
@@ -120,8 +111,7 @@ class Appointment(models.Model):
     description = models.TextField(null=True, blank=True)
     status = models.CharField(choices=APPOINTMENT_STATUS, default='canceled')
     type = models.CharField(choices=APPOINTMENT_TYPE, default='online')
-    appointment_time = models.ForeignKey(AppointmentTime, on_delete=models.CASCADE, related_name='appointments',
-                                         default=-1)
+    appointment_time = models.OneToOneField(TimeSlice, on_delete=models.CASCADE, related_name='appointment')
 
     def __str__(self):
         return f'{self.id} - {self.type}'
@@ -153,12 +143,3 @@ class Comment(models.Model):
     def __str__(self):
         return f'Comment by {self.patient_id} on {self.doctor_id}'
 
-
-class DoctorTime(TimeSlice):
-    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='doctor_times')
-
-    class Meta:
-        verbose_name_plural = 'doctor times'
-
-    def __str__(self):
-        return f'{self.id}'

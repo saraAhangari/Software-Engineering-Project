@@ -538,9 +538,36 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - {}
       responses:
         '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSliceList'
+          description: ''
+  /api/v1/timeslices/{doctor_id}:
+    get:
+      operationId: api_v1_timeslices_retrieve
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date-time
+        explode: false
+        style: form
+      - in: path
+        name: doctor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - timeSlice
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
           content:
             application/json:
               schema:
@@ -582,9 +609,6 @@ components:
           type: integer
         doctor_id:
           type: integer
-        date:
-          type: string
-          format: date-time
         description:
           type: string
           nullable: true
@@ -597,7 +621,6 @@ components:
           - $ref: '#/components/schemas/Prescription'
           readOnly: true
       required:
-      - date
       - doctor_id
       - patient_id
       - prescription

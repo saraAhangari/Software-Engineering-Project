@@ -2,19 +2,19 @@ from datetime import datetime
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment, DoctorTime
+from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment, TimeSlice
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
 from .serializers import (DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer,
-                          AppointmentSerializer, AssuranceSerializer, TimeSliceListSerializer)
+                          AppointmentSerializer, AssuranceSerializer, TimeSliceListSerializer, DateSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer
 from .utils import split_datetime, time_to_minutes, minutes_to_time
@@ -191,28 +191,65 @@ class DoctorTimeSliceView(generics.CreateAPIView):
         available_time_slices = serializer.data.get('available_time_slices')
 
         for available_time_slice in available_time_slices:
-            start_data, start_time = split_datetime(available_time_slice['start'])
+            start_date, start_time = split_datetime(available_time_slice['start'])
             end_date, end_time = split_datetime(available_time_slice['end'])
 
-            if start_data != end_date:
+            if start_date != end_date:
                 # TODO
                 return Response({'ok': False, 'message': 'start time and end time not equal'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             doctor = Doctor.objects.get(user_ptr_id=request.user.id)
-            DoctorTime.objects.get_or_create(doctor_id=doctor,
-                                             date=start_data,
-                                             start=time_to_minutes(start_time),
-                                             end=time_to_minutes(end_time),
-                                             status='available')
+            TimeSlice.objects.get_or_create(doctor=doctor,
+                                            date=start_date,
+                                            start=time_to_minutes(start_time),
+                                            end=time_to_minutes(end_time),
+                                            status='available')
 
         return Response({'ok': True, 'message': 'saved successfully'})
 
 
+@extend_schema(tags=['timeSlice'], responses=TimeSliceListSerializer, request=None)
 class TimeSliceView(generics.CreateAPIView):
-    serializer_class = TimeSliceListSerializer
 
-    def get(self, request,  doctor_id, *args, **kwargs):
-        pass
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "date",
+                type=datetime, style="form", explode=False,
+            )
+        ])
+    def get(self, request, doctor_id, *args, **kwargs):
+        doctor = Doctor.objects.get(id=doctor_id)
+        requested_date = request.GET.get('date')
 
+        available_time_slices = []
+        for minutes in range(0, 24 * 60, doctor.slice):
+            start = minutes
+            end = minutes + doctor.slice
 
+            print(start, end)
+
+            is_time_doctor_free = False
+            is_time_appointment_free = True
+            for av_time in doctor.available_time_slices.filter(date=requested_date):
+                if start >= av_time.start and end <= av_time.end:
+                    is_time_doctor_free = True
+
+            for appointment in Appointment.objects.filter(doctor_id=doctor_id,
+                                                          appointment_time__date=requested_date):
+                if (appointment.appointment_time.start <= start < appointment.appointment_time.end
+                        or appointment.appointment_time.start < end <= appointment.appointment_time.end
+                        or (appointment.appointment_time.start == start and appointment.appointment_time.end == end)):
+                    is_time_appointment_free = False
+
+            if is_time_appointment_free and is_time_doctor_free:
+                available_time_slices.append({
+                    'date': requested_date,
+                    'start': minutes_to_time(start),
+                    'end': minutes_to_time(end)
+                })
+
+        return Response({
+            'available_time_slices': available_time_slices
+        })

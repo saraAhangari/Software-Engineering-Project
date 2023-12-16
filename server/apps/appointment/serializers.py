@@ -56,7 +56,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['patient_id', 'doctor_id', 'date', 'description', 'status', 'type', 'prescription']
+        fields = ['patient_id', 'doctor_id', 'description', 'status', 'type', 'prescription']
 
 
 class AssuranceSerializer(serializers.ModelSerializer):
@@ -72,3 +72,7 @@ class TimeSliceSerializer(serializers.Serializer):
 
 class TimeSliceListSerializer(serializers.Serializer):
     available_time_slices = serializers.ListField(child=TimeSliceSerializer())
+
+
+class DateSerializer(serializers.Serializer):
+    date = serializers.DateField(format='%Y-%m-%d')
