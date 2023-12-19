@@ -135,8 +135,8 @@ class PatientDetailView(generics.UpdateAPIView):
         return Response(serializer.data)
 
     def get(self, request):
-        patient = Patient.objects.get(id=request.user.id)
-        serializer = PatientSerializer(patient)
+        patient = self.get_object()
+        serializer = self.serializer_class(patient)
         return Response(serializer.data)
 
 
@@ -166,16 +166,16 @@ class AppointmentDetailView(generics.RetrieveAPIView):
         serializer = AppointmentDetailSerializer(appointments, many=True)
         data = serializer.data
 
-        for appointment_data in data:
-            date_time_str = appointment_data['date']
-            date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%SZ")
-
-            appointment_data['date'] = date_time_obj.date().isoformat()
-            appointment_data['time'] = date_time_obj.time().isoformat()
-
-            doctor_id = appointment_data['doctor_id']
-            doctor = Doctor.objects.get(id=doctor_id)
-            appointment_data['doctor_full_name'] = f"{doctor.first_name} {doctor.last_name}"
+        # for appointment_data in data:
+        #     date_time_str = appointment_data['date']
+        #     date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%SZ")
+        #
+        #     appointment_data['date'] = date_time_obj.date().isoformat()
+        #     appointment_data['time'] = date_time_obj.time().isoformat()
+        #
+        #     doctor_id = appointment_data['doctor_id']
+        #     doctor = Doctor.objects.get(id=doctor_id)
+        #     appointment_data['doctor_full_name'] = f"{doctor.first_name} {doctor.last_name}"
 
         return Response(data, status=status.HTTP_200_OK)
 
