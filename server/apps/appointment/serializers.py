@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Assurance, Appointment, Prescription, TimeSlice
-from .utils import minutes_to_time
+from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Assurance, Appointment, Prescription, TimeSlice, \
+    Medicine
+from .utils import minutes_to_time, split_datetime
 
 
 class SpecialitySerializer(serializers.ModelSerializer):
@@ -23,21 +24,20 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'fees', 'medical_system_number',
-                  'speciality',
-                  'phone_no', 'birthdate', 'gender', 'comments']
+        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'medical_system_number',
+                  'speciality', 'phone_no', 'birthdate', 'gender']
 
 
-class DoctorListSerializer(serializers.ModelSerializer):
-    speciality = SpecialitySerializer()
+class DoctorDetailSerializer(serializers.ModelSerializer):
+    speciality = serializers.SerializerMethodField()
 
     def get_speciality(self, obj):
         return SpecialitySerializer(obj.speciality.all(), many=True).data
 
     class Meta:
         model = Doctor
-        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'fees', 'medical_system_number',
-                  'speciality', 'phone_no', 'birthdate', 'gender']
+        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'medical_system_number',
+                  'speciality', 'phone_no', 'birthdate', 'gender', 'comments']
 
 
 class MedicalHistorySerializer(serializers.ModelSerializer):
@@ -46,7 +46,18 @@ class MedicalHistorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class MedicineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medicine
+        fields = '__all__'
+
+
 class PrescriptionSerializer(serializers.ModelSerializer):
+    medicines = serializers.ListField(child=MedicineSerializer())
+
+    def get_medicines(self, obj):
+        return MedicineSerializer(obj.medicines.all(), many=True).data
+
     class Meta:
         model = Prescription
         fields = '__all__'
@@ -57,7 +68,8 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
     appointment_time = serializers.SerializerMethodField()
 
     def get_appointment_time(self, obj):
-        print(obj.appointment_time)
+        date = split_datetime(obj.appointment_time.date)[0]
+        obj.appointment_time.date = date
         return TimeSliceSerializer(obj.appointment_time).data
 
     class Meta:
@@ -84,17 +96,6 @@ class DateSerializer(serializers.Serializer):
     date = serializers.DateField(format='%Y-%m-%d')
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(default='reserved', allow_null=True)
-    description = serializers.CharField(default='-', allow_null=True)
-    type = serializers.CharField(default='face to face', allow_null=True)
-    appointment_time = DateTimeSliceSerializer()
-
-    class Meta:
-        model = Appointment
-        fields = ['doctor_id', 'status', 'description', 'type', 'appointment_time']
-
-
 class TimeSliceSerializer(serializers.ModelSerializer):
     start = serializers.SerializerMethodField()
     end = serializers.SerializerMethodField()
@@ -107,4 +108,15 @@ class TimeSliceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TimeSlice
-        fields = '__all__'
+        fields = ['date', 'start', 'end', 'status']
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(default='reserved', allow_null=True)
+    description = serializers.CharField(default='-', allow_null=True)
+    type = serializers.CharField(default='face to face', allow_null=True)
+    appointment_time = DateTimeSliceSerializer()
+
+    class Meta:
+        model = Appointment
+        fields = ['doctor_id', 'status', 'description', 'type', 'appointment_time']

@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import AssuranceView, DoctorDetailView, DoctorListView, PatientDetailView, AddCommentView, \
-    GetCommentView, CommentPermissionView, MedicalHistoryView, AppointmentDetailView, DoctorTimeSliceView, TimeSliceView, AppointmentView
+    GetCommentView, CommentPermissionView, MedicalHistoryView, AppointmentDetailView, DoctorTimeSliceView, \
+    TimeSliceView, AppointmentView, PrescriptionView
 
 urlpatterns = [
     # assurance
@@ -28,5 +29,5 @@ urlpatterns = [
 
     # appointment
     path('appointments', AppointmentView.as_view()),
-    path('appointments/<int:appointment_id>', AppointmentView.as_view())
+    path('appointments/<int:appointment_id>', AppointmentView.as_view()),
 ]

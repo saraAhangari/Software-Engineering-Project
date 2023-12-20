@@ -6,6 +6,8 @@ from apps.appointment.serializers import MedicalHistorySerializer, AppointmentDe
 from apps.appointment.models import Patient, User
 
 
+# class PatientDetailSerializer(serializers.ModelSerializer):
+
 
 class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer()
@@ -14,14 +16,14 @@ class PatientSerializer(serializers.ModelSerializer):
     def get_medical_history(self, obj):
         return MedicalHistorySerializer(obj.medical_history.all()).data
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
-        appointments_data = representation.get('appointments', [])
-        completed_appointments = [appt for appt in appointments_data if appt.get('status') == 'completed']
-        representation['appointments'] = completed_appointments
-
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #
+    #     appointments_data = representation.get('appointments', [])
+    #     completed_appointments = [appt for appt in appointments_data if appt.get('status') == 'completed']
+    #     representation['appointments'] = completed_appointments
+    #
+    #     return representation
 
     class Meta:
         model = Patient
@@ -91,6 +93,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('login first')
 
         return data
+
 
 class GetTokenSerializer(serializers.Serializer):
     national_id = serializers.CharField(max_length=10)

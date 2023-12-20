@@ -17,7 +17,6 @@ class UserAdmin(ImportExportModelAdmin):
 class RoleAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('id', 'name')
-    list_filter = ('id', 'name',)
 
     class Meta:
         model = Role

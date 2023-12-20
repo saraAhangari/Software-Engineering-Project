@@ -20,7 +20,6 @@ class Speciality(models.Model):
 class Doctor(User):
     description = models.TextField(null=True, blank=True)
     medical_system_number = models.IntegerField(unique=True)
-    fees = models.FloatField()
     slice = models.IntegerField(default=30)
     speciality = models.ManyToManyField(Speciality)
 
@@ -92,7 +91,6 @@ class Patient(User):
 class Medicine(models.Model):
     generic_name = models.CharField(null=True, blank=True)
     infant_safe = models.BooleanField(default=True)
-    price = models.FloatField()
 
 
 class Appointment(models.Model):
@@ -122,6 +120,7 @@ class Prescription(models.Model):
     description = models.TextField(null=True, blank=True)
     is_expired = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=False)
+    medicines = models.ManyToManyField(Medicine)
 
     def __str__(self):
         return f'{self.appointment_id} - {self.date}'

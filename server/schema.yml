@@ -249,7 +249,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedDoctorListList'
+                $ref: '#/components/schemas/PaginatedDoctorList'
           description: ''
   /api/v1/doctors/{doctor_id}/:
     get:
@@ -270,7 +270,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Doctor'
+                $ref: '#/components/schemas/DoctorDetail'
           description: ''
   /api/v1/get_token:
     post:
@@ -698,7 +698,7 @@ components:
           $ref: '#/components/schemas/TypeEnum'
         prescription:
           allOf:
-          - $ref: '#/components/schemas/Prescription'
+          - $ref: '#/components/schemas/PrescriptionDetail'
           readOnly: true
         appointment_time:
           type: string
@@ -791,9 +791,6 @@ components:
         description:
           type: string
           nullable: true
-        fees:
-          type: number
-          format: double
         medical_system_number:
           type: integer
           maximum: 2147483647
@@ -804,25 +801,20 @@ components:
         phone_no:
           type: string
           maxLength: 11
+          minLength: 10
         birthdate:
           type: string
           format: date
           nullable: true
         gender:
           $ref: '#/components/schemas/GenderEnum'
-        comments:
-          type: array
-          items:
-            type: integer
       required:
-      - comments
-      - fees
       - id
       - medical_system_number
       - national_id
       - phone_no
       - speciality
-    DoctorList:
+    DoctorDetail:
       type: object
       properties:
         id:
@@ -841,26 +833,29 @@ components:
         description:
           type: string
           nullable: true
-        fees:
-          type: number
-          format: double
         medical_system_number:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
         speciality:
-          $ref: '#/components/schemas/Speciality'
+          type: string
+          readOnly: true
         phone_no:
           type: string
           maxLength: 11
+          minLength: 10
         birthdate:
           type: string
           format: date
           nullable: true
         gender:
           $ref: '#/components/schemas/GenderEnum'
+        comments:
+          type: array
+          items:
+            type: integer
       required:
-      - fees
+      - comments
       - id
       - medical_system_number
       - national_id
@@ -870,10 +865,12 @@ components:
       enum:
       - m
       - f
+      - n
       type: string
       description: |-
         * `m` - male
         * `f` - female
+        * `n` - known
     GetToken:
       type: object
       properties:
@@ -921,10 +918,23 @@ components:
           nullable: true
       required:
       - id
+    Medicine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        generic_name:
+          type: string
+          nullable: true
+        infant_safe:
+          type: boolean
+      required:
+      - id
     NullEnum:
       enum:
       - null
-    PaginatedDoctorListList:
+    PaginatedDoctorList:
       type: object
       properties:
         count:
@@ -943,7 +953,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/DoctorList'
+            $ref: '#/components/schemas/Doctor'
     PatchedPatient:
       type: object
       properties:
@@ -963,6 +973,7 @@ components:
         phone_no:
           type: string
           maxLength: 11
+          minLength: 10
         birthdate:
           type: string
           format: date
@@ -998,6 +1009,7 @@ components:
         phone_no:
           type: string
           maxLength: 11
+          minLength: 10
         birthdate:
           type: string
           format: date
@@ -1020,12 +1032,16 @@ components:
       - medical_history
       - national_id
       - phone_no
-    Prescription:
+    PrescriptionDetail:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
+        medicines:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medicine'
         description:
           type: string
           nullable: true
@@ -1040,6 +1056,7 @@ components:
       - appointment_id
       - date
       - id
+      - medicines
     Role:
       type: object
       properties:
@@ -1049,18 +1066,6 @@ components:
         name:
           type: string
           maxLength: 10
-      required:
-      - id
-      - name
-    Speciality:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 30
       required:
       - id
       - name

@@ -13,9 +13,9 @@ from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
-from .serializers import (DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer,
+from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSerializer, MedicalHistorySerializer,
                           AppointmentDetailSerializer, AssuranceSerializer, TimeSliceListSerializer,
-                          AppointmentSerializer)
+                          AppointmentSerializer, PrescriptionSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer
 from .utils import split_datetime, time_to_minutes, minutes_to_time
@@ -44,7 +44,7 @@ class AssuranceView(generics.CreateAPIView):
 
 class DoctorListView(ListAPIView):
     queryset = Doctor.objects.all()
-    serializer_class = DoctorListSerializer
+    serializer_class = DoctorSerializer
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q', '')
@@ -57,20 +57,20 @@ class DoctorListView(ListAPIView):
         pagination = self.pagination_class()
         paginated_set = pagination.paginate_queryset(doctors, request)
 
-        serializer = DoctorListSerializer(paginated_set, many=True)
+        serializer = self.serializer_class(paginated_set, many=True)
         return Response(serializer.data)
 
 
 class DoctorDetailView(RetrieveAPIView):
     queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
+    serializer_class = DoctorDetailSerializer
 
     def get(self, request, *args, **kwargs):
         doctor_id = kwargs.get('doctor_id')
 
         try:
             doctor = get_object_or_404(Doctor, id=doctor_id)
-            serializer = DoctorSerializer(doctor)
+            serializer = self.serializer_class(doctor)
             return Response(serializer.data)
         except Http404:
             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -135,8 +135,8 @@ class PatientDetailView(generics.UpdateAPIView):
         return Response(serializer.data)
 
     def get(self, request):
-        patient = Patient.objects.get(id=request.user.id)
-        serializer = PatientSerializer(patient)
+        patient = self.get_object()
+        serializer = self.serializer_class(patient)
         return Response(serializer.data)
 
 
@@ -166,16 +166,16 @@ class AppointmentDetailView(generics.RetrieveAPIView):
         serializer = AppointmentDetailSerializer(appointments, many=True)
         data = serializer.data
 
-        for appointment_data in data:
-            date_time_str = appointment_data['date']
-            date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%SZ")
-
-            appointment_data['date'] = date_time_obj.date().isoformat()
-            appointment_data['time'] = date_time_obj.time().isoformat()
-
-            doctor_id = appointment_data['doctor_id']
-            doctor = Doctor.objects.get(id=doctor_id)
-            appointment_data['doctor_full_name'] = f"{doctor.first_name} {doctor.last_name}"
+        # for appointment_data in data:
+        #     date_time_str = appointment_data['date']
+        #     date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%SZ")
+        #
+        #     appointment_data['date'] = date_time_obj.date().isoformat()
+        #     appointment_data['time'] = date_time_obj.time().isoformat()
+        #
+        #     doctor_id = appointment_data['doctor_id']
+        #     doctor = Doctor.objects.get(id=doctor_id)
+        #     appointment_data['doctor_full_name'] = f"{doctor.first_name} {doctor.last_name}"
 
         return Response(data, status=status.HTTP_200_OK)
 
