@@ -13,7 +13,7 @@ from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
-from .serializers import (DoctorSerializer, CommentSerializer, DoctorListSerializer, MedicalHistorySerializer,
+from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSerializer, MedicalHistorySerializer,
                           AppointmentDetailSerializer, AssuranceSerializer, TimeSliceListSerializer,
                           AppointmentSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
@@ -44,7 +44,7 @@ class AssuranceView(generics.CreateAPIView):
 
 class DoctorListView(ListAPIView):
     queryset = Doctor.objects.all()
-    serializer_class = DoctorListSerializer
+    serializer_class = DoctorSerializer
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q', '')
@@ -57,20 +57,20 @@ class DoctorListView(ListAPIView):
         pagination = self.pagination_class()
         paginated_set = pagination.paginate_queryset(doctors, request)
 
-        serializer = DoctorListSerializer(paginated_set, many=True)
+        serializer = self.serializer_class(paginated_set, many=True)
         return Response(serializer.data)
 
 
 class DoctorDetailView(RetrieveAPIView):
     queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
+    serializer_class = DoctorDetailSerializer
 
     def get(self, request, *args, **kwargs):
         doctor_id = kwargs.get('doctor_id')
 
         try:
             doctor = get_object_or_404(Doctor, id=doctor_id)
-            serializer = DoctorSerializer(doctor)
+            serializer = self.serializer_class(doctor)
             return Response(serializer.data)
         except Http404:
             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)

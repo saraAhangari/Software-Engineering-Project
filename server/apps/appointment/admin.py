@@ -8,7 +8,7 @@ from .models import Doctor, Speciality, TimeSlice, Assurance, PatientMedicalHist
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'username', 'email', 'description', 'fees', 'slice', 'medical_system_number',
+        'id', 'username', 'email', 'description', 'slice', 'medical_system_number',
         'display_specialities')
     list_filter = ('speciality',)
 
@@ -76,7 +76,7 @@ class PatientAdmin(admin.ModelAdmin):
 
 @admin.register(Medicine)
 class MedicineAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'generic_name', 'infant_safe', 'price',)
+    list_display = ('id', 'generic_name', 'infant_safe',)
     search_fields = ('generic_name',)
 
     class Meta:

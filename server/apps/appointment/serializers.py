@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Assurance, Appointment, Prescription, TimeSlice
+from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Assurance, Appointment, Prescription, TimeSlice, \
+    Medicine
 from .utils import minutes_to_time, split_datetime
 
 
@@ -23,21 +24,20 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'fees', 'medical_system_number',
-                  'speciality',
-                  'phone_no', 'birthdate', 'gender', 'comments']
+        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'medical_system_number',
+                  'speciality', 'phone_no', 'birthdate', 'gender']
 
 
-class DoctorListSerializer(serializers.ModelSerializer):
-    speciality = SpecialitySerializer()
+class DoctorDetailSerializer(serializers.ModelSerializer):
+    speciality = serializers.SerializerMethodField()
 
     def get_speciality(self, obj):
         return SpecialitySerializer(obj.speciality.all(), many=True).data
 
     class Meta:
         model = Doctor
-        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'fees', 'medical_system_number',
-                  'speciality', 'phone_no', 'birthdate', 'gender']
+        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'medical_system_number',
+                  'speciality', 'phone_no', 'birthdate', 'gender', 'comments']
 
 
 class MedicalHistorySerializer(serializers.ModelSerializer):
@@ -46,14 +46,25 @@ class MedicalHistorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PrescriptionSerializer(serializers.ModelSerializer):
+class MedicineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medicine
+        fields = '__all__'
+
+
+class PrescriptionDetailSerializer(serializers.ModelSerializer):
+    medicines = serializers.ListField(child=MedicineSerializer())
+
+    def get_medicines(self, obj):
+        return MedicineSerializer(obj.medicines.all(), many=True).data
+
     class Meta:
         model = Prescription
         fields = '__all__'
 
 
 class AppointmentDetailSerializer(serializers.ModelSerializer):
-    prescription = PrescriptionSerializer(read_only=True)
+    prescription = PrescriptionDetailSerializer(read_only=True)
     appointment_time = serializers.SerializerMethodField()
 
     def get_appointment_time(self, obj):

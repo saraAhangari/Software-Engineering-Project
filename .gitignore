@@ -138,4 +138,7 @@ GitHub.sublime-settings
 .history
 
 .dockerignore
+front-end/node_modules
+
+./front-end/node_modules
 
