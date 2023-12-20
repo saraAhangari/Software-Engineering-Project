@@ -1,13 +1,9 @@
 from datetime import datetime, time
 
 
-def split_datetime(dt):
+def time_to_minutes(dt):
     if type(dt) == str:
-        dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S")
-    return dt.date(), dt.time()
-
-
-def time_to_minutes(dt: datetime):
+        dt = datetime.strptime(dt, "%H:%M:%S")
     return dt.hour * 60 + dt.minute
 
 

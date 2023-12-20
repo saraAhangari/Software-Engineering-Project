@@ -1,11 +1,10 @@
 from datetime import datetime
-
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment, TimeSlice
@@ -18,7 +17,7 @@ from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSeria
                           AppointmentSerializer, PrescriptionSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer
-from .utils import split_datetime, time_to_minutes, minutes_to_time
+from .utils import time_to_minutes, minutes_to_time
 
 
 @extend_schema(tags=['Assurance'])
@@ -164,20 +163,8 @@ class AppointmentDetailView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         appointments = Appointment.objects.filter(patient_id=request.user.id)
         serializer = AppointmentDetailSerializer(appointments, many=True)
-        data = serializer.data
 
-        # for appointment_data in data:
-        #     date_time_str = appointment_data['date']
-        #     date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%SZ")
-        #
-        #     appointment_data['date'] = date_time_obj.date().isoformat()
-        #     appointment_data['time'] = date_time_obj.time().isoformat()
-        #
-        #     doctor_id = appointment_data['doctor_id']
-        #     doctor = Doctor.objects.get(id=doctor_id)
-        #     appointment_data['doctor_full_name'] = f"{doctor.first_name} {doctor.last_name}"
-
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['timeSlice'])
@@ -192,29 +179,24 @@ class DoctorTimeSliceView(generics.CreateAPIView):
         available_time_slices = serializer.data.get('available_time_slices')
 
         for available_time_slice in available_time_slices:
-            start_date, start_time = split_datetime(available_time_slice['start'])
-            end_date, end_time = split_datetime(available_time_slice['end'])
-
-            if start_date != end_date:
-                # TODO
-                return Response({'ok': False, 'message': 'start time and end time not equal'},
-                                status=status.HTTP_400_BAD_REQUEST)
+            date = available_time_slice['date']
+            start = available_time_slice['start']
+            end = available_time_slice['end']
 
             doctor = Doctor.objects.get(user_ptr_id=request.user.id)
             TimeSlice.objects.get_or_create(doctor=doctor,
-                                            date=start_date,
-                                            start=time_to_minutes(start_time),
-                                            end=time_to_minutes(end_time),
+                                            date=date,
+                                            start=time_to_minutes(start),
+                                            end=time_to_minutes(end),
                                             status='available')
 
-        return Response({'ok': True, 'message': 'saved successfully'})
+        return Response(serializer.data)
 
 
 @extend_schema(tags=['timeSlice'], responses=TimeSliceListSerializer, request=None)
 class TimeSliceView(generics.CreateAPIView):
-
     @staticmethod
-    def is_date_free(doctor: Doctor, requested_date: datetime, start, end):
+    def is_date_free(doctor: Doctor, requested_date, start, end):
         is_time_doctor_free = False
         is_time_appointment_free = True
         for av_time in doctor.available_time_slices.filter(date=requested_date):
@@ -233,11 +215,11 @@ class TimeSliceView(generics.CreateAPIView):
 
     @extend_schema(parameters=[OpenApiParameter("date", type=datetime, style="form", explode=False, )])
     def get(self, request, doctor_id, *args, **kwargs):
-        doctor = Doctor.objects.get(id=doctor_id)
-        requested_date = request.GET.get('date')
+        doctor = get_object_or_404(Doctor.objects.all(), id=doctor_id)
+        requested_date = request.GET.get('date', datetime.today())
 
         available_time_slices = []
-        for minutes in range(0, 24 * 60, doctor.slice):
+        for minutes in range(0, 24 * 60-doctor.slice, doctor.slice):
             start = minutes
             end = minutes + doctor.slice
 
@@ -253,40 +235,67 @@ class TimeSliceView(generics.CreateAPIView):
         })
 
 
-class AppointmentView(generics.CreateAPIView):
+@extend_schema(tags=['appointment'])
+class AppointmentPatientView(generics.CreateAPIView):
     serializer_class = AppointmentSerializer
     permission_classes = (IsAuthenticated, IsNotInBlackedList, IsPatient)
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        doctor = Doctor.objects.get(id=serializer.validated_data.get('doctor_id').id)
-        start_date, start_time = split_datetime(serializer.validated_data.get('appointment_time').get('start'))
-        end_date, end_time = split_datetime(serializer.validated_data.get('appointment_time').get('end'))
+            doctor = get_object_or_404(Doctor.objects.all(), id=serializer.validated_data.get('doctor_id').id)
+            date = serializer.validated_data.get('appointment_time').get('date')
+            start = serializer.validated_data.get('appointment_time').get('start')
+            end = serializer.validated_data.get('appointment_time').get('end', start + doctor.slice)
 
-        if not TimeSliceView.is_date_free(doctor, start_date, time_to_minutes(start_time), time_to_minutes(end_time)):
-            return Response({'ok': False, 'message': 'the requested time is full'})
+            # convert start, end to minutes
+            start_minutes = time_to_minutes(start)
+            end_minutes = time_to_minutes(end)
 
-        patient = Patient.objects.get(id=request.user.id)
-        appointment_time = TimeSlice.objects.create(
-            date=start_date,
-            start=time_to_minutes(start_time),
-            end=time_to_minutes(end_time),
-            status='unavailable',
-            doctor_id=doctor.id
-        )
-        appointment_time.save()
+            # check start and end time
+            if start + doctor.slice != end:
+                return Response({'ok': False, 'message': 'time slice range not correct'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-        appointment = Appointment.objects.create(
-            patient_id=patient,
-            doctor_id=doctor,
-            description=serializer.validated_data.get('description'),
-            status=serializer.validated_data.get('status'),
-            type=serializer.validated_data.get('type'),
-            appointment_time=appointment_time
-        )
+            if not TimeSliceView.is_date_free(doctor, date, start_minutes, end_minutes):
+                return Response({'ok': False, 'message': 'the requested time is full'})
 
-        appointment.save()
+            patient = get_object_or_404(Patient.objects.all(), id=request.user.id)
+            appointment_time = TimeSlice.objects.create(
+                date=date,
+                start=start_minutes,
+                end=end_minutes,
+                status='unavailable',
+                doctor_id=doctor.id
+            )
+            appointment_time.save()
 
-        return Response(AppointmentDetailSerializer(appointment).data)
+            appointment = Appointment.objects.create(
+                patient_id=patient,
+                doctor_id=doctor,
+                description=serializer.validated_data.get('description'),
+                status=serializer.validated_data.get('status'),
+                type=serializer.validated_data.get('type'),
+                appointment_time=appointment_time
+            )
+            appointment.save()
+
+            return Response(AppointmentDetailSerializer(appointment).data)
+        except Exception as e:
+            print(e)
+            return Response({'ok': False, 'message': 'internal error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get(self, request, appointment_id=None, *args, **kwargs):
+        serializer = AppointmentDetailSerializer(request.user.patient.appointments, many=True)
+        if appointment_id:
+            serializer = AppointmentDetailSerializer(get_object_or_404(request.user.patient.appointments,
+                                                                       id=appointment_id))
+
+        return Response(serializer.data)
+
+
+class PrescriptionView(generics.CreateAPIView):
+    pass
