@@ -92,6 +92,9 @@ class Medicine(models.Model):
     generic_name = models.CharField(null=True, blank=True)
     infant_safe = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f'{self.generic_name}'
+
 
 class Appointment(models.Model):
     APPOINTMENT_STATUS = [
@@ -118,12 +121,11 @@ class Appointment(models.Model):
 class Prescription(models.Model):
     appointment_id = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name='prescription')
     description = models.TextField(null=True, blank=True)
-    is_expired = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=False)
     medicines = models.ManyToManyField(Medicine)
 
     def __str__(self):
-        return f'{self.appointment_id} - {self.date}'
+        return f'{self.id}'
 
 
 class Comment(models.Model):

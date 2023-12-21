@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class PatientValidationView(generics.CreateAPIView):
     serializer_class = PatientSerializer
 
@@ -37,7 +37,7 @@ class PatientValidationView(generics.CreateAPIView):
         }, status=status.HTTP_200_OK)
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class RegisterView(generics.CreateAPIView):
     serializer_class = PatientSerializer
 
@@ -71,7 +71,7 @@ class RegisterView(generics.CreateAPIView):
         return Response(serializer.data)
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
 
@@ -94,7 +94,7 @@ class LoginView(generics.CreateAPIView):
         }, status=status.HTTP_200_OK)
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class GetTokenView(generics.CreateAPIView):
     serializer_class = GetTokenSerializer
 
@@ -134,7 +134,7 @@ class GetTokenView(generics.CreateAPIView):
         return response
 
 
-@extend_schema(tags=['Authentication'], request=None, responses={
+@extend_schema(tags=['authentication'], request=None, responses={
     201: OpenApiResponse(description='user logged out successfully'),
     400: OpenApiResponse(description='login first'),
 })
@@ -164,7 +164,7 @@ class LogoutView(generics.CreateAPIView):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@extend_schema(tags=['Role'])
+@extend_schema(tags=['role'])
 class RoleView(generics.CreateAPIView):
     serializer_class = RoleSerializer
     queryset = Role.objects.all()

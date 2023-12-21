@@ -7,7 +7,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Assurance, Doctor, Comment, Patient, PatientMedicalHistory, Appointment, TimeSlice
+from .models import Assurance, Doctor, Comment, Patient, Appointment, TimeSlice, Prescription
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
@@ -20,7 +20,7 @@ from ..authentication.serializers import PatientSerializer
 from .utils import time_to_minutes, minutes_to_time
 
 
-@extend_schema(tags=['Assurance'])
+@extend_schema(tags=['assurance'])
 class AssuranceView(generics.CreateAPIView):
     serializer_class = AssuranceSerializer
     queryset = Assurance.objects.all()
@@ -41,6 +41,7 @@ class AssuranceView(generics.CreateAPIView):
         pass  # TODO
 
 
+@extend_schema(tags=['doctor'])
 class DoctorListView(ListAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
@@ -60,6 +61,7 @@ class DoctorListView(ListAPIView):
         return Response(serializer.data)
 
 
+@extend_schema(tags=['doctor'])
 class DoctorDetailView(RetrieveAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorDetailSerializer
@@ -75,6 +77,7 @@ class DoctorDetailView(RetrieveAPIView):
             return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(tags=['comment'])
 class AddCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment]
@@ -96,6 +99,7 @@ class AddCommentView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
+@extend_schema(tags=['comment'])
 class GetCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList]
@@ -107,7 +111,7 @@ class GetCommentView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@extend_schema(tags=['Comment'], request=None, responses=None)
+@extend_schema(tags=['comment'], request=None, responses=None)
 class CommentPermissionView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment, ]
 
@@ -118,10 +122,11 @@ class CommentPermissionView(generics.CreateAPIView):
         })
 
 
+@extend_schema(tags=['patient'])
 class PatientDetailView(generics.UpdateAPIView):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated, IsNotInBlackedList]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPatient]
 
     def get_object(self):
         return self.request.user.patient
@@ -139,6 +144,7 @@ class PatientDetailView(generics.UpdateAPIView):
         return Response(serializer.data)
 
 
+@extend_schema(tags=['medicalHistory'])
 class MedicalHistoryView(generics.CreateAPIView):
     serializer_class = MedicalHistorySerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPatient]
@@ -155,6 +161,7 @@ class MedicalHistoryView(generics.CreateAPIView):
         return Response({'ok': True, 'message': 'medical history saved'}, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(tags=['appointment'])
 class AppointmentDetailView(generics.RetrieveAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentDetailSerializer
@@ -219,7 +226,7 @@ class TimeSliceView(generics.CreateAPIView):
         requested_date = request.GET.get('date', datetime.today())
 
         available_time_slices = []
-        for minutes in range(0, 24 * 60-doctor.slice, doctor.slice):
+        for minutes in range(0, 24 * 60 - doctor.slice, doctor.slice):
             start = minutes
             end = minutes + doctor.slice
 
@@ -297,5 +304,37 @@ class AppointmentPatientView(generics.CreateAPIView):
         return Response(serializer.data)
 
 
-class PrescriptionView(generics.CreateAPIView):
-    pass
+@extend_schema(tags=['prescription'])
+class PrescriptionDoctorView(generics.CreateAPIView):
+    serializer_class = PrescriptionSerializer
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
+
+    def post(self, request, appointment_id=None, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id,
+                                        doctor_id__exact=request.user.id)
+
+        existing_prescription = Prescription.objects.filter(appointment_id=appointment).first()
+
+        if existing_prescription:
+            return Response({"detail": "Prescription already exists for this appointment."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        prescription = Prescription.objects.create(
+            appointment_id=appointment,
+            description=serializer.validated_data.get('description'),
+            date=appointment.appointment_time.date
+        )
+        prescription.medicines.set(serializer.validated_data.get('medicines', []))
+        prescription.save()
+
+        return Response(PrescriptionSerializer(prescription).data)
+
+    def get(self, request, appointment_id=None, *args, **kwargs):
+        appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id,
+                                        doctor_id__exact=request.user.id)
+        prescription = get_object_or_404(Prescription.objects.all(), appointment_id=appointment)
+
+        return Response(PrescriptionSerializer(prescription).data)

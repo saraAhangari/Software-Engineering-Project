@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import AssuranceView, DoctorDetailView, DoctorListView, PatientDetailView, AddCommentView, \
     GetCommentView, CommentPermissionView, MedicalHistoryView, DoctorTimeSliceView, \
-    TimeSliceView, AppointmentPatientView, PrescriptionView
+    TimeSliceView, AppointmentPatientView,  PrescriptionDoctorView
 
 urlpatterns = [
     # assurance
@@ -28,4 +28,8 @@ urlpatterns = [
     path('appointments', AppointmentPatientView.as_view(http_method_names=['post', 'get'])),
     path('appointments/<int:appointment_id>', AppointmentPatientView.as_view(http_method_names=['get', 'delete',
                                                                                                 'put', 'patch'])),
+
+    # prescription
+    path('appointments/<int:appointment_id>/prescription', PrescriptionDoctorView.as_view(http_method_names=['post',
+                                                                                                             'get']))
 ]
