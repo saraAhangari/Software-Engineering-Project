@@ -140,3 +140,6 @@ GitHub.sublime-settings
 
 front-end/node_modules
 ./front-end/node_modules
+
+server/.env.dockerfile
+
