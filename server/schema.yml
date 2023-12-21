@@ -72,6 +72,25 @@ paths:
                 $ref: '#/components/schemas/Appointment'
           description: ''
   /api/v1/appointments/{appointment_id}/prescription:
+    get:
+      operationId: api_v1_appointments_prescription_retrieve
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - prescription
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
     post:
       operationId: api_v1_appointments_prescription_create
       parameters:
@@ -942,19 +961,6 @@ components:
           nullable: true
       required:
       - id
-    Medicine:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        generic_name:
-          type: string
-          nullable: true
-        infant_safe:
-          type: boolean
-      required:
-      - id
     NullEnum:
       enum:
       - null
@@ -1059,27 +1065,14 @@ components:
     Prescription:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        medicines:
-          type: array
-          items:
-            $ref: '#/components/schemas/Medicine'
         description:
           type: string
           nullable: true
-        is_expired:
-          type: boolean
-        date:
-          type: string
-          format: date
-        appointment_id:
-          type: integer
+        medicines:
+          type: array
+          items:
+            type: integer
       required:
-      - appointment_id
-      - date
-      - id
       - medicines
     Role:
       type: object
