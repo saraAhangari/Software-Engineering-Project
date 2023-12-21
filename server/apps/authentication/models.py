@@ -25,5 +25,5 @@ class User(AbstractUser):
         MinLengthValidator(limit_value=10, message="Phone Number should be exactly 10 or 11 characters.")
     ])
     birthdate = models.DateField(null=True)
-    role = models.ForeignKey(Role, on_delete=models.PROTECT, default=-1)
+    role = models.ForeignKey(Role, on_delete=models.PROTECT, default=1)
     gender = models.CharField(choices=GENDER_CHOICES, default='n')

@@ -10,7 +10,7 @@ from apps.appointment.models import Patient, User
 
 
 class PatientSerializer(serializers.ModelSerializer):
-    medical_history = MedicalHistorySerializer()
+    medical_history = MedicalHistorySerializer(allow_null=True)
     appointments = AppointmentDetailSerializer(many=True, read_only=True)
 
     def get_medical_history(self, obj):

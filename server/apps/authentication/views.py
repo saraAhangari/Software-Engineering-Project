@@ -177,11 +177,14 @@ class RoleView(generics.CreateAPIView):
         return Response(serializer.data)
 
     def get(self, request, pk=None):
+        response = Response()
         serializer = self.serializer_class(self.queryset.all(), many=True)
+        response.data = {'roles': serializer.data}
         if pk:
             serializer = self.serializer_class(get_object_or_404(self.queryset, id=pk))
+            response.data = serializer.data
 
-        return Response(serializer.data)
+        return response
 
     def delete(self, request, pk=None, *args, **kwargs):
         get_object_or_404(self.queryset, id=pk).delete()
