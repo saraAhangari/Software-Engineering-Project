@@ -13,10 +13,23 @@ paths:
         '200':
           description: get message
   /api/v1/appointments:
+    get:
+      operationId: api_v1_appointments_retrieve
+      tags:
+      - appointment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
     post:
       operationId: api_v1_appointments_create
       tags:
-      - api
+      - appointment
       requestBody:
         content:
           application/json:
@@ -39,8 +52,8 @@ paths:
                 $ref: '#/components/schemas/Appointment'
           description: ''
   /api/v1/appointments/{appointment_id}:
-    post:
-      operationId: api_v1_appointments_create_2
+    get:
+      operationId: api_v1_appointments_retrieve_2
       parameters:
       - in: path
         name: appointment_id
@@ -48,18 +61,38 @@ paths:
           type: integer
         required: true
       tags:
-      - api
+      - appointment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/appointments/{appointment_id}/prescription:
+    post:
+      operationId: api_v1_appointments_prescription_create
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - prescription
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Appointment'
+              $ref: '#/components/schemas/Prescription'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Appointment'
+              $ref: '#/components/schemas/Prescription'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Appointment'
+              $ref: '#/components/schemas/Prescription'
         required: true
       security:
       - jwtAuth: []
@@ -68,13 +101,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Appointment'
+                $ref: '#/components/schemas/Prescription'
           description: ''
   /api/v1/assurance:
     get:
       operationId: api_v1_assurance_retrieve
       tags:
-      - Assurance
+      - assurance
       security:
       - jwtAuth: []
       - {}
@@ -88,7 +121,7 @@ paths:
     post:
       operationId: api_v1_assurance_create
       tags:
-      - Assurance
+      - assurance
       requestBody:
         content:
           application/json:
@@ -114,7 +147,7 @@ paths:
     delete:
       operationId: api_v1_assurance_destroy
       tags:
-      - Assurance
+      - assurance
       security:
       - jwtAuth: []
       - {}
@@ -131,7 +164,7 @@ paths:
           type: integer
         required: true
       tags:
-      - api
+      - comment
       requestBody:
         content:
           application/json:
@@ -163,7 +196,7 @@ paths:
           type: integer
         required: true
       tags:
-      - Comment
+      - comment
       security:
       - jwtAuth: []
       responses:
@@ -178,7 +211,7 @@ paths:
           type: integer
         required: true
       tags:
-      - Comment
+      - comment
       security:
       - jwtAuth: []
       responses:
@@ -188,7 +221,7 @@ paths:
     get:
       operationId: api_v1_comments_retrieve
       tags:
-      - api
+      - comment
       security:
       - jwtAuth: []
       responses:
@@ -201,7 +234,7 @@ paths:
     post:
       operationId: api_v1_comments_create
       tags:
-      - api
+      - comment
       requestBody:
         content:
           application/json:
@@ -240,7 +273,7 @@ paths:
         schema:
           type: integer
       tags:
-      - api
+      - doctor
       security:
       - jwtAuth: []
       - {}
@@ -261,7 +294,7 @@ paths:
           type: integer
         required: true
       tags:
-      - api
+      - doctor
       security:
       - jwtAuth: []
       - {}
@@ -276,7 +309,7 @@ paths:
     post:
       operationId: api_v1_get_token_create
       tags:
-      - Authentication
+      - authentication
       requestBody:
         content:
           application/json:
@@ -303,7 +336,7 @@ paths:
     post:
       operationId: api_v1_login_create
       tags:
-      - Authentication
+      - authentication
       requestBody:
         content:
           application/json:
@@ -330,7 +363,7 @@ paths:
     post:
       operationId: api_v1_logout_create
       tags:
-      - Authentication
+      - authentication
       security:
       - jwtAuth: []
       responses:
@@ -338,25 +371,11 @@ paths:
           description: user logged out successfully
         '400':
           description: login first
-  /api/v1/patient/appointment:
-    get:
-      operationId: api_v1_patient_appointment_retrieve
-      tags:
-      - api
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AppointmentDetail'
-          description: ''
   /api/v1/patient/medical_history:
     post:
       operationId: api_v1_patient_medical_history_create
       tags:
-      - api
+      - medicalHistory
       requestBody:
         content:
           application/json:
@@ -381,7 +400,7 @@ paths:
     get:
       operationId: api_v1_patient_profile_retrieve
       tags:
-      - api
+      - patient
       security:
       - jwtAuth: []
       responses:
@@ -394,7 +413,7 @@ paths:
     put:
       operationId: api_v1_patient_profile_update
       tags:
-      - api
+      - patient
       requestBody:
         content:
           application/json:
@@ -419,7 +438,7 @@ paths:
     patch:
       operationId: api_v1_patient_profile_partial_update
       tags:
-      - api
+      - patient
       requestBody:
         content:
           application/json:
@@ -444,7 +463,7 @@ paths:
     post:
       operationId: api_v1_register_create
       tags:
-      - Authentication
+      - authentication
       requestBody:
         content:
           application/json:
@@ -471,7 +490,7 @@ paths:
     get:
       operationId: api_v1_role_retrieve
       tags:
-      - Role
+      - role
       security:
       - jwtAuth: []
       - {}
@@ -485,7 +504,7 @@ paths:
     post:
       operationId: api_v1_role_create
       tags:
-      - Role
+      - role
       requestBody:
         content:
           application/json:
@@ -518,7 +537,7 @@ paths:
           type: integer
         required: true
       tags:
-      - Role
+      - role
       security:
       - jwtAuth: []
       - {}
@@ -538,7 +557,7 @@ paths:
           type: integer
         required: true
       tags:
-      - Role
+      - role
       requestBody:
         content:
           application/json:
@@ -570,7 +589,7 @@ paths:
           type: integer
         required: true
       tags:
-      - Role
+      - role
       security:
       - jwtAuth: []
       - {}
@@ -635,7 +654,7 @@ paths:
     post:
       operationId: api_v1_validate_create
       tags:
-      - Authentication
+      - authentication
       requestBody:
         content:
           application/json:
@@ -698,7 +717,7 @@ components:
           $ref: '#/components/schemas/TypeEnum'
         prescription:
           allOf:
-          - $ref: '#/components/schemas/PrescriptionDetail'
+          - $ref: '#/components/schemas/Prescription'
           readOnly: true
         appointment_time:
           type: string
@@ -763,13 +782,18 @@ components:
     DateTimeSlice:
       type: object
       properties:
+        date:
+          type: string
+          format: date
         start:
           type: string
-          format: date-time
+          format: time
         end:
           type: string
-          format: date-time
+          format: time
+          nullable: true
       required:
+      - date
       - end
       - start
     Doctor:
@@ -1032,7 +1056,7 @@ components:
       - medical_history
       - national_id
       - phone_no
-    PrescriptionDetail:
+    Prescription:
       type: object
       properties:
         id:
