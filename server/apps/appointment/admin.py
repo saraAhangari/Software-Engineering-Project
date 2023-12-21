@@ -96,13 +96,15 @@ class AppointmentAdmin(ImportExportModelAdmin):
 
 @admin.register(Prescription)
 class PrescriptionAdmin(ImportExportModelAdmin):
-    list_display = ('appointment_id', 'description', 'is_expired', 'date')
-    list_filter = ('is_expired', 'date')
+    list_display = ('appointment_id', 'description', 'display_medicines', 'date')
+    list_filter = ('date',)
     ordering = ('-date',)
     list_per_page = 25
 
-    class Meta:
-        model = Prescription
+    def display_medicines(self, obj):
+        return ', '.join([str(medicine) for medicine in obj.medicines.all()])
+
+    display_medicines.short_description = 'Medicines'
 
 
 @admin.register(Comment)
@@ -114,5 +116,3 @@ class CommentAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Comment
-
-

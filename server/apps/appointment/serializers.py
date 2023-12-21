@@ -53,14 +53,16 @@ class MedicineSerializer(serializers.ModelSerializer):
 
 
 class PrescriptionSerializer(serializers.ModelSerializer):
-    medicines = serializers.ListField(child=MedicineSerializer())
-
-    def get_medicines(self, obj):
-        return MedicineSerializer(obj.medicines.all(), many=True).data
+    medicines = serializers.PrimaryKeyRelatedField(queryset=Medicine.objects.all(), many=True)
 
     class Meta:
         model = Prescription
-        fields = '__all__'
+        fields = ['description', 'medicines']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['medicines'] = MedicineSerializer(instance.medicines.all(), many=True).data
+        return representation
 
 
 class AppointmentDetailSerializer(serializers.ModelSerializer):
