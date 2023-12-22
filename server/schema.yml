@@ -487,13 +487,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Patient'
+              $ref: '#/components/schemas/Register'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Patient'
+              $ref: '#/components/schemas/Register'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Patient'
+              $ref: '#/components/schemas/Register'
         required: true
       security:
       - jwtAuth: []
@@ -503,11 +503,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Patient'
+                $ref: '#/components/schemas/Register'
           description: ''
-  /api/v1/role:
+  /api/v1/roles:
     get:
-      operationId: api_v1_role_retrieve
+      operationId: api_v1_roles_retrieve
       tags:
       - role
       security:
@@ -521,7 +521,7 @@ paths:
                 $ref: '#/components/schemas/Role'
           description: ''
     post:
-      operationId: api_v1_role_create
+      operationId: api_v1_roles_create
       tags:
       - role
       requestBody:
@@ -546,9 +546,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Role'
           description: ''
-  /api/v1/role/{id}/:
+  /api/v1/roles/{id}/:
     get:
-      operationId: api_v1_role_retrieve_2
+      operationId: api_v1_roles_retrieve_2
       parameters:
       - in: path
         name: id
@@ -568,7 +568,7 @@ paths:
                 $ref: '#/components/schemas/Role'
           description: ''
     put:
-      operationId: api_v1_role_update
+      operationId: api_v1_roles_update
       parameters:
       - in: path
         name: id
@@ -600,7 +600,7 @@ paths:
                 $ref: '#/components/schemas/Role'
           description: ''
     delete:
-      operationId: api_v1_role_destroy
+      operationId: api_v1_roles_destroy
       parameters:
       - in: path
         name: id
@@ -1059,7 +1059,6 @@ components:
       required:
       - appointments
       - id
-      - medical_history
       - national_id
       - phone_no
     Prescription:
@@ -1074,6 +1073,51 @@ components:
             type: integer
       required:
       - medicines
+    Register:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        national_id:
+          type: string
+          maxLength: 10
+          minLength: 10
+        phone_no:
+          type: string
+          maxLength: 11
+          minLength: 10
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        assurance:
+          type: integer
+          nullable: true
+        gender:
+          $ref: '#/components/schemas/GenderEnum'
+        medical_history:
+          $ref: '#/components/schemas/MedicalHistory'
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDetail'
+          readOnly: true
+        otp:
+          type: string
+          writeOnly: true
+      required:
+      - appointments
+      - id
+      - national_id
+      - otp
+      - phone_no
     Role:
       type: object
       properties:
