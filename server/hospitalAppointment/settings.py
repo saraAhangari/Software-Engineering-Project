@@ -163,6 +163,8 @@ CACHES = {
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_PATH = '/;HttpOnly'
 
 # panel config
 PANEL_API_KEY = env('PANEL_API_KEY')

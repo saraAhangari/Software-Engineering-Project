@@ -23,18 +23,12 @@ class PatientValidationView(generics.CreateAPIView):
         user_phone_no = serializer.data.get('phone_no')
 
         if cache.get(user_phone_no) is not None:
-            return Response({
-                'ok': False,
-                'message': 'otp has already been sent.'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'otp has already been sent.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # send the otp and cache it in redis
         send_otp(user_phone_no)
 
-        return Response({
-            'ok': True,
-            'message': 'otp sent to the user'
-        }, status=status.HTTP_200_OK)
+        return Response({'message': 'otp sent to the user'}, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['authentication'])
@@ -50,22 +44,13 @@ class RegisterView(generics.CreateAPIView):
         print(user_otp, valid_otp)
 
         if user_otp is None:
-            return Response({
-                'ok': False,
-                'message': 'otp not provided'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'otp not provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp is None:
-            return Response({
-                'ok': False,
-                'message': 'first call get otp function'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'first call get otp function'}, status=status.HTTP_400_BAD_REQUEST)
 
         if int(user_otp) != int(valid_otp):
-            return Response({
-                'ok': False,
-                'message': 'otp is not correct'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'otp is not correct'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data)
@@ -83,15 +68,9 @@ class LoginView(generics.CreateAPIView):
         user = User.objects.get(national_id=user_national_id)
 
         if not send_otp(user.phone_no):
-            return Response({
-                'ok': False,
-                'message': 'cant send otp'
-            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            return Response({'message': 'cant send otp'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-        return Response({
-            'ok': True,
-            'message': 'otp sent to the user'
-        }, status=status.HTTP_200_OK)
+        return Response({'message': 'otp sent to the user'}, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['authentication'])
@@ -109,21 +88,17 @@ class GetTokenView(generics.CreateAPIView):
         valid_otp = cache.get(user.phone_no)
 
         if valid_otp is None:
-            return Response({
-                'ok': False,
-                'message': 'login first'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'login first'}, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp != user_otp:
-            return Response({
-                'ok': False,
-                'message': 'otp is not correct'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'otp is not correct'}, status=status.HTTP_400_BAD_REQUEST)
 
         response = Response()
 
         refresh = RefreshToken.for_user(user)
         access = str(refresh.access_token)
+
+        response.set_cookie('authorization', access)
 
         response.data = {
             'national_id': user_national_id,
@@ -152,10 +127,7 @@ class LogoutView(generics.CreateAPIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             cache.set(token, True, 5 * 60)
-            return Response({
-                'ok': True,
-                'message': 'user logged out successfully'
-            }, status=status.HTTP_200_OK)
+            return Response({'message': 'user logged out successfully'}, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(e)
@@ -174,7 +146,7 @@ class RoleView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get(self, request, pk=None):
         response = Response()
@@ -189,15 +161,15 @@ class RoleView(generics.CreateAPIView):
     def delete(self, request, pk=None, *args, **kwargs):
         get_object_or_404(self.queryset, id=pk).delete()
 
-        return Response({
-            'ok': True,
-            'message': 'role deleted'
-        })
+        return Response({'message': 'role deleted'})
 
     def put(self, request, pk, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        new_name = serializer.data.get('name')
         role = get_object_or_404(self.queryset, id=pk)
-        role.name = request.data.get('name')
+        if role.name != new_name:
+            role.name = new_name
         role.save()
-        return Response({'ok': True, 'message': 'updated successfully'})
+
+        return Response({'message': 'role updates successfully'}, status=status.HTTP_200_OK)
