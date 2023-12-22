@@ -2,14 +2,14 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
 from .models import Doctor, Speciality, TimeSlice, Assurance, PatientMedicalHistory, Patient, Medicine, Appointment, \
-    Prescription, Comment, DoctorTime, AppointmentTime
+    Prescription, Comment
 
 
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'username', 'email', 'description', 'fees', 'slice', 'medical_system_number',
-        'display_specialities',)
+        'id', 'username', 'email', 'description', 'slice', 'medical_system_number',
+        'display_specialities')
     list_filter = ('speciality',)
 
     def display_specialities(self, obj):
@@ -36,7 +36,7 @@ class SpecialityAdmin(admin.ModelAdmin):
 
 @admin.register(TimeSlice)
 class TimeSliceAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'date', 'start', 'end', 'status')
+    list_display = ('id', 'date', 'start', 'end', 'status', 'doctor')
     list_filter = ('date', 'status')
     search_fields = ('date', 'start', 'end', 'status')
 
@@ -76,7 +76,7 @@ class PatientAdmin(admin.ModelAdmin):
 
 @admin.register(Medicine)
 class MedicineAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'generic_name', 'infant_safe', 'price',)
+    list_display = ('id', 'generic_name', 'infant_safe',)
     search_fields = ('generic_name',)
 
     class Meta:
@@ -85,7 +85,7 @@ class MedicineAdmin(ImportExportModelAdmin):
 
 @admin.register(Appointment)
 class AppointmentAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'patient_id', 'doctor_id', 'date', 'description', 'status', 'type')
+    list_display = ('id', 'patient_id', 'doctor_id', 'description', 'status', 'type')
     search_fields = ('type', 'status')
     list_per_page = 25
     list_filter = ('type', 'status')
@@ -96,13 +96,15 @@ class AppointmentAdmin(ImportExportModelAdmin):
 
 @admin.register(Prescription)
 class PrescriptionAdmin(ImportExportModelAdmin):
-    list_display = ('description', 'is_expired', 'date')
-    list_filter = ('is_expired', 'date')
+    list_display = ('appointment_id', 'description', 'display_medicines', 'date')
+    list_filter = ('date',)
     ordering = ('-date',)
     list_per_page = 25
 
-    class Meta:
-        model = Prescription
+    def display_medicines(self, obj):
+        return ', '.join([str(medicine) for medicine in obj.medicines.all()])
+
+    display_medicines.short_description = 'Medicines'
 
 
 @admin.register(Comment)
@@ -114,19 +116,3 @@ class CommentAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Comment
-
-
-@admin.register(DoctorTime)
-class DoctorTimeAdmin(admin.ModelAdmin):
-    list_display = ('doctor_id',)
-
-    class Meta:
-        model = DoctorTime
-
-
-@admin.register(AppointmentTime)
-class AppointmentTimeAdmin(admin.ModelAdmin):
-    list_display = ('appointment_id',)
-
-    class Meta:
-        model = AppointmentTime

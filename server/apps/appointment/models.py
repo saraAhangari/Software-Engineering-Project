@@ -1,3 +1,6 @@
+import datetime
+
+import django
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from apps.authentication.models import User
@@ -17,7 +20,6 @@ class Speciality(models.Model):
 class Doctor(User):
     description = models.TextField(null=True, blank=True)
     medical_system_number = models.IntegerField(unique=True)
-    fees = models.FloatField()
     slice = models.IntegerField(default=30)
     speciality = models.ManyToManyField(Speciality)
 
@@ -30,15 +32,16 @@ class Doctor(User):
 
 
 class TimeSlice(models.Model):
-    date = models.DateField(null=True)
-    start = models.TimeField(null=True)
-    end = models.TimeField(null=True)
+    date = models.DateField(default=datetime.date.today)
+    start = models.IntegerField(default=-1)
+    end = models.IntegerField(default=-1)
     TIME_STATUS = [
         ('available', 'available'),
         ('unavailable', 'unavailable')
     ]
 
     status = models.CharField(choices=TIME_STATUS, default='unavailable')
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='available_time_slices')
 
 
 class Assurance(models.Model):
@@ -60,10 +63,10 @@ class PatientMedicalHistory(models.Model):
         ('AB+', 'AB Positive'),
     )
 
-    height = models.FloatField()
-    weight = models.FloatField()
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    blood_pressure = models.IntegerField()
+    height = models.FloatField(blank=True, null=True)
+    weight = models.FloatField(blank=True, null=True)
+    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, default="A+", blank=True, null=True)
+    blood_pressure = models.IntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'medical history'
@@ -75,7 +78,7 @@ class PatientMedicalHistory(models.Model):
 
 class Patient(User):
     assurance = models.ForeignKey(Assurance, on_delete=models.PROTECT, null=True)
-    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.SET_NULL, null=True)
+    medical_history = models.OneToOneField(PatientMedicalHistory, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = 'patient'
@@ -88,39 +91,41 @@ class Patient(User):
 class Medicine(models.Model):
     generic_name = models.CharField(null=True, blank=True)
     infant_safe = models.BooleanField(default=True)
-    price = models.FloatField()
+
+    def __str__(self):
+        return f'{self.generic_name}'
 
 
 class Appointment(models.Model):
     APPOINTMENT_STATUS = [
+        ('reserved', 'reserved'),
         ('completed', 'completed'),
         ('canceled', 'canceled'),
-        ('reserved', 'reserved')
     ]
 
     APPOINTMENT_TYPE = [
         ('face to face', 'face to face'),
         ('online', 'online')
     ]
-    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
     doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=False)
-    description = models.TextField(null=True, blank=True)
-    status = models.CharField(choices=APPOINTMENT_STATUS, default='canceled')
-    type = models.CharField(choices=APPOINTMENT_TYPE, default='online')
+    description = models.TextField(null=True, blank=True, default='-')
+    status = models.CharField(choices=APPOINTMENT_STATUS, default='reserved')
+    type = models.CharField(choices=APPOINTMENT_TYPE, default='face to face')
+    appointment_time = models.OneToOneField(TimeSlice, on_delete=models.CASCADE, related_name='appointment')
 
     def __str__(self):
         return f'{self.id} - {self.type}'
 
 
 class Prescription(models.Model):
-    appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE)
+    appointment_id = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name='prescription')
     description = models.TextField(null=True, blank=True)
-    is_expired = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=False)
+    medicines = models.ManyToManyField(Medicine)
 
     def __str__(self):
-        return f'{self.appointment_id} - {self.date}'
+        return f'{self.id}'
 
 
 class Comment(models.Model):
@@ -139,22 +144,3 @@ class Comment(models.Model):
     def __str__(self):
         return f'Comment by {self.patient_id} on {self.doctor_id}'
 
-
-class DoctorTime(TimeSlice):
-    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='doctor_times')
-
-    class Meta:
-        verbose_name_plural = 'doctor times'
-
-    def __str__(self):
-        return f'{self.id}'
-
-
-class AppointmentTime(TimeSlice):
-    appointment_id = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name="appointment_times")
-
-    class Meta:
-        verbose_name_plural = 'appointment times'
-
-    def __str__(self):
-        return f'{self.id}'

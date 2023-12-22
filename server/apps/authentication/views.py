@@ -1,21 +1,19 @@
 from django.core.cache import cache
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from apps.appointment.models import Patient
+from apps.appointment.models import User
 from .models import Role
-from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer
+from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer, RegisterSerializer
 from .utils import send_otp
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsNotInBlackedList
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, extend_schema_serializer, OpenApiResponse, OpenApiRequest
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class PatientValidationView(generics.CreateAPIView):
     serializer_class = PatientSerializer
 
@@ -25,23 +23,17 @@ class PatientValidationView(generics.CreateAPIView):
         user_phone_no = serializer.data.get('phone_no')
 
         if cache.get(user_phone_no) is not None:
-            return Response({
-                'ok': False,
-                'message': 'otp has already been sent.'
-            }, status=400)
+            return Response({'message': 'otp has already been sent.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # send the otp and cache it in redis
         send_otp(user_phone_no)
 
-        return Response({
-            'ok': True,
-            'message': 'otp sent to the user'
-        }, status=200)
+        return Response({'message': 'otp sent to the user'}, status=status.HTTP_200_OK)
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class RegisterView(generics.CreateAPIView):
-    serializer_class = PatientSerializer
+    serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = PatientSerializer(data=request.data)
@@ -52,49 +44,36 @@ class RegisterView(generics.CreateAPIView):
         print(user_otp, valid_otp)
 
         if user_otp is None:
-            return Response({
-                'ok': False,
-                'message': 'otp not provided'
-            }, status=400)
+            return Response({'message': 'otp not provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp is None:
-            return Response({
-                'ok': False,
-                'message': 'first call get otp function'
-            }, status=400)
+            return Response({'message': 'first call get otp function'}, status=status.HTTP_400_BAD_REQUEST)
 
         if int(user_otp) != int(valid_otp):
-            return Response({
-                'ok': False,
-                'message': 'otp is not correct'
-            }, status=400)
+            return Response({'message': 'otp is not correct'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data)
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = Patient.objects.get(national_id=serializer.data['national_id'])
+
+        user_national_id = serializer.data['national_id']
+        user = User.objects.get(national_id=user_national_id)
 
         if not send_otp(user.phone_no):
-            return Response({
-                'ok': False,
-                'message': 'cant send otp'
-            })
+            return Response({'message': 'cant send otp'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-        return Response({
-            'ok': True,
-            'message': 'otp sent to the user'
-        })
+        return Response({'message': 'otp sent to the user'}, status=status.HTTP_200_OK)
 
 
-@extend_schema(tags=['Authentication'])
+@extend_schema(tags=['authentication'])
 class GetTokenView(generics.CreateAPIView):
     serializer_class = GetTokenSerializer
 
@@ -102,30 +81,27 @@ class GetTokenView(generics.CreateAPIView):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        national_id = serializer.data['national_id']
+        user_national_id = serializer.data['national_id']
         user_otp = int(serializer.data['otp'])
 
-        patient = Patient.objects.filter(national_id=national_id).first()
-        valid_otp = cache.get(patient.phone_no)
+        user = User.objects.filter(national_id=user_national_id).first()
+        valid_otp = cache.get(user.phone_no)
 
         if valid_otp is None:
-            return Response({
-                'ok': False,
-                'message': 'login first'
-            })
+            return Response({'message': 'login first'}, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp != user_otp:
-            return Response({
-                'ok': False,
-                'message': 'otp is not correct'
-            })
+            return Response({'message': 'otp is not correct'}, status=status.HTTP_400_BAD_REQUEST)
 
         response = Response()
 
-        refresh = RefreshToken.for_user(patient)
+        refresh = RefreshToken.for_user(user)
         access = str(refresh.access_token)
 
+        response.set_cookie('authorization', access)
+
         response.data = {
+            'national_id': user_national_id,
             'refresh_token': str(refresh),
             'access_token': access
         }
@@ -133,7 +109,7 @@ class GetTokenView(generics.CreateAPIView):
         return response
 
 
-@extend_schema(tags=['Authentication'], request=None, responses={
+@extend_schema(tags=['authentication'], request=None, responses={
     201: OpenApiResponse(description='user logged out successfully'),
     400: OpenApiResponse(description='login first'),
 })
@@ -150,11 +126,8 @@ class LogoutView(generics.CreateAPIView):
                     'message': 'login first'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            cache.set(token, True, 5 * 24 * 60 * 60)
-            return Response({
-                'ok': True,
-                'message': 'user logged out successfully'
-            })
+            cache.set(token, True, 5 * 60)
+            return Response({'message': 'user logged out successfully'}, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(e)
@@ -163,8 +136,7 @@ class LogoutView(generics.CreateAPIView):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-@extend_schema(tags=['Role'])
+@extend_schema(tags=['role'])
 class RoleView(generics.CreateAPIView):
     serializer_class = RoleSerializer
     queryset = Role.objects.all()
@@ -174,27 +146,30 @@ class RoleView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get(self, request, pk=None):
+        response = Response()
         serializer = self.serializer_class(self.queryset.all(), many=True)
+        response.data = {'roles': serializer.data}
         if pk:
             serializer = self.serializer_class(get_object_or_404(self.queryset, id=pk))
+            response.data = serializer.data
 
-        return Response(serializer.data)
+        return response
 
     def delete(self, request, pk=None, *args, **kwargs):
         get_object_or_404(self.queryset, id=pk).delete()
 
-        return Response({
-            'ok': True,
-            'message': 'role deleted'
-        })
+        return Response({'message': 'role deleted'})
 
     def put(self, request, pk, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        new_name = serializer.data.get('name')
         role = get_object_or_404(self.queryset, id=pk)
-        role.name = request.data.get('name')
+        if role.name != new_name:
+            role.name = new_name
         role.save()
-        return Response({'ok': True, 'message': 'updated successfully'})
+
+        return Response({'message': 'role updates successfully'}, status=status.HTTP_200_OK)

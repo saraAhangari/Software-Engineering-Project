@@ -129,7 +129,6 @@ Control.ca-bundle
 Control.system-ca-bundle
 GitHub.sublime-settings
 
-# Visual Studio Code #
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -139,5 +138,8 @@ GitHub.sublime-settings
 
 .dockerignore
 
-server/apps/appointment/migrations/
-server/apps/authentication/migrations/
+front-end/node_modules
+./front-end/node_modules
+
+server/.env.base
+

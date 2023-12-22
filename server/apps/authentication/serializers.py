@@ -1,28 +1,45 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from .models import Role
-from apps.appointment.models import Patient
-from apps.appointment.serializers import MedicalHistorySerializer
+
+from apps.appointment.serializers import MedicalHistorySerializer, AppointmentDetailSerializer
+from apps.appointment.models import Patient, User
+
+
+# class PatientDetailSerializer(serializers.ModelSerializer):
 
 
 class PatientSerializer(serializers.ModelSerializer):
-    medical_history = MedicalHistorySerializer()
+    medical_history = MedicalHistorySerializer(required=False)
+    appointments = AppointmentDetailSerializer(many=True, read_only=True)
 
     def get_medical_history(self, obj):
-        return MedicalHistorySerializer(obj.mediaclHistory.all()).data
+        return MedicalHistorySerializer(obj.medical_history.all()).data
+
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #
+    #     appointments_data = representation.get('appointments', [])
+    #     completed_appointments = [appt for appt in appointments_data if appt.get('status') == 'completed']
+    #     representation['appointments'] = completed_appointments
+    #
+    #     return representation
 
     class Meta:
         model = Patient
         fields = ['id', 'first_name', 'last_name', 'national_id',
                   'phone_no', 'birthdate', 'assurance', 'gender',
-                  'medical_history']
+                  'medical_history', 'appointments'
+                  ]
 
     def create(self, validated_data):
-        patient = self.Meta.model(**validated_data)
+        validated_data.pop('medical_history', [])
+        validated_data.pop('appointments', [])
+        patient = Patient.objects.create(**validated_data)
         patient.role = Role.objects.filter(name='patient').first()
         patient.username = patient.national_id
-
         patient.save()
+
         return patient
 
     def update(self, patient, validated_data):
@@ -45,8 +62,27 @@ class PatientSerializer(serializers.ModelSerializer):
                                                                               patient.medical_history.blood_pressure)
             patient.medical_history.save()
 
-        patient.save()
-        return patient
+        representation = {
+            'id': patient.id,
+            'first_name': patient.first_name,
+            'last_name': patient.last_name,
+            'national_id': patient.national_id,
+            'phone_no': patient.phone_no,
+            'birthdate': patient.birthdate,
+            'assurance': patient.assurance,
+            'gender': patient.gender,
+            'medical_history': MedicalHistorySerializer(patient.medical_history).data,
+        }
+
+        return representation
+
+
+class RegisterSerializer(PatientSerializer):
+    otp = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Patient
+        fields = PatientSerializer.Meta.fields + ['otp']
 
 
 class LoginSerializer(serializers.Serializer):
@@ -61,7 +97,7 @@ class LoginSerializer(serializers.Serializer):
         if len(national_id) != 10:
             raise serializers.ValidationError('national_id not valid pattern')
 
-        if Patient.objects.filter(national_id=national_id).first() is None:
+        if User.objects.filter(national_id=national_id).first() is None:
             raise serializers.ValidationError('login first')
 
         return data
@@ -72,7 +108,7 @@ class GetTokenSerializer(serializers.Serializer):
     otp = serializers.CharField(max_length=6)
 
     def validate(self, data):
-        patient = Patient.objects.filter(national_id=data['national_id']).first()
+        user = User.objects.filter(national_id=data['national_id']).first()
 
         if not data['national_id']:
             raise serializers.ValidationError('national_id not provided')
@@ -80,7 +116,7 @@ class GetTokenSerializer(serializers.Serializer):
         if not data['otp']:
             raise serializers.ValidationError('otp not provided')
 
-        if patient is None:
+        if user is None:
             raise serializers.ValidationError('user not found')
 
         return data
@@ -100,4 +136,3 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
-

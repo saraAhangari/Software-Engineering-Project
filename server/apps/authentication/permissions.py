@@ -1,8 +1,4 @@
 from rest_framework import permissions
-import jwt
-from hospitalAppointment.settings import SECRET_KEY
-from apps.authentication.models import Role
-from rest_framework.exceptions import ValidationError
 from rest_framework.exceptions import APIException
 from django.core.cache import cache
 from rest_framework import status
@@ -18,26 +14,25 @@ class GenericAPIException(APIException):
             self.status_code = status_code
 
 
-class IsDoctor(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.user.role.name == 'doctor':
-            return True
-        return False
-
-
 class IsNotInBlackedList(permissions.BasePermission):
 
     def has_permission(self, request, view):
         token = request.headers['Authorization'].split(" ")[1]
-
         # if not in blacklist
         if cache.get(token) is None:
             return True
-        raise GenericAPIException(detail='login first', status_code=401)
+        raise GenericAPIException(detail='login first', status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 class IsPatient(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.role.name == 'patient':
+            return True
+        return False
+
+
+class IsDoctor(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.role.name == 'doctor':
             return True
         return False
