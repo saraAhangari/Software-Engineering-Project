@@ -16,7 +16,7 @@ def send_message(confirmation_code, receiver_phone_number):
                               f" به سامانه مدیریت نوبت دهی بیمارستان شهید بهشتی خوش آمدید. کد یکبار مصرف: {confirmation_code}",
                               f'${confirmation_code}')
     except Error as e:  # ippanel sms error
-        print(f"Error handled => code: {e.code}, message: {e.message}")
+        # print(f"Error handled => code: {e.code}, message: {e.message}")
         if e.code == ResponseCode.ErrUnprocessableEntity.value:
             for field in e.message:
                 print(f"Field: {field} , Errors: {e.message[field]}")
