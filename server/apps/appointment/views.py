@@ -6,6 +6,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from datetime import timedelta
 
 from .models import Assurance, Doctor, Comment, Patient, Appointment, TimeSlice, Prescription
 from django.db.models import Q
@@ -256,14 +257,14 @@ class AppointmentPatientView(generics.CreateAPIView):
             doctor = get_object_or_404(Doctor.objects.all(), id=serializer.validated_data.get('doctor_id').id)
             date = serializer.validated_data.get('appointment_time').get('date')
             start = serializer.validated_data.get('appointment_time').get('start')
-            end = serializer.validated_data.get('appointment_time').get('end', start + doctor.slice)
+            end = serializer.validated_data.get('appointment_time').get('end', time_to_minutes(start) + doctor.slice)
 
             # convert start, end to minutes
             start_minutes = time_to_minutes(start)
             end_minutes = time_to_minutes(end)
 
             # check start and end time
-            if start + doctor.slice != end:
+            if start_minutes + doctor.slice != end_minutes:
                 return Response({'ok': False, 'message': 'time slice range not correct'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
