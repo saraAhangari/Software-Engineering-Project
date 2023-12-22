@@ -10,7 +10,7 @@ from apps.appointment.models import Patient, User
 
 
 class PatientSerializer(serializers.ModelSerializer):
-    medical_history = MedicalHistorySerializer(allow_null=True)
+    medical_history = MedicalHistorySerializer(required=False)
     appointments = AppointmentDetailSerializer(many=True, read_only=True)
 
     def get_medical_history(self, obj):
@@ -75,6 +75,14 @@ class PatientSerializer(serializers.ModelSerializer):
         }
 
         return representation
+
+
+class RegisterSerializer(PatientSerializer):
+    otp = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Patient
+        fields = PatientSerializer.Meta.fields + ['otp']
 
 
 class LoginSerializer(serializers.Serializer):

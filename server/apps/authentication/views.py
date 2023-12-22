@@ -4,7 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from apps.appointment.models import User
 from .models import Role
-from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer
+from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer, RegisterSerializer
 from .utils import send_otp
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsNotInBlackedList
@@ -39,7 +39,7 @@ class PatientValidationView(generics.CreateAPIView):
 
 @extend_schema(tags=['authentication'])
 class RegisterView(generics.CreateAPIView):
-    serializer_class = PatientSerializer
+    serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = PatientSerializer(data=request.data)
