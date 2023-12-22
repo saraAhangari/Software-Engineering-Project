@@ -478,6 +478,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/Patient'
           description: ''
+  /api/v1/patient/profile/appointments/{appointment_id}/prescription:
+    get:
+      operationId: api_v1_patient_profile_appointments_prescription_retrieve
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - prescription
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
   /api/v1/register:
     post:
       operationId: api_v1_register_create
