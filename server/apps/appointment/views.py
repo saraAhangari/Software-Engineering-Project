@@ -325,7 +325,7 @@ class PrescriptionDoctorView(generics.CreateAPIView):
         prescription = Prescription.objects.create(
             appointment_id=appointment,
             description=serializer.validated_data.get('description'),
-            date=appointment.appointment_time.date
+            date=datetime.now()
         )
         prescription.medicines.set(serializer.validated_data.get('medicines', []))
         prescription.save()
@@ -336,5 +336,17 @@ class PrescriptionDoctorView(generics.CreateAPIView):
         appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id,
                                         doctor_id__exact=request.user.id)
         prescription = get_object_or_404(Prescription.objects.all(), appointment_id=appointment)
+
+        return Response(PrescriptionSerializer(prescription).data)
+
+
+@extend_schema(tags=['prescription'])
+class PrescriptionPatientView(generics.RetrieveAPIView):
+    serializer_class = PrescriptionSerializer
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsPatient)
+
+    def get(self, request, appointment_id=None, *args, **kwargs):
+        appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id, patient_id__exact=request.user.id)
+        prescription = get_object_or_404(Prescription.objects.all(), appointment_id=appointment, )
 
         return Response(PrescriptionSerializer(prescription).data)
