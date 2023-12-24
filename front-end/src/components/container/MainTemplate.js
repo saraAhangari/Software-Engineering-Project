@@ -5,6 +5,7 @@ import ICON_LOGOUT from "../../assets/images/icon_logout.svg";
 import ICON_PROFILE from "../../assets/images/icon_profile_circled.svg"
 import {useNavigate} from "react-router-dom";
 import DEFAULT_BACKGROUND from "../../assets/images/main_background.png";
+import {useAuth} from "../../auth/Auth";
 
 function MainTemplate(
     {
@@ -12,10 +13,11 @@ function MainTemplate(
         buttonTitle = undefined,
         onButtonClicked = () => {},
         showDefaultBackground = true,
-        hasLoggedIn = false, // TODO: read from current state
         style = {},
     }
 ) {
+    const {token, logoutUser} = useAuth();
+
     const ref = useRef(null);
     const [height, setHeight] = useState(0);
 
@@ -49,7 +51,8 @@ function MainTemplate(
     }
 
     function logout() {
-        // TODO: logout
+        logoutUser();
+        navigateToHome();
     }
 
     return (
@@ -80,7 +83,7 @@ function MainTemplate(
                         </IconButton>
                         <div className={'toolbar__icon-spacer'}/>
                         {
-                            hasLoggedIn ? (
+                            token ? (
                                 <>
                                     <IconButton onClick={handleProfileIconClick}>
                                         <img className={'toolbar__icon'}
