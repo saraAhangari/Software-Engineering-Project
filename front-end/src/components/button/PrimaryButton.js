@@ -1,17 +1,20 @@
 import {Button, useTheme} from "@mui/material";
 import {buttonHorizontalPadding, buttonVerticalPadding} from "./Variables";
+import Spinner from "../animation/Spinner";
 
 function PrimaryButton(
     {
         text = undefined,
         style = {},
         onButtonClicked = () => {},
+        isLoading = undefined,
     }
 ) {
     const theme = useTheme()
 
     return (
         <Button
+            disabled={isLoading}
             style={
                 {
                     backgroundColor: theme.palette.primary.main,
@@ -21,7 +24,7 @@ function PrimaryButton(
                 }
             }
             onClick={onButtonClicked}
-        >{text}</Button>
+        >{isLoading ? <Spinner/> : text}</Button>
     )
 }
 

@@ -1,14 +1,46 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import MainTemplate from "../../components/container/MainTemplate";
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import CustomCard from "../../components/container/CustomCard";
-import {Button, Divider, Link, makeStyles, styled, useTheme} from "@mui/material";
+import {Divider} from "@mui/material";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import CustomTextFiled from "../../components/text-field/CustomTextField";
+import {safeApiCall} from "../../data/api/Api";
+import {getToken, login} from "../../data/api/AuthenticationApi";
+import {useAuth} from "../../auth/Auth";
 
 function Login() {
     const navigate = useNavigate()
+
+    const {token, loginUser} = useAuth();
+
+    const [showOtpField, setShowOtpField] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState({});
+
+    console.log('error');
+    console.log(error);
+
+    const [isDoctorLogin, setIsDoctorLogin] = useState(false);
+
+    const [inputs, setInputs] = useState({
+        nationalId: undefined,
+        otp: undefined,
+    });
+
+    const handleTextFieldInputs = (event) => {
+        setInputs(
+            prevState => ({
+                ...prevState,
+                [event.target.name]: event.target.value,
+            })
+        )
+    }
+
+    if (token) {
+        return <Navigate to='/patient-panel' />
+    }
 
     function navigateToHome() {
         navigate('/')
@@ -17,8 +49,6 @@ function Login() {
     function navigateToSignUp() {
         navigate('/signup')
     }
-
-    const [isDoctorLogin, setIsDoctorLogin] = useState(false);
 
     function getButton(isActive, text, onClick) {
         if (isActive) {
@@ -38,7 +68,30 @@ function Login() {
         }
     }
 
-    const [error, setError] = useState(undefined);
+    function requestToken() {
+        setError({});
+        safeApiCall(
+            getToken(inputs.nationalId, inputs.otp),
+            setIsLoading,
+            setError,
+            loginUser,
+        )
+    }
+
+    function requestLogin() {
+        setError({});
+        safeApiCall(
+            login(inputs.nationalId),
+            setIsLoading,
+            setError,
+            () => {
+                setShowOtpField(true)
+                setTimeout(() => {
+                    setShowOtpField(false);
+                }, 2 * 60 * 1000);
+            },
+        )
+    }
 
     return (
         <MainTemplate buttonTitle={'صفحه اصلی'} onButtonClicked={navigateToHome}>
@@ -74,7 +127,9 @@ function Login() {
 
                     <CustomTextFiled
                         label={'کد ملی'}
-                        errorMessage={error}
+                        name={'nationalId'}
+                        errorMessage={error.national_id}
+                        disabled={showOtpField}
                         style={
                             {
                                 marginTop: '40px',
@@ -87,21 +142,42 @@ function Login() {
                                 }
                             }
                         }
+                        onTextChanged={handleTextFieldInputs}
                     />
+
+                    {
+                        showOtpField && <CustomTextFiled
+                            label={'کد تایید'}
+                            name={'otp'}
+                            errorMessage={error.otp}
+                            inputProps={
+                                {
+                                    style: {
+                                        background: 'var(--gray1, #D9D9D9)',
+                                    }
+                                }
+                            }
+                            onTextChanged={handleTextFieldInputs}
+                        />
+                    }
 
                     <PrimaryButton
                         style={
                             {
-                                marginTop: '40px',
+                                marginTop: showOtpField ? '0' : '40px',
                                 borderRadius: '15px',
                                 padding: '15px'
                             }
                         }
-                        text={'دریافت کد تایید'}
+                        isLoading={isLoading}
+                        text={showOtpField ? 'ارسال کد تایید' : 'دریافت کد تایید'}
                         onButtonClicked={
                             () => {
-                                // TODO: send request
-                                setError('هنوز این فیچر پیاده سازی نشده است.')
+                                if (showOtpField) {
+                                    requestToken();
+                                } else {
+                                    requestLogin();
+                                }
                             }
                         }
                     />
