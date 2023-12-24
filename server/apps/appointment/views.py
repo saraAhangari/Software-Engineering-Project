@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from datetime import timedelta
 
+from .builder import DoctorQueryFilterBuilder
 from .models import Assurance, Doctor, Comment, Patient, Appointment, TimeSlice, Prescription
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
@@ -42,18 +43,29 @@ class AssuranceView(generics.CreateAPIView):
         pass  # TODO
 
 
-@extend_schema(tags=['doctor'])
+@extend_schema(tags=['doctor'], parameters=[
+    OpenApiParameter(name='first_name', type=str, location=OpenApiParameter.QUERY, description='Filter doctors by '
+                                                                                               'first name'),
+    OpenApiParameter(name='last_name', type=str, location=OpenApiParameter.QUERY, description='Filter doctors by last '
+                                                                                              'name'),
+    OpenApiParameter(name='speciality_name', type=str, location=OpenApiParameter.QUERY, description='Filter doctors '
+                                                                                                    'by speciality '
+                                                                                                    'name'),
+])
 class DoctorListView(ListAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
 
     def get(self, request, *args, **kwargs):
-        query = request.GET.get('q', '')
-        doctors = Doctor.objects.filter(
-            Q(first_name__startswith=query) |
-            Q(last_name__startswith=query) |
-            Q(speciality__name__startswith=query)
-        )
+        query_builder = DoctorQueryFilterBuilder()
+
+        first_name = request.GET.get('first_name', '')
+        last_name = request.GET.get('last_name', '')
+        speciality_name = request.GET.get('speciality_name', '')
+
+        query_builder.with_first_name(first_name).with_last_name(last_name).with_speciality(speciality_name)
+
+        doctors = Doctor.objects.filter(query_builder.build())
 
         pagination = self.pagination_class()
         paginated_set = pagination.paginate_queryset(doctors, request)
