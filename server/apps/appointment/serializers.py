@@ -13,7 +13,7 @@ class SpecialitySerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['doctor_id', 'patient_id', 'treatment_experience', 'point']
+        fields = ['treatment_experience', 'point']
 
 
 class DoctorSerializer(serializers.ModelSerializer):
