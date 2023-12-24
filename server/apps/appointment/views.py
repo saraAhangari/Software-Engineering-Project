@@ -63,7 +63,7 @@ class DoctorListView(ListAPIView):
         last_name = request.GET.get('last_name', '')
         speciality_name = request.GET.get('speciality_name', '')
 
-        query_builder.with_first_name(first_name).with_last_name(last_name).with_speciality(speciality_name)
+        query_builder.by_first_name(first_name).by_last_name(last_name).by_speciality_name(speciality_name)
 
         doctors = Doctor.objects.filter(query_builder.build())
 
