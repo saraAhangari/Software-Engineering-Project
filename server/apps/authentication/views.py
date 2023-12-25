@@ -18,17 +18,19 @@ class PatientValidationView(generics.CreateAPIView):
     serializer_class = PatientSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = PatientSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_phone_no = serializer.data.get('phone_no')
 
         if cache.get(user_phone_no) is not None:
-            return Response({'message': 'otp has already been sent.'}, status=status.HTTP_400_BAD_REQUEST)
+            ttl = cache.ttl(user_phone_no)
+            return Response({'message': f'کد یکبار مصرف قبلا برای شما ارسال شده است. {ttl} ثانیه دیگر میتوانید دوباره امتحان کنید. ',
+                             'ttl': ttl}, status=status.HTTP_400_BAD_REQUEST)
 
         # send the otp and cache it in redis
         send_otp(user_phone_no)
 
-        return Response({'message': 'otp sent to the user'}, status=status.HTTP_200_OK)
+        return Response({'message': 'کد یکبار مصرف ارسال شد.'}, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['authentication'])

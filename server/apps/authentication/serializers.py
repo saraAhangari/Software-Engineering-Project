@@ -11,10 +11,16 @@ from apps.appointment.models import Patient, User
 
 class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer(required=False)
-    appointments = AppointmentDetailSerializer(many=True, read_only=True)
+    appointments = AppointmentDetailSerializer(many=True, read_only=True, required=False)
 
     def get_medical_history(self, obj):
         return MedicalHistorySerializer(obj.medical_history.all()).data
+
+    def validate_national_id(self, value):
+        if Patient.objects.filter(national_id=value).exists():
+            raise serializers.ValidationError('کد ملی وارد شده تکراری است.')
+
+        return value
 
     # def to_representation(self, instance):
     #     representation = super().to_representation(instance)
@@ -31,6 +37,66 @@ class PatientSerializer(serializers.ModelSerializer):
                   'phone_no', 'birthdate', 'assurance', 'gender',
                   'medical_history', 'appointments'
                   ]
+
+        extra_kwargs = {
+            'first_name': {
+                'required': True,
+                'error_messages': {
+                    'required': 'نام وارد نشده است.',
+                    'invalid': 'نام معتبر نیست.'
+                }
+            },
+            'last_name': {
+                'required': True,
+                'error_messages': {
+                    'required': 'نام خانوادگی وارد نشده است.',
+                    'invalid': 'نام خانوادگی معتبر نیست.'
+                }
+            },
+            'national_id': {
+                'required': True,
+                'error_messages': {
+                    'required': 'کد ملی وارد نشده است.',
+                    'invalid': 'کد ملی معتبر نیست.',
+                    'min_length': 'کد ملی باید ۱۰ رقم باشد.',
+                    'max_length': 'کد ملی باید ۱۰ رقم باشد.',
+                    'unique': 'کد ملی باید یکتا باشد.'
+                }
+            },
+            'phone_no': {
+                'required': True,
+                'error_messages': {
+                    "required": 'شماره تلفن وارد نشده است.',
+                    'invalid': 'شماره تلفن معتبر نیست.',
+                    'min_length': 'شماره تلفن باید حداقل ۱۰ رقم باشد.',
+                    'max_length': 'شماره تلفن باید حداکثر ۱۱ رقم باشد.',
+                    'unique': 'شماره تلفن باید یکتا باشد.'
+                }
+            },
+            'birthdate': {
+                'required': True,
+                'error_messages': {
+                    "required": 'تاریخ تولد وارد نشده است.',
+                    'invalid': 'تاریخ تولد معتبر نیست.',
+                }
+            },
+            'assurance': {
+                'required': True,
+                'error_messages': {
+                    'required': 'بیمه وارد نشده است.',
+                    'invalid': 'بیمه معتبر نیست.',
+                }
+            },
+            'gender': {
+                'required': True,
+                'error_messages': {
+                    "required": 'جنسیت وارد نشده است.',
+                    'invalid': 'جنسیت معتبر نیست.'
+                }
+            },
+
+
+        }
 
     def create(self, validated_data):
         validated_data.pop('medical_history', [])

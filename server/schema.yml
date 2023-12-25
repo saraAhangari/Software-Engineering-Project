@@ -566,7 +566,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Role'
           description: ''
-  /api/v1/roles/{id}/:
+  /api/v1/roles/{id}:
     get:
       operationId: api_v1_roles_retrieve_2
       parameters:

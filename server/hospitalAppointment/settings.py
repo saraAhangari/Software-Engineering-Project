@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import environ
 from datetime import timedelta
+import collections
+collections.Callable = collections.abc.Callable
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     "apps.appointment",
     "import_export",
     "drf_spectacular",
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -176,3 +179,9 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=authentication,appointment',
+]
