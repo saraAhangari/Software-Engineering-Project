@@ -185,3 +185,12 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-package=authentication,appointment',
 ]
+
+
+CELERY_BROKER_URL = env('REDIS_URI')
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_ACCEPT_TYPE = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_DEFAULT_QUEUE = 'default'
