@@ -27,6 +27,39 @@ services:
     ports:
       - "5432:5432"
 
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/local.Dockerfile
+    container_name: 'worker'
+
+    command: 'celery -A hospitalAppointment worker --loglevel=info'
+    depends_on:
+      - redis
+      - db
+
+    env_file:
+      - .env.base
+
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG_MODE=${DEBUG_MODE}
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - REDIS_URI=${REDIS_URI}
+      - PANEL_API_KEY=${PANEL_API_KEY}
+
+    volumes:
+      - .:/app
+
+    restart: on-failure
+
+
+
   server:
     build:
       context: .
@@ -34,7 +67,7 @@ services:
     container_name: 'server'
     command: >
       sh -c "python manage.py migrate && 
-              python manage.py runserver 0.0.0.0:8000"
+             python manage.py runserver 0.0.0.0:8000"
 
     env_file:
       - .env.base
