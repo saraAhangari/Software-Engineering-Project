@@ -195,7 +195,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/Comment'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -221,21 +220,6 @@ paths:
       responses:
         '200':
           description: No response body
-    post:
-      operationId: api_v1_comment_permission_create
-      parameters:
-      - in: path
-        name: doctor_id
-        schema:
-          type: integer
-        required: true
-      tags:
-      - comment
-      security:
-      - jwtAuth: []
-      responses:
-        '201':
-          description: No response body
   /api/v1/comments:
     get:
       operationId: api_v1_comments_retrieve
@@ -245,31 +229,6 @@ paths:
       - jwtAuth: []
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Comment'
-          description: ''
-    post:
-      operationId: api_v1_comments_create
-      tags:
-      - comment
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Comment'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Comment'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Comment'
-        required: true
-      security:
-      - jwtAuth: []
-      responses:
-        '201':
           content:
             application/json:
               schema:
@@ -804,10 +763,6 @@ components:
     Comment:
       type: object
       properties:
-        doctor_id:
-          type: integer
-        patient_id:
-          type: integer
         treatment_experience:
           type: string
           nullable: true
@@ -815,9 +770,6 @@ components:
           type: integer
           maximum: 5
           minimum: 1
-      required:
-      - doctor_id
-      - patient_id
     DateTimeSlice:
       type: object
       properties:

@@ -81,27 +81,27 @@ class DoctorDetailView(RetrieveAPIView):
 @extend_schema(tags=['comment'])
 class AddCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment, IsPatient]
 
-    def create(self, request, doctor_id, *args, **kwargs):
-        try:
-            doctor = Doctor.objects.get(pk=doctor_id)
-        except Doctor.DoesNotExist:
-            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        request.data['patient_id'] = request.user.id
-        request.data['doctor_id'] = doctor.id
-
-        serializer = self.get_serializer(data=request.data)
+    def post(self, request, doctor_id, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        doctor = get_object_or_404(Doctor.objects.all(), id=doctor_id)
+
+        comment = Comment.objects.create(
+            patient_id=request.user.patient,
+            doctor_id=doctor,
+            treatment_experience=serializer.validated_data.get('treatment_experience'),
+            point=serializer.validated_data.get('point')
+        )
+        comment.save()
+
+        return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=['comment'])
-class GetCommentView(generics.CreateAPIView):
+class GetCommentView(generics.RetrieveAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList]
 
@@ -113,12 +113,11 @@ class GetCommentView(generics.CreateAPIView):
 
 
 @extend_schema(tags=['comment'], request=None, responses=None)
-class CommentPermissionView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment, ]
+class CommentPermissionView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPermittedToComment, IsPatient]
 
     def get(self, request, *args, **kwargs):
         return Response({
-            'ok': True,
             'description': 'patient has permission to comment'
         })
 
