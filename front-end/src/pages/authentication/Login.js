@@ -39,7 +39,7 @@ function Login() {
     }
 
     if (token) {
-        return <Navigate to='/patient-panel' />
+        navigate('/patient-panel');
     }
 
     function navigateToHome() {

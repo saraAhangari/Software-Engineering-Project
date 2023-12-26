@@ -1,6 +1,6 @@
 import React from "react";
 import PatientPanelItem from "../../components/item/PatientPanelItem";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams, Navigate} from "react-router-dom";
 import ICON_CALENDAR from "../../assets/images/icon_calendar.svg";
 import ICON_DOCUMENT from "../../assets/images/icon_docs.svg";
 import ICON_EDIT_PENCIL from "../../assets/images/icon_edit_pencil.svg";
@@ -8,9 +8,15 @@ import ICON_MESSAGE from "../../assets/images/icon_message.svg";
 import ICON_NOTES from "../../assets/images/icon_notes.svg";
 import MainTemplate from "../../components/container/MainTemplate";
 import SearchBar from "../../components/searchbar/SearchBar";
+import {useAuth} from "../../auth/Auth";
 
 function PatientPanel(props) {
-    const { patient_id } = useParams();
+    const {token} = useAuth();
+    const navigate = useNavigate();
+
+    if (!token) {
+        return <Navigate to={'/login'} />
+    }
 
     const menuItems = [
         {
@@ -45,7 +51,7 @@ function PatientPanel(props) {
             icon: ICON_EDIT_PENCIL,
             title: 'ویرایش اطلاعات',
             onClick: () => {
-                // TODO: handle
+                navigate('/edit-information')
             },
         },
     ];

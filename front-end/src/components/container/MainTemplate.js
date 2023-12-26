@@ -7,6 +7,8 @@ import {useNavigate} from "react-router-dom";
 import DEFAULT_BACKGROUND from "../../assets/images/main_background.png";
 import {useAuth} from "../../auth/Auth";
 
+const PROFILE_ITEM = 1;
+
 function MainTemplate(
     {
         children,
@@ -41,7 +43,11 @@ function MainTemplate(
     }
 
     function handleMenuItemClick(item) {
-        // TODO: handle action based on item
+        switch (item.target.tabIndex) {
+            case PROFILE_ITEM: {
+                navigation('/patient-panel')
+            }
+        }
         setAnchorEl(null);
         setIsMenuOpen(false);
     }
@@ -128,7 +134,7 @@ function MainTemplate(
                                 }
                             }
                         />
-                        <MenuItem onClick={handleMenuItemClick}>پروفایل</MenuItem>
+                        <MenuItem tabIndex={PROFILE_ITEM} onClick={handleMenuItemClick}>پروفایل</MenuItem>
                     </Menu>
                 </AppBar>
                 {

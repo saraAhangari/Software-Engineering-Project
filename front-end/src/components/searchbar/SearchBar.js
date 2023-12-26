@@ -1,12 +1,14 @@
 import React from "react";
 import {Box, IconButton, InputBase} from "@mui/material";
 import {Search} from "@mui/icons-material";
+import PrimaryButton from "../button/PrimaryButton";
 
 function SearchBar(
     {
         placeholder,
         onTextChanged = () => {},
         onSearchButtonClicked = () => {},
+        endChild = undefined,
     }
 ) {
     return (
@@ -30,6 +32,9 @@ function SearchBar(
                 placeholder={placeholder}
                 onChange={onTextChanged}
             />
+            {
+                endChild
+            }
         </Box>
     );
 }
