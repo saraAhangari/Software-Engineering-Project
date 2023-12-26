@@ -95,12 +95,12 @@ class PatientSerializer(serializers.ModelSerializer):
                 }
             },
 
-
         }
 
     def create(self, validated_data):
         validated_data.pop('medical_history', [])
         validated_data.pop('appointments', [])
+        validated_data.pop('otp')
         patient = Patient.objects.create(**validated_data)
         patient.role = Role.objects.filter(name='patient').first()
         patient.username = patient.national_id
@@ -144,11 +144,12 @@ class PatientSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(PatientSerializer):
-    otp = serializers.CharField(write_only=True)
+    otp = serializers.CharField()
 
     class Meta:
         model = Patient
         fields = PatientSerializer.Meta.fields + ['otp']
+
 
 
 class LoginSerializer(serializers.Serializer):

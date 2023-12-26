@@ -38,21 +38,22 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = PatientSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_otp = request.data.get('otp')
-        valid_otp = cache.get(request.data['phone_no'])
 
-        print(user_otp, valid_otp)
-
-        if user_otp is None:
-            return Response({'message': 'otp not provided'}, status=status.HTTP_400_BAD_REQUEST)
+        user_otp = serializer.validated_data.get('otp')
+        valid_otp = cache.get(serializer.validated_data.get('phone_no'))
 
         if valid_otp is None:
-            return Response({'message': 'first call get otp function'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if int(user_otp) != int(valid_otp):
-            return Response({'message': 'otp is not correct'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'دوباره درخواست کد یکبار مصرف داشته باشید.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if int(user_otp) != int(valid_otp):
+                return Response({'message': 'کد وارد شده صحیح نمیباشد.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({'message': 'کد وارد شده باید عدد باشد.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data)

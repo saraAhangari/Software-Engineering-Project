@@ -15,7 +15,6 @@ class GenericAPIException(APIException):
 
 
 class IsNotInBlackedList(permissions.BasePermission):
-
     def has_permission(self, request, view):
         token = request.headers['Authorization'].split(" ")[1]
         # if not in blacklist
