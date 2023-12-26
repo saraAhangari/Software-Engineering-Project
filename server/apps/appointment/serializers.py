@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Assurance, Appointment, Prescription, TimeSlice, \
+from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Appointment, Prescription, TimeSlice, \
     Medicine
 from .utils import minutes_to_time
 
@@ -76,12 +76,6 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = ['patient_id', 'doctor_id', 'description', 'status', 'type', 'prescription', 'appointment_time']
-
-
-class AssuranceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Assurance
-        fields = '__all__'
 
 
 class DateTimeSliceSerializer(serializers.Serializer):

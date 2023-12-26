@@ -29,14 +29,14 @@ class RoleViewTest(TestCase):
         response = self.client.put(f'/api/v1/roles/{role.id}', data={'name': 'manager'},
                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'message': 'role updates successfully'})
+        self.assertEqual(response.json(), {'message': 'نقش با موفقیت بروز شد.'})
         self.assertEqual(Role.objects.get(id=role.id).name, 'manager')
 
     def test_delete_role(self):
         role = Role.objects.create(name='nurse')
         response = self.client.delete(f'/api/v1/roles/{role.id}', content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"message": "role deleted"})
+        self.assertEqual(response.json(), {"message": "نقش با موفقیت حذف شد."})
         self.assertFalse(Role.objects.filter(id=role.id).exists())
 
     def test_get_single_role(self):
@@ -78,7 +78,7 @@ class AuthenticationViewTest(TestCase):
 
         response = self.client.post('/api/v1/validate', data=person)
 
-        self.assertEqual(response.json(), {'message': 'otp sent to the user'})
+        self.assertEqual(response.json(), {'message': 'کد یکبار مصرف ارسال شد.'})
         self.assertEqual(response.status_code, 200)
 
     @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}})
@@ -112,7 +112,7 @@ class AuthenticationViewTest(TestCase):
 
         response = self.client.post('/api/v1/validate', data=person)
 
-        self.assertEqual(response.json(), {'message': 'otp sent to the user'})
+        self.assertEqual(response.json(), {'message': 'کد یکبار مصرف ارسال شد.'})
         self.assertEqual(response.status_code, 200)
 
         person['otp'] = cache.get(person['phone_no'])
@@ -136,7 +136,7 @@ class AuthenticationViewTest(TestCase):
         response = self.client.post('/api/v1/login', data={'national_id': '1234567899'})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'message': 'otp sent to the user'})
+        self.assertEqual(response.json(), {'message': 'کد یکبار مصرف ارسال شد.'})
 
         response = self.client.post('/api/v1/get_token',
                                     data={'national_id': '1234567899', 'otp': cache.get('1234567899')})

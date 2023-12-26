@@ -4,7 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from apps.appointment.models import User
 from .models import Role
-from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer, RegisterSerializer
+from .serializers import PatientSerializer, LoginSerializer, GetTokenSerializer, RoleSerializer
 from .utils import send_otp
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsNotInBlackedList
@@ -24,8 +24,9 @@ class PatientValidationView(generics.CreateAPIView):
 
         if cache.get(user_phone_no) is not None:
             ttl = cache.ttl(user_phone_no)
-            return Response({'message': f'کد یکبار مصرف قبلا برای شما ارسال شده است. {ttl} ثانیه دیگر میتوانید دوباره امتحان کنید. ',
-                             'ttl': ttl}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'message': f'کد یکبار مصرف قبلا برای شما ارسال شده است. {ttl} ثانیه دیگر میتوانید دوباره امتحان کنید. ',
+                'ttl': ttl}, status=status.HTTP_400_BAD_REQUEST)
 
         # send the otp and cache it in redis
         send_otp(user_phone_no)
@@ -35,14 +36,17 @@ class PatientValidationView(generics.CreateAPIView):
 
 @extend_schema(tags=['authentication'])
 class RegisterView(generics.CreateAPIView):
-    serializer_class = RegisterSerializer
+    serializer_class = PatientSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user_otp = serializer.validated_data.get('otp')
+        user_otp = request.data.get('otp', None)
         valid_otp = cache.get(serializer.validated_data.get('phone_no'))
+
+        if user_otp is None:
+            return Response({'message': 'کد یکبار مصرف وارد نشده است.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp is None:
             return Response({'message': 'دوباره درخواست کد یکبار مصرف داشته باشید.'},
@@ -64,16 +68,16 @@ class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = LoginSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user_national_id = serializer.data['national_id']
+        user_national_id = serializer.data.get('national_id')
         user = User.objects.get(national_id=user_national_id)
 
         if not send_otp(user.phone_no):
-            return Response({'message': 'cant send otp'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            return Response({'message': 'مشکلی پیش آمده. بعدا دوباره تلاش کنین.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-        return Response({'message': 'otp sent to the user'}, status=status.HTTP_200_OK)
+        return Response({'message': 'کد یکبار مصرف ارسال شد.'}, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['authentication'])
@@ -81,28 +85,32 @@ class GetTokenView(generics.CreateAPIView):
     serializer_class = GetTokenSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = GetTokenSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user_national_id = serializer.data['national_id']
-        user_otp = int(serializer.data['otp'])
+        try:
+            user_national_id = serializer.data.get('national_id')
+            user_otp = int(serializer.data['otp'])
+        except Exception as e:
+            print(e)
+            return Response({'message': 'قرمت کد وارد شده صحیح نیست.'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.filter(national_id=user_national_id).first()
         valid_otp = cache.get(user.phone_no)
 
+        # TODO: create a class OTP and make functionality
         if valid_otp is None:
-            return Response({'message': 'login first'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'ایتدا ثبتنام کنید.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if valid_otp != user_otp:
-            return Response({'message': 'otp is not correct'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'کد وارد شده صحیح نیست.'}, status=status.HTTP_400_BAD_REQUEST)
 
         response = Response()
 
         refresh = RefreshToken.for_user(user)
         access = str(refresh.access_token)
 
-        response.set_cookie('authorization', access)
-
+        response.set_cookie('Authorization', access)
         response.data = {
             'national_id': user_national_id,
             'refresh_token': str(refresh),
@@ -113,8 +121,8 @@ class GetTokenView(generics.CreateAPIView):
 
 
 @extend_schema(tags=['authentication'], request=None, responses={
-    201: OpenApiResponse(description='user logged out successfully'),
-    400: OpenApiResponse(description='login first'),
+    201: OpenApiResponse(description='با موفقیت خارج شدید.'),
+    400: OpenApiResponse(description='ابتدا لاگین کنید.'),
 })
 class LogoutView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated, IsNotInBlackedList,)
@@ -125,17 +133,16 @@ class LogoutView(generics.CreateAPIView):
             blocked = cache.get(token)
             if blocked is not None and blocked:
                 return Response({
-                    'ok': False,
-                    'message': 'login first'
+                    'message': 'ابتدا ثبتنام کنید.'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             cache.set(token, True, 5 * 60)
-            return Response({'message': 'user logged out successfully'}, status=status.HTTP_200_OK)
+            return Response({'message': 'با موفقیت خارج شدید.'}, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(e)
             # Handle any exceptions that might occur during the logout process
-            return Response({'detail': 'An error occurred during logout.'},
+            return Response({'detail': 'مشکلی پیش آمده.'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -164,7 +171,7 @@ class RoleView(generics.CreateAPIView):
     def delete(self, request, pk=None, *args, **kwargs):
         get_object_or_404(self.queryset, id=pk).delete()
 
-        return Response({'message': 'role deleted'})
+        return Response({'message': 'نقش با موفقیت حذف شد.'})
 
     def put(self, request, pk, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -175,4 +182,4 @@ class RoleView(generics.CreateAPIView):
             role.name = new_name
         role.save()
 
-        return Response({'message': 'role updates successfully'}, status=status.HTTP_200_OK)
+        return Response({'message': 'نقش با موفقیت بروز شد.'}, status=status.HTTP_200_OK)

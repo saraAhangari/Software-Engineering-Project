@@ -19,11 +19,11 @@ class User(AbstractUser):
     national_id = models.CharField(max_length=10, unique=True, validators=[
         MaxLengthValidator(limit_value=10, message="National ID should be exactly 10 characters."),
         MinLengthValidator(limit_value=10, message="National ID should be exactly 10 characters.")
-    ])
+    ], verbose_name='national_id')
     phone_no = models.CharField(max_length=11, unique=True, validators=[
         MaxLengthValidator(limit_value=11, message="Phone Number should be exactly 10 or 11 characters."),
         MinLengthValidator(limit_value=10, message="Phone Number should be exactly 10 or 11 characters.")
-    ])
+    ], verbose_name='phone_no')
     birthdate = models.DateField(null=True)
     role = models.ForeignKey(Role, on_delete=models.PROTECT, default=1)
-    gender = models.CharField(choices=GENDER_CHOICES, default='n')
+    gender = models.CharField(choices=GENDER_CHOICES, default='n', verbose_name='gender')

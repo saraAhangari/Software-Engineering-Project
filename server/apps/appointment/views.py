@@ -14,10 +14,10 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
 from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSerializer, MedicalHistorySerializer,
-                          AppointmentDetailSerializer, AssuranceSerializer, TimeSliceListSerializer,
+                          AppointmentDetailSerializer, TimeSliceListSerializer,
                           AppointmentSerializer, PrescriptionSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
-from ..authentication.serializers import PatientSerializer
+from ..authentication.serializers import PatientSerializer, AssuranceSerializer
 from .utils import time_to_minutes, minutes_to_time
 
 
