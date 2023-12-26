@@ -1,0 +1,23 @@
+.NavbarContainer{
+    background-color: #293D85;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 10vh;
+    padding:  0vh 5vh;
+}
+.NavbarIcon{
+    height: 6vh;
+}
+.Navbar-Left{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5vh;
+}
+.navbar-left-seprator{
+    width: 1px;
+    background-color: black;
+    height: 4vh;
+    margin-top: 0.8vh;
+}
