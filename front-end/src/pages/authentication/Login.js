@@ -42,10 +42,6 @@ function Login() {
         navigate('/patient-panel');
     }
 
-    function navigateToHome() {
-        navigate('/')
-    }
-
     function navigateToSignUp() {
         navigate('/signup')
     }
@@ -94,7 +90,7 @@ function Login() {
     }
 
     return (
-        <MainTemplate buttonTitle={'صفحه اصلی'} onButtonClicked={navigateToHome}>
+        <MainTemplate>
             <div className={'login-page'}>
                 <CustomCard>
 

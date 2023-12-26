@@ -9,6 +9,7 @@ import ICON_NOTES from "../../assets/images/icon_notes.svg";
 import MainTemplate from "../../components/container/MainTemplate";
 import SearchBar from "../../components/searchbar/SearchBar";
 import {useAuth} from "../../auth/Auth";
+import PrimaryButton from "../../components/button/PrimaryButton";
 
 function PatientPanel(props) {
     const {token} = useAuth();
@@ -60,6 +61,10 @@ function PatientPanel(props) {
         // TODO: filter items
     }
 
+    const navigateToAllDoctorsPage = () => {
+        navigate('/all-doctors');
+    }
+
     return (
         <MainTemplate
             hasLoggedIn={true}
@@ -69,6 +74,12 @@ function PatientPanel(props) {
                 <SearchBar
                     placeholder={'جستجوی پزشک'}
                     onTextChanged={handleSearchInput}
+                    endChild={
+                        <PrimaryButton
+                            text={'همه پزشکان'}
+                            onButtonClicked={navigateToAllDoctorsPage}
+                        />
+                    }
                 />
                 {
                     menuItems.map(

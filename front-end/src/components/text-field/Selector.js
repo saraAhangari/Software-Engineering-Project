@@ -9,6 +9,8 @@ function Selector(
         onValueChanged = () => {},
         style = {},
         defaultValue = undefined,
+        disabled = false,
+        error = undefined,
     }
 ) {
     const [value, setValue] = useState();
@@ -21,8 +23,10 @@ function Selector(
 
     return (
         <FormControl style={style}>
-            <InputLabel>{label}</InputLabel>
+            <InputLabel error={error}>{label}</InputLabel>
             <Select
+                error={error}
+                disabled={disabled}
                 // TODO: fix the icon and replace the default one
                 // IconComponent={
                 //     () => {

@@ -12,9 +12,8 @@ const PROFILE_ITEM = 1;
 function MainTemplate(
     {
         children,
-        buttonTitle = undefined,
-        onButtonClicked = () => {},
         showDefaultBackground = true,
+        showLoginButton = true,
         style = {},
     }
 ) {
@@ -31,10 +30,14 @@ function MainTemplate(
     const [anchorEl, setAnchorEl] = useState(null);
 
     const theme = useTheme();
-    const navigation = useNavigate()
+    const navigate = useNavigate()
 
     function navigateToHome() {
-        navigation('/')
+        navigate('/')
+    }
+
+    const navigateToLogin = () => {
+        navigate('/login');
     }
 
     function handleProfileIconClick(event) {
@@ -45,7 +48,7 @@ function MainTemplate(
     function handleMenuItemClick(item) {
         switch (item.target.tabIndex) {
             case PROFILE_ITEM: {
-                navigation('/patient-panel')
+                navigate('/patient-panel')
             }
         }
         setAnchorEl(null);
@@ -107,8 +110,10 @@ function MainTemplate(
                                     </IconButton>
                                 </>
                             ) : (
-                                buttonTitle && <Button className={'toolbar__button'}
-                                                       onClick={onButtonClicked}>{buttonTitle}</Button>
+                                showLoginButton && <Button
+                                    className={'toolbar__button'}
+                                    onClick={navigateToLogin}
+                                >ورود | ثبت نام</Button>
                             )
                         }
                     </Toolbar>

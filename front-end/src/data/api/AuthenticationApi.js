@@ -33,14 +33,10 @@ export async function validate(
             birthdate: birthdate,
             assurance: assurance,
             gender: gender,
-            medical_history: {
-                height: 0,
-                weight: 0,
-                blood_group: "A+",
-                blood_pressure: 2147483647
-            }
         }
-    )
+    ).catch(error => {
+        throw error.response.data;
+    })
 }
 
 export async function register(

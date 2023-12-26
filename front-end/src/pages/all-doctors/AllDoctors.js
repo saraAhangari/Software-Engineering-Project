@@ -3,54 +3,57 @@ import Doctor from "../../components/doctor/Doctor";
 import SearchBar from "../../components/searchbar/SearchBar";
 import MainTemplate from "../../components/container/MainTemplate";
 import {useNavigate} from "react-router-dom";
+import {getAllDoctors} from "../../data/api/DoctorApi";
+import {safeApiCall} from "../../data/api/Api";
+import Spinner from "../../components/animation/Spinner";
 
 function AllDoctors(props) {
-    const doctors = [
-        {
-            id: '1',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-        {
-            id: '2',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-        {
-            id: '3',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-        {
-            id: '4',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-        {
-            id: '5',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-        {
-            id: '6',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-        {
-            id: '7',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-        {
-            id: '8',
-            name: 'دکتر محمد محمدی',
-            expertise: 'متخصص جراحی استخوان و مفاصل',
-        },
-    ]
+
+    const [doctors, setDoctors] = useState([])
+    const [filteredDoctors, setFilteredDoctors] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+    const [errors, setErrors] = useState({})
+
+    useEffect(() => {
+        safeApiCall(
+            getAllDoctors(),
+            setIsLoading,
+            setErrors,
+            setDoctors,
+        )
+    }, [])
 
     function handleSearchInput(search) {
-        // TODO: handle search input
+        setSearchQuery(search);
     }
+
+    const [searchQuery, setSearchQuery] = useState(undefined);
+    useEffect(
+        () => {
+            console.log("searchQuery");
+            console.log(searchQuery);
+            if (searchQuery) {
+                const filteredList = doctors.filter(doctor => {
+                    doctor.name.includes(searchQuery)
+                })
+                setFilteredDoctors(filteredList);
+            } else {
+                setFilteredDoctors(doctors);
+            }
+        },
+        [searchQuery, doctors],
+    )
+
+    window.onscroll = () => {
+        if (!isLoading) {
+            const documentElement = document.documentElement;
+            const isScrollToBottom = documentElement.clientHeight + documentElement.scrollTop + 20 >= documentElement.scrollHeight;
+            if (isScrollToBottom) {
+                setIsLoading(true);
+                // TODO: fetch more data, implement pagination
+            }
+        }
+    };
 
     const navigate = useNavigate();
 
@@ -81,13 +84,13 @@ function AllDoctors(props) {
                     onTextChanged={handleSearchInput}
                 />
                 {
-                    doctors.map(
+                    filteredDoctors.map(
                         (doctor) => {
                             return <Doctor
                                 id={doctor.id}
                                 maxWidth={`${maxItemsWidth}px`}
                                 name={doctor.name}
-                                expertise={doctor.expertise}
+                                expertise={doctor.speciality}
                                 buttonTitle={'دریافت نوبت'}
                                 onItemClicked={
                                     () => {
@@ -97,6 +100,9 @@ function AllDoctors(props) {
                             />
                         }
                     )
+                }
+                {
+                    isLoading && <Spinner/>
                 }
             </div>
         </MainTemplate>
