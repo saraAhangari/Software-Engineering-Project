@@ -5,17 +5,20 @@ import ICON_LOGOUT from "../../assets/images/icon_logout.svg";
 import ICON_PROFILE from "../../assets/images/icon_profile_circled.svg"
 import {useNavigate} from "react-router-dom";
 import DEFAULT_BACKGROUND from "../../assets/images/main_background.png";
+import {useAuth} from "../../auth/Auth";
+
+const PROFILE_ITEM = 1;
 
 function MainTemplate(
     {
         children,
-        buttonTitle = undefined,
-        onButtonClicked = () => {},
         showDefaultBackground = true,
-        hasLoggedIn = false, // TODO: read from current state
+        showLoginButton = true,
         style = {},
     }
 ) {
+    const {token, logoutUser} = useAuth();
+
     const ref = useRef(null);
     const [height, setHeight] = useState(0);
 
@@ -27,10 +30,14 @@ function MainTemplate(
     const [anchorEl, setAnchorEl] = useState(null);
 
     const theme = useTheme();
-    const navigation = useNavigate()
+    const navigate = useNavigate()
 
     function navigateToHome() {
-        navigation('/')
+        navigate('/')
+    }
+
+    const navigateToLogin = () => {
+        navigate('/login');
     }
 
     function handleProfileIconClick(event) {
@@ -39,7 +46,11 @@ function MainTemplate(
     }
 
     function handleMenuItemClick(item) {
-        // TODO: handle action based on item
+        switch (item.target.tabIndex) {
+            case PROFILE_ITEM: {
+                navigate('/patient-panel')
+            }
+        }
         setAnchorEl(null);
         setIsMenuOpen(false);
     }
@@ -49,7 +60,8 @@ function MainTemplate(
     }
 
     function logout() {
-        // TODO: logout
+        logoutUser();
+        navigateToHome();
     }
 
     return (
@@ -80,7 +92,7 @@ function MainTemplate(
                         </IconButton>
                         <div className={'toolbar__icon-spacer'}/>
                         {
-                            hasLoggedIn ? (
+                            token ? (
                                 <>
                                     <IconButton onClick={handleProfileIconClick}>
                                         <img className={'toolbar__icon'}
@@ -98,8 +110,10 @@ function MainTemplate(
                                     </IconButton>
                                 </>
                             ) : (
-                                buttonTitle && <Button className={'toolbar__button'}
-                                                       onClick={onButtonClicked}>{buttonTitle}</Button>
+                                showLoginButton && <Button
+                                    className={'toolbar__button'}
+                                    onClick={navigateToLogin}
+                                >ورود | ثبت نام</Button>
                             )
                         }
                     </Toolbar>
@@ -125,7 +139,7 @@ function MainTemplate(
                                 }
                             }
                         />
-                        <MenuItem onClick={handleMenuItemClick}>پروفایل</MenuItem>
+                        <MenuItem tabIndex={PROFILE_ITEM} onClick={handleMenuItemClick}>پروفایل</MenuItem>
                     </Menu>
                 </AppBar>
                 {

@@ -6,21 +6,37 @@ import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import CloseIcon from '@mui/icons-material/Close';
 import CountDownTimer from "../../utils/CountDownTimer";
+import {safeApiCall} from "../../data/api/Api";
+import {register} from "../../data/api/AuthenticationApi";
+import {useAuth} from "../../auth/Auth";
+import {useNavigate} from "react-router-dom";
 
 function OptValidator(
     {
-        correctOtp = '1456',
-        resendOtp = {},
-        onClose = {},
+        inputs,
+        onClose,
     }
 ) {
-    const theme = useTheme()
+    const theme = useTheme();
+    const navigate = useNavigate();
+    const {token, loginUser} = useAuth();
 
-    const digitsSize = correctOtp.length
+    const [isLoading, setIsLoading] = useState(false)
+    const [errors, setErrors] = useState({})
+
+    const digitsSize = 6
     const [otp, setOtp] = useState(new Array(digitsSize).fill(""));
     const otpBoxReference = useRef([]);
 
+    if (token) {
+        navigate('/patient-panel');
+    }
+
     function handleChange(value, index) {
+        if (isLoading) {
+            return
+        }
+
         let newArr = [...otp];
         newArr[index] = value;
         setOtp(newArr);
@@ -31,6 +47,10 @@ function OptValidator(
     }
 
     function handleBackspaceAndEnter(e, index) {
+        if (isLoading) {
+            return
+        }
+
         if (e.key === "Backspace" && !e.target.value && index + 1 < digitsSize) {
             otpBoxReference.current[index + 1].focus()
         }
@@ -39,7 +59,7 @@ function OptValidator(
         }
     }
 
-    const [isButtonActive, setIsButtonActive] = useState(false)
+    const [isRetryButtonActive, setIsRetryButtonActive] = useState(false)
     const [remainingTime, setRemainingTime] = useState(undefined)
     const [restartTimer, setRestartButton] = useState(false)
 
@@ -64,12 +84,22 @@ function OptValidator(
                     setRemainingTime(formatDuration(remainingTime))
                 },
                 function onFinish() {
-                    setIsButtonActive(true)
+                    setIsRetryButtonActive(true)
                 },
             )
         },
         [restartTimer]
     )
+
+    function validateOtp() {
+        const otpCode = otp.reverse().join('')
+        safeApiCall(
+            register(inputs.first_name, inputs.last_name, inputs.national_id, inputs.phone_no, inputs.birthdate, inputs.assurance, inputs.gender, otpCode),
+            setIsLoading,
+            setErrors,
+            loginUser,
+        )
+    }
 
     return (
         <SimpleDialog
@@ -169,7 +199,7 @@ function OptValidator(
 
                 {
                     (
-                        isButtonActive ?
+                        isRetryButtonActive ?
                             <PrimaryButton
                                 style={
                                     {
@@ -180,20 +210,21 @@ function OptValidator(
                                 text={'ارسال مجدد'}
                                 onButtonClicked={
                                     () => {
-                                        setIsButtonActive(false)
+                                        setIsRetryButtonActive(false)
                                         setRestartButton(!restartTimer)
                                     }
                                     // TODO: resend the Otp request
                                 }
                             /> :
-                            <SecondaryButton
+                            <PrimaryButton
                                 style={
                                     {
                                         width: 'fit-content',
                                         alignSelf: 'center',
                                     }
                                 }
-                                text={'ارسال مجدد'}
+                                text={'تایید کد'}
+                                onButtonClicked={validateOtp}
                             />
                     )
                 }

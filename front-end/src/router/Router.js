@@ -19,7 +19,7 @@ function Router() {
                 <Route path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='/signup' element={<SignUp />} />
-                <Route path='/patient-panel/:patient_id?' element={<PatientPanel />} />
+                <Route path='/patient-panel' element={<PatientPanel />} />
                 <Route path='/all-doctors' element={<AllDoctors />} />
                 <Route path='/doctor-info/:doctor_id?' element={<DoctorInfo />} />
                 <Route path='/my-comments' element={<MyComments />} />

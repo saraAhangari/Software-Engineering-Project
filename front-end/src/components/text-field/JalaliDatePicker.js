@@ -9,11 +9,14 @@ function JalaliDatePicker(
         views = ['year', 'month', 'day'],
         onDateChanged = () => {},
         style = {},
+        disabled = false,
+        error = undefined,
     }
 ) {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
+                disabled={disabled}
                 sx={
                     {
                         '& .MuiOutlinedInput-root': {
@@ -27,6 +30,13 @@ function JalaliDatePicker(
                 label={label}
                 views={views}
                 onChange={onDateChanged}
+                slotProps={{
+                    textField: {
+                        variant: 'outlined',
+                        error: error,
+                        helperText: error?.message,
+                    },
+                }}
                 // TODO: fix border radius
             />
         </LocalizationProvider>
