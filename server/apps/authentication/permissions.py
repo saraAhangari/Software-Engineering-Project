@@ -15,16 +15,17 @@ class GenericAPIException(APIException):
 
 
 class IsNotInBlackedList(permissions.BasePermission):
-
     def has_permission(self, request, view):
         token = request.headers['Authorization'].split(" ")[1]
         # if not in blacklist
         if cache.get(token) is None:
             return True
-        raise GenericAPIException(detail='login first', status_code=status.HTTP_401_UNAUTHORIZED)
+        raise GenericAPIException(detail='ابتدا وارد سایت شوید.', status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 class IsPatient(permissions.BasePermission):
+    message = 'این امکان فقط برای بیماران پشتیبانی میشود.'
+
     def has_permission(self, request, view):
         if request.user.role.name == 'patient':
             return True
@@ -32,6 +33,8 @@ class IsPatient(permissions.BasePermission):
 
 
 class IsDoctor(permissions.BasePermission):
+    message = 'این امکان فقط برای پزشکان پشتیبانی میشود.'
+
     def has_permission(self, request, view):
         if request.user.role.name == 'doctor':
             return True

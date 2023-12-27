@@ -3,38 +3,115 @@ from rest_framework import serializers
 from .models import Role
 
 from apps.appointment.serializers import MedicalHistorySerializer, AppointmentDetailSerializer
-from apps.appointment.models import Patient, User
+from apps.appointment.models import Patient, User, Assurance
 
 
-# class PatientDetailSerializer(serializers.ModelSerializer):
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+
+class AssuranceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assurance
+        fields = '__all__'
 
 
 class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer(required=False)
-    appointments = AppointmentDetailSerializer(many=True, read_only=True)
+    appointments = AppointmentDetailSerializer(many=True, read_only=True, required=False)
+    assurance = serializers.PrimaryKeyRelatedField(queryset=Assurance.objects.all(), required=False)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        assurance_id = representation.get('assurance')
+        if assurance_id is None:
+            return representation
+
+        assurance_instance = Assurance.objects.get(id=assurance_id)
+        assurance_data = AssuranceSerializer(assurance_instance).data
+        representation['assurance'] = assurance_data
+        return representation
 
     def get_medical_history(self, obj):
         return MedicalHistorySerializer(obj.medical_history.all()).data
 
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #
-    #     appointments_data = representation.get('appointments', [])
-    #     completed_appointments = [appt for appt in appointments_data if appt.get('status') == 'completed']
-    #     representation['appointments'] = completed_appointments
-    #
-    #     return representation
+    def validate_national_id(self, value):
+        if Patient.objects.filter(national_id=value).exists():
+            raise serializers.ValidationError('کد ملی وارد شده تکراری است.')
+
+        return value
 
     class Meta:
         model = Patient
         fields = ['id', 'first_name', 'last_name', 'national_id',
                   'phone_no', 'birthdate', 'assurance', 'gender',
-                  'medical_history', 'appointments'
-                  ]
+                  'medical_history', 'appointments']
+
+        extra_kwargs = {
+            'first_name': {
+                'required': True,
+                'error_messages': {
+                    'required': 'نام وارد نشده است.',
+                    'invalid': 'نام معتبر نیست.'
+                }
+            },
+            'last_name': {
+                'required': True,
+                'error_messages': {
+                    'required': 'نام خانوادگی وارد نشده است.',
+                    'invalid': 'نام خانوادگی معتبر نیست.'
+                }
+            },
+            'national_id': {
+                'required': True,
+                'error_messages': {
+                    'required': 'کد ملی وارد نشده است.',
+                    'invalid': 'کد ملی معتبر نیست.',
+                    'min_length': 'کد ملی باید ۱۰ رقم باشد.',
+                    'max_length': 'کد ملی باید ۱۰ رقم باشد.',
+                    'unique': 'کد ملی باید یکتا باشد.'
+                }
+            },
+            'phone_no': {
+                'required': True,
+                'error_messages': {
+                    "required": 'شماره تلفن وارد نشده است.',
+                    'invalid': 'شماره تلفن معتبر نیست.',
+                    'min_length': 'شماره تلفن باید حداقل ۱۰ رقم باشد.',
+                    'max_length': 'شماره تلفن باید حداکثر ۱۱ رقم باشد.',
+                    'unique': 'شماره تلفن باید یکتا باشد.'
+                }
+            },
+            'birthdate': {
+                'required': True,
+                'error_messages': {
+                    "required": 'تاریخ تولد وارد نشده است.',
+                    'invalid': 'تاریخ تولد معتبر نیست.',
+                }
+            },
+            'assurance': {
+                'required': True,
+                'error_messages': {
+                    'required': 'بیمه وارد نشده است.',
+                    'invalid': 'بیمه معتبر نیست.',
+                }
+            },
+            'gender': {
+                'required': True,
+                'error_messages': {
+                    "required": 'جنسیت وارد نشده است.',
+                    'invalid': 'جنسیت معتبر نیست.'
+                }
+            },
+
+        }
 
     def create(self, validated_data):
         validated_data.pop('medical_history', [])
         validated_data.pop('appointments', [])
+        validated_data.pop('otp', None)
         patient = Patient.objects.create(**validated_data)
         patient.role = Role.objects.filter(name='patient').first()
         patient.username = patient.national_id
@@ -77,14 +154,6 @@ class PatientSerializer(serializers.ModelSerializer):
         return representation
 
 
-class RegisterSerializer(PatientSerializer):
-    otp = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = Patient
-        fields = PatientSerializer.Meta.fields + ['otp']
-
-
 class LoginSerializer(serializers.Serializer):
     national_id = serializers.CharField(max_length=10)
 
@@ -92,32 +161,25 @@ class LoginSerializer(serializers.Serializer):
         national_id = data['national_id']
 
         if not national_id:
-            raise serializers.ValidationError('national_id not provided')
+            raise serializers.ValidationError('کد ملی وارد نشده است.')
 
         if len(national_id) != 10:
-            raise serializers.ValidationError('national_id not valid pattern')
+            raise serializers.ValidationError('کد ملی باید ۱۰ رقم باشد.')
 
         if User.objects.filter(national_id=national_id).first() is None:
-            raise serializers.ValidationError('login first')
+            raise serializers.ValidationError('ایتدا ثبتنام کنید.')
 
         return data
 
 
-class GetTokenSerializer(serializers.Serializer):
-    national_id = serializers.CharField(max_length=10)
-    otp = serializers.CharField(max_length=6)
+class GetTokenSerializer(LoginSerializer):
+    otp = serializers.CharField(max_length=6, min_length=6)
 
     def validate(self, data):
-        user = User.objects.filter(national_id=data['national_id']).first()
+        super().validate(data)
 
-        if not data['national_id']:
-            raise serializers.ValidationError('national_id not provided')
-
-        if not data['otp']:
-            raise serializers.ValidationError('otp not provided')
-
-        if user is None:
-            raise serializers.ValidationError('user not found')
+        if len(data['otp']) != 6:
+            raise serializers.ValidationError('کد وارد شده باید ۶ رقم باشد.')
 
         return data
 
@@ -132,7 +194,3 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Role
-        fields = '__all__'

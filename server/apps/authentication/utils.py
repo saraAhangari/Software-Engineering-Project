@@ -1,16 +1,21 @@
+import time
+
 from ippanel import Client, HTTPError, Error, ResponseCode
 import random
+
+from apps.appointment.models import Patient
 from hospitalAppointment.settings import PANEL_API_KEY
 from django.core.cache import cache
+from hospitalAppointment.celery import app
 
 
 def generate_confirmation_number():
     return random.randint(100000, 999999)
 
 
+@app.task
 def send_message(confirmation_code, receiver_phone_number):
-    api_key = PANEL_API_KEY
-    sms = Client(api_key)
+    sms = Client(PANEL_API_KEY)
     try:
         message_id = sms.send("+989981801484", ['+98' + receiver_phone_number],
                               f" به سامانه مدیریت نوبت دهی بیمارستان شهید بهشتی خوش آمدید. کد یکبار مصرف: {confirmation_code}",
@@ -31,7 +36,7 @@ def send_otp(phone_no):
         print(phone_no)
         print(f'otp code is {confirmation_code}')  # TODO
 
-        send_message(confirmation_code, phone_no)
+        send_message.delay(confirmation_code, phone_no)
         cache.set(phone_no, confirmation_code, 120)
         return True
 
