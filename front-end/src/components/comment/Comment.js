@@ -24,8 +24,6 @@ function Rating(props) {
 function getRatingColor(rate) {
     rate = parseFloat(rate);
 
-    console.log(`rate: ${rate}`)
-
     if (rate ===undefined || isNaN(rate)) {
         return undefined;
     }
