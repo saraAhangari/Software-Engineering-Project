@@ -80,6 +80,11 @@ function AppointmentChooser(props) {
                 }
             >انتخاب ساعت</p>
             <Selector
+                style={
+                    {
+                        width: '100%',
+                    }
+                }
                 name={'hour'}
                 menuItems={availableTimes}
                 onValueChanged={handlePickedTime}

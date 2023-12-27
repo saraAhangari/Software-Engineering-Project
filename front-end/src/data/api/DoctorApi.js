@@ -7,7 +7,19 @@ export async function getAllDoctors() {
 }
 
 export async function getDoctor(id) {
-    return await API.get(`/doctors/${id}`)
+    return await API.get(`/doctors/${id}`).then(r => {
+        const doctor = r.data;
+        return {
+            id: doctor.id,
+            biography: doctor.description,
+            name: extractDoctorFullName(doctor),
+            speciality: getDoctorSpeciality(doctor.speciality),
+        }
+    })
+}
+
+function extractDoctorFullName(doctor) {
+    return `دکتر ${doctor.first_name} ${doctor.last_name}`;
 }
 
 function mapDoctorResult(doctor) {
@@ -15,7 +27,7 @@ function mapDoctorResult(doctor) {
         id: doctor.id,
         description: doctor.description,
         speciality: getDoctorSpeciality(doctor.speciality),
-        name: `دکتر ${doctor.first_name} ${doctor.last_name}`,
+        name: extractDoctorFullName(doctor),
     }
 }
 

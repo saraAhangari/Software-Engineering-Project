@@ -20,7 +20,7 @@ function AuthProvider(props) {
     useEffect(
         () => {
             if (token) {
-                API.defaults.headers.common["Authorization"] = token;
+                API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
                 localStorage.setItem('token',token);
             } else {
                 delete API.defaults.headers.common["Authorization"];
