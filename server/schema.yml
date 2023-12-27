@@ -238,6 +238,16 @@ paths:
     get:
       operationId: api_v1_doctors_list
       parameters:
+      - in: query
+        name: first_name
+        schema:
+          type: string
+        description: Filter doctors by first name
+      - in: query
+        name: last_name
+        schema:
+          type: string
+        description: Filter doctors by last name
       - name: limit
         required: false
         in: query
@@ -250,6 +260,11 @@ paths:
         description: The initial index from which to return the results.
         schema:
           type: integer
+      - in: query
+        name: speciality_name
+        schema:
+          type: string
+        description: Filter doctors by speciality name
       tags:
       - doctor
       security:
