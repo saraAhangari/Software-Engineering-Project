@@ -4,6 +4,7 @@ from apps.appointment.models import Appointment
 
 
 class IsPermittedToComment(permissions.BasePermission):
+    message = 'شما فقط میتوانید برای پزشکانی که یک نوبت تمام شده دارید کامنت بگذارید.'
     def has_permission(self,  request, view):
         doctor_id = view.kwargs.get('doctor_id')
         try:

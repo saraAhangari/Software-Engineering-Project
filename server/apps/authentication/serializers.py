@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Role
 
 from apps.appointment.serializers import MedicalHistorySerializer, AppointmentDetailSerializer
-from apps.appointment.models import Patient, User, Assurance
+from apps.appointment.models import Patient, User, Assurance, PatientMedicalHistory
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -32,6 +32,13 @@ class PatientSerializer(serializers.ModelSerializer):
         assurance_instance = Assurance.objects.get(id=assurance_id)
         assurance_data = AssuranceSerializer(assurance_instance).data
         representation['assurance'] = assurance_data
+
+        medical_history = representation.get('medical_history')
+        if medical_history is None:
+            return representation
+
+        medical_data = MedicalHistorySerializer(medical_history).data
+        representation['medical_history'] = medical_data
         return representation
 
     def get_medical_history(self, obj):
@@ -130,6 +137,11 @@ class PatientSerializer(serializers.ModelSerializer):
         patient.gender = validated_data.get('gender', patient.gender)
 
         medical_history_data = validated_data.get('medical_history', {})
+
+        if patient.medical_history is None:
+            patient.medical_history = PatientMedicalHistory(height=None, weight=None,
+                                                            blood_group=None, blood_pressure=None)
+
         if medical_history_data:
             patient.medical_history.height = medical_history_data.get('height', patient.medical_history.height)
             patient.medical_history.weight = medical_history_data.get('weight', patient.medical_history.weight)
@@ -138,6 +150,8 @@ class PatientSerializer(serializers.ModelSerializer):
             patient.medical_history.blood_pressure = medical_history_data.get('blood_pressure',
                                                                               patient.medical_history.blood_pressure)
             patient.medical_history.save()
+
+        patient.save()
 
         representation = {
             'id': patient.id,

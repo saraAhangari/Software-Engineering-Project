@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 from .models import Doctor, Speciality, Comment, PatientMedicalHistory, Appointment, Prescription, TimeSlice, \
     Medicine
@@ -70,7 +72,8 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
     appointment_time = serializers.SerializerMethodField()
 
     def get_appointment_time(self, obj):
-        obj.appointment_time.date = obj.appointment_time.date.date()
+        if type(obj.appointment_time.date) is datetime.datetime:
+            obj.appointment_time.date = obj.appointment_time.date.date()
         return TimeSliceSerializer(obj.appointment_time).data
 
     class Meta:
@@ -81,7 +84,7 @@ class AppointmentDetailSerializer(serializers.ModelSerializer):
 class DateTimeSliceSerializer(serializers.Serializer):
     date = serializers.DateField(format='%Y-%m-%d')
     start = serializers.TimeField(format='%H:%M:%S')
-    end = serializers.TimeField(format='%H:%M:%S', allow_null=True)
+    end = serializers.TimeField(format='%H:%M:%S', required=False)
 
 
 class TimeSliceListSerializer(serializers.Serializer):

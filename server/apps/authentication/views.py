@@ -60,7 +60,7 @@ class RegisterView(generics.CreateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=['authentication'])

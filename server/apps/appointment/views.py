@@ -6,11 +6,9 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from datetime import timedelta
 
 from .builder import DoctorQueryFilterBuilder
 from .models import Assurance, Doctor, Comment, Patient, Appointment, TimeSlice, Prescription
-from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
@@ -63,7 +61,9 @@ class DoctorListView(ListAPIView):
         last_name = request.GET.get('last_name', '')
         speciality_name = request.GET.get('speciality_name', '')
 
-        query_builder.by_first_name(first_name).by_last_name(last_name).by_speciality_name(speciality_name)
+        (query_builder.by_first_name(first_name)
+                      .by_last_name(last_name)
+                      .by_speciality_name(speciality_name))
 
         doctors = Doctor.objects.filter(query_builder.build())
 
@@ -209,7 +209,7 @@ class DoctorTimeSliceView(generics.CreateAPIView):
                                             end=time_to_minutes(end),
                                             status='available')
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=['timeSlice'], responses=TimeSliceListSerializer, request=None)
@@ -261,7 +261,6 @@ class AppointmentPatientView(generics.CreateAPIView):
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        try:
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
 
@@ -302,10 +301,10 @@ class AppointmentPatientView(generics.CreateAPIView):
             )
             appointment.save()
 
-            return Response(AppointmentDetailSerializer(appointment).data)
-        except Exception as e:
-            print(e)
-            return Response({'ok': False, 'message': 'internal error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(AppointmentDetailSerializer(appointment).data, status=status.HTTP_201_CREATED)
+        # except Exception as e:
+        #     print(e)
+        #     return Response({'ok': False, 'message': 'internal error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request, appointment_id=None, *args, **kwargs):
         serializer = AppointmentDetailSerializer(request.user.patient.appointments, many=True)
@@ -342,7 +341,7 @@ class PrescriptionDoctorView(generics.CreateAPIView):
         prescription.medicines.set(serializer.validated_data.get('medicines', []))
         prescription.save()
 
-        return Response(PrescriptionSerializer(prescription).data)
+        return Response(PrescriptionSerializer(prescription).data, status=status.HTTP_201_CREATED)
 
     def get(self, request, appointment_id=None, *args, **kwargs):
         appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id,
