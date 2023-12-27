@@ -1,0 +1,1161 @@
+openapi: 3.0.3
+info:
+  title: SBU Hospital API
+  version: 1.0.0
+  description: crud rest api
+paths:
+  /:
+    get:
+      operationId: root_retrieve
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: get message
+  /api/v1/appointments:
+    get:
+      operationId: api_v1_appointments_retrieve
+      tags:
+      - appointment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    post:
+      operationId: api_v1_appointments_create
+      tags:
+      - appointment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/appointments/{appointment_id}:
+    get:
+      operationId: api_v1_appointments_retrieve_2
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - appointment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/v1/appointments/{appointment_id}/prescription:
+    get:
+      operationId: api_v1_appointments_prescription_retrieve
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - prescription
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+    post:
+      operationId: api_v1_appointments_prescription_create
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - prescription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Prescription'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Prescription'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Prescription'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+  /api/v1/assurance:
+    get:
+      operationId: api_v1_assurance_retrieve
+      tags:
+      - assurance
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assurance'
+          description: ''
+    post:
+      operationId: api_v1_assurance_create
+      tags:
+      - assurance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assurance'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Assurance'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Assurance'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assurance'
+          description: ''
+    delete:
+      operationId: api_v1_assurance_destroy
+      tags:
+      - assurance
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/comment/{doctor_id}/:
+    post:
+      operationId: api_v1_comment_create
+      parameters:
+      - in: path
+        name: doctor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/v1/comment/{doctor_id}/permission:
+    get:
+      operationId: api_v1_comment_permission_retrieve
+      parameters:
+      - in: path
+        name: doctor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/comments:
+    get:
+      operationId: api_v1_comments_retrieve
+      tags:
+      - comment
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/v1/doctors:
+    get:
+      operationId: api_v1_doctors_list
+      parameters:
+      - in: query
+        name: first_name
+        schema:
+          type: string
+        description: Filter doctors by first name
+      - in: query
+        name: last_name
+        schema:
+          type: string
+        description: Filter doctors by last name
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: speciality_name
+        schema:
+          type: string
+        description: Filter doctors by speciality name
+      tags:
+      - doctor
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDoctorList'
+          description: ''
+  /api/v1/doctors/{doctor_id}/:
+    get:
+      operationId: api_v1_doctors_retrieve
+      parameters:
+      - in: path
+        name: doctor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - doctor
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorDetail'
+          description: ''
+  /api/v1/get_token:
+    post:
+      operationId: api_v1_get_token_create
+      tags:
+      - authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GetToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GetToken'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetToken'
+          description: ''
+  /api/v1/login:
+    post:
+      operationId: api_v1_login_create
+      tags:
+      - authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /api/v1/logout:
+    post:
+      operationId: api_v1_logout_create
+      tags:
+      - authentication
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          description: با موفقیت خارج شدید.
+        '400':
+          description: ابتدا لاگین کنید.
+  /api/v1/medicine:
+    get:
+      operationId: api_v1_medicine_retrieve
+      tags:
+      - Medicine
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+          description: ''
+    post:
+      operationId: api_v1_medicine_create
+      tags:
+      - Medicine
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+          description: ''
+  /api/v1/patient/medical_history:
+    post:
+      operationId: api_v1_patient_medical_history_create
+      tags:
+      - medicalHistory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalHistory'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MedicalHistory'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MedicalHistory'
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicalHistory'
+          description: ''
+  /api/v1/patient/profile:
+    get:
+      operationId: api_v1_patient_profile_retrieve
+      tags:
+      - patient
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    put:
+      operationId: api_v1_patient_profile_update
+      tags:
+      - patient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    patch:
+      operationId: api_v1_patient_profile_partial_update
+      tags:
+      - patient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatient'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/v1/patient/profile/appointments/{appointment_id}/prescription:
+    get:
+      operationId: api_v1_patient_profile_appointments_prescription_retrieve
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - prescription
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prescription'
+          description: ''
+  /api/v1/register:
+    post:
+      operationId: api_v1_register_create
+      tags:
+      - authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/v1/roles:
+    get:
+      operationId: api_v1_roles_retrieve
+      tags:
+      - role
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    post:
+      operationId: api_v1_roles_create
+      tags:
+      - role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Role'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Role'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+  /api/v1/roles/{id}:
+    get:
+      operationId: api_v1_roles_retrieve_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - role
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    put:
+      operationId: api_v1_roles_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Role'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Role'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    delete:
+      operationId: api_v1_roles_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - role
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/timeslices:
+    post:
+      operationId: api_v1_timeslices_create
+      tags:
+      - timeSlice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSliceList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TimeSliceList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TimeSliceList'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSliceList'
+          description: ''
+  /api/v1/timeslices/{doctor_id}:
+    get:
+      operationId: api_v1_timeslices_retrieve
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date-time
+        explode: false
+        style: form
+      - in: path
+        name: doctor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - timeSlice
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSliceList'
+          description: ''
+  /api/v1/validate:
+    post:
+      operationId: api_v1_validate_create
+      tags:
+      - authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+components:
+  schemas:
+    Appointment:
+      type: object
+      properties:
+        doctor_id:
+          type: integer
+        status:
+          type: string
+          nullable: true
+          default: reserved
+        description:
+          type: string
+          nullable: true
+          default: '-'
+        type:
+          type: string
+          nullable: true
+          default: face to face
+        appointment_time:
+          $ref: '#/components/schemas/DateTimeSlice'
+      required:
+      - appointment_time
+      - doctor_id
+    AppointmentDetail:
+      type: object
+      properties:
+        patient_id:
+          type: integer
+        doctor_id:
+          type: integer
+        description:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        prescription:
+          allOf:
+          - $ref: '#/components/schemas/Prescription'
+          readOnly: true
+        appointment_time:
+          type: string
+          readOnly: true
+      required:
+      - appointment_time
+      - doctor_id
+      - patient_id
+      - prescription
+    Assurance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 32
+      required:
+      - id
+      - name
+    BlankEnum:
+      enum:
+      - ''
+    BloodGroupEnum:
+      enum:
+      - A+
+      - A-
+      - B-
+      - B+
+      - O+
+      - O-
+      - AB-
+      - AB+
+      type: string
+      description: |-
+        * `A+` - A Positive
+        * `A-` - A Negative
+        * `B-` - B Negative
+        * `B+` - B Positive
+        * `O+` - O Positive
+        * `O-` - O Negative
+        * `AB-` - AB Negative
+        * `AB+` - AB Positive
+    Comment:
+      type: object
+      properties:
+        treatment_experience:
+          type: string
+          nullable: true
+        point:
+          type: integer
+          maximum: 5
+          minimum: 1
+    DateTimeSlice:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        start:
+          type: string
+          format: time
+        end:
+          type: string
+          format: time
+      required:
+      - date
+      - start
+    Doctor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        national_id:
+          type: string
+          maxLength: 10
+          minLength: 10
+        description:
+          type: string
+          nullable: true
+        medical_system_number:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        speciality:
+          type: string
+          readOnly: true
+        phone_no:
+          type: string
+          maxLength: 11
+          minLength: 10
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          $ref: '#/components/schemas/GenderEnum'
+      required:
+      - id
+      - medical_system_number
+      - national_id
+      - phone_no
+      - speciality
+    DoctorDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        national_id:
+          type: string
+          maxLength: 10
+          minLength: 10
+        description:
+          type: string
+          nullable: true
+        medical_system_number:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        speciality:
+          type: string
+          readOnly: true
+        phone_no:
+          type: string
+          maxLength: 11
+          minLength: 10
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          $ref: '#/components/schemas/GenderEnum'
+        comments:
+          type: array
+          items:
+            type: integer
+      required:
+      - comments
+      - id
+      - medical_system_number
+      - national_id
+      - phone_no
+      - speciality
+    GenderEnum:
+      enum:
+      - m
+      - f
+      - n
+      type: string
+      description: |-
+        * `m` - male
+        * `f` - female
+        * `n` - known
+    GetToken:
+      type: object
+      properties:
+        national_id:
+          type: string
+          maxLength: 10
+        otp:
+          type: string
+          maxLength: 6
+          minLength: 6
+      required:
+      - national_id
+      - otp
+    Login:
+      type: object
+      properties:
+        national_id:
+          type: string
+          maxLength: 10
+      required:
+      - national_id
+    MedicalHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        height:
+          type: number
+          format: double
+          nullable: true
+        weight:
+          type: number
+          format: double
+          nullable: true
+        blood_group:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/BloodGroupEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        blood_pressure:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - id
+    Medicine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        generic_name:
+          type: string
+        infant_safe:
+          type: boolean
+      required:
+      - generic_name
+      - id
+    NullEnum:
+      enum:
+      - null
+    PaginatedDoctorList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doctor'
+    PatchedPatient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        national_id:
+          type: string
+          maxLength: 10
+          minLength: 10
+        phone_no:
+          type: string
+          maxLength: 11
+          minLength: 10
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        assurance:
+          type: integer
+        gender:
+          $ref: '#/components/schemas/GenderEnum'
+        medical_history:
+          $ref: '#/components/schemas/MedicalHistory'
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDetail'
+          readOnly: true
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        national_id:
+          type: string
+          maxLength: 10
+          minLength: 10
+        phone_no:
+          type: string
+          maxLength: 11
+          minLength: 10
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        assurance:
+          type: integer
+        gender:
+          $ref: '#/components/schemas/GenderEnum'
+        medical_history:
+          $ref: '#/components/schemas/MedicalHistory'
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDetail'
+          readOnly: true
+      required:
+      - appointments
+      - birthdate
+      - first_name
+      - gender
+      - id
+      - last_name
+      - national_id
+      - phone_no
+    Prescription:
+      type: object
+      properties:
+        description:
+          type: string
+          nullable: true
+        medicines:
+          type: array
+          items:
+            type: integer
+      required:
+      - medicines
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 10
+      required:
+      - id
+      - name
+    StatusEnum:
+      enum:
+      - reserved
+      - completed
+      - canceled
+      type: string
+      description: |-
+        * `reserved` - reserved
+        * `completed` - completed
+        * `canceled` - canceled
+    TimeSliceList:
+      type: object
+      properties:
+        available_time_slices:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateTimeSlice'
+      required:
+      - available_time_slices
+    TypeEnum:
+      enum:
+      - face to face
+      - online
+      type: string
+      description: |-
+        * `face to face` - face to face
+        * `online` - online
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
