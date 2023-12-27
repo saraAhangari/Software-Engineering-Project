@@ -364,6 +364,47 @@ paths:
           description: با موفقیت خارج شدید.
         '400':
           description: ابتدا لاگین کنید.
+  /api/v1/medicine:
+    get:
+      operationId: api_v1_medicine_retrieve
+      tags:
+      - Medicine
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+          description: ''
+    post:
+      operationId: api_v1_medicine_create
+      tags:
+      - Medicine
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Medicine'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medicine'
+          description: ''
   /api/v1/patient/medical_history:
     post:
       operationId: api_v1_patient_medical_history_create
@@ -797,10 +838,8 @@ components:
         end:
           type: string
           format: time
-          nullable: true
       required:
       - date
-      - end
       - start
     Doctor:
       type: object
@@ -949,6 +988,19 @@ components:
           nullable: true
       required:
       - id
+    Medicine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        generic_name:
+          type: string
+        infant_safe:
+          type: boolean
+      required:
+      - generic_name
+      - id
     NullEnum:
       enum:
       - null
@@ -978,56 +1030,12 @@ components:
         id:
           type: integer
           readOnly: true
-        medical_history:
-          $ref: '#/components/schemas/MedicalHistory'
-        appointments:
-          type: array
-          items:
-            $ref: '#/components/schemas/AppointmentDetail'
-          readOnly: true
-        assurance:
-          type: integer
-        password:
-          type: string
-          maxLength: 128
-        last_login:
-          type: string
-          format: date-time
-          nullable: true
-        is_superuser:
-          type: boolean
-          title: Superuser status
-          description: Designates that this user has all permissions without explicitly
-            assigning them.
-        username:
-          type: string
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          pattern: ^[\w.@+-]+$
-          maxLength: 150
         first_name:
           type: string
           maxLength: 150
         last_name:
           type: string
           maxLength: 150
-        email:
-          type: string
-          format: email
-          title: Email address
-          maxLength: 254
-        is_staff:
-          type: boolean
-          title: Staff status
-          description: Designates whether the user can log into this admin site.
-        is_active:
-          type: boolean
-          title: Active
-          description: Designates whether this user should be treated as active. Unselect
-            this instead of deleting accounts.
-        date_joined:
-          type: string
-          format: date-time
         national_id:
           type: string
           maxLength: 10
@@ -1040,77 +1048,29 @@ components:
           type: string
           format: date
           nullable: true
+        assurance:
+          type: integer
         gender:
           $ref: '#/components/schemas/GenderEnum'
-        role:
-          type: integer
-        groups:
+        medical_history:
+          $ref: '#/components/schemas/MedicalHistory'
+        appointments:
           type: array
           items:
-            type: integer
-          description: The groups this user belongs to. A user will get all permissions
-            granted to each of their groups.
-        user_permissions:
-          type: array
-          items:
-            type: integer
-          description: Specific permissions for this user.
+            $ref: '#/components/schemas/AppointmentDetail'
+          readOnly: true
     Patient:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        medical_history:
-          $ref: '#/components/schemas/MedicalHistory'
-        appointments:
-          type: array
-          items:
-            $ref: '#/components/schemas/AppointmentDetail'
-          readOnly: true
-        assurance:
-          type: integer
-        password:
-          type: string
-          maxLength: 128
-        last_login:
-          type: string
-          format: date-time
-          nullable: true
-        is_superuser:
-          type: boolean
-          title: Superuser status
-          description: Designates that this user has all permissions without explicitly
-            assigning them.
-        username:
-          type: string
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          pattern: ^[\w.@+-]+$
-          maxLength: 150
         first_name:
           type: string
           maxLength: 150
         last_name:
           type: string
           maxLength: 150
-        email:
-          type: string
-          format: email
-          title: Email address
-          maxLength: 254
-        is_staff:
-          type: boolean
-          title: Staff status
-          description: Designates whether the user can log into this admin site.
-        is_active:
-          type: boolean
-          title: Active
-          description: Designates whether this user should be treated as active. Unselect
-            this instead of deleting accounts.
-        date_joined:
-          type: string
-          format: date-time
         national_id:
           type: string
           maxLength: 10
@@ -1123,33 +1083,26 @@ components:
           type: string
           format: date
           nullable: true
+        assurance:
+          type: integer
         gender:
           $ref: '#/components/schemas/GenderEnum'
-        role:
-          type: integer
-        groups:
+        medical_history:
+          $ref: '#/components/schemas/MedicalHistory'
+        appointments:
           type: array
           items:
-            type: integer
-          description: The groups this user belongs to. A user will get all permissions
-            granted to each of their groups.
-        user_permissions:
-          type: array
-          items:
-            type: integer
-          description: Specific permissions for this user.
+            $ref: '#/components/schemas/AppointmentDetail'
+          readOnly: true
       required:
       - appointments
-      - assurance
       - birthdate
       - first_name
       - gender
       - id
       - last_name
       - national_id
-      - password
       - phone_no
-      - username
     Prescription:
       type: object
       properties:

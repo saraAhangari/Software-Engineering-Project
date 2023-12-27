@@ -8,13 +8,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .builder import DoctorQueryFilterBuilder
-from .models import Assurance, Doctor, Comment, Patient, Appointment, TimeSlice, Prescription
+from .models import Assurance, Doctor, Comment, Patient, Appointment, TimeSlice, Prescription, Medicine
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .permissions import IsPermittedToComment
 from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSerializer, MedicalHistorySerializer,
                           AppointmentDetailSerializer, TimeSliceListSerializer,
-                          AppointmentSerializer, PrescriptionSerializer)
+                          AppointmentSerializer, PrescriptionSerializer, MedicineSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer, AssuranceSerializer
 from .utils import time_to_minutes, minutes_to_time
@@ -361,3 +361,12 @@ class PrescriptionPatientView(generics.RetrieveAPIView):
         prescription = get_object_or_404(Prescription.objects.all(), appointment_id=appointment, )
 
         return Response(PrescriptionSerializer(prescription).data)
+
+
+@extend_schema(tags=['Medicine'])
+class MedicineView(generics.CreateAPIView):
+    serializer_class = MedicineSerializer
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.serializer_class(Medicine.objects.all(), many=True)
+        return Response({'medicines': serializer.data})
