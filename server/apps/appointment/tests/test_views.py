@@ -1,11 +1,11 @@
-# from django.test import TestCase, override_settings
-# from django.urls import reverse
-# from django.core.cache import cache
-# from django.core.management import call_command
-# from apps.appointment.models import Patient, Doctor
-# from apps.authentication.models import Role
-#
-#
+from django.test import TestCase, override_settings
+from django.urls import reverse
+from django.core.cache import cache
+from django.core.management import call_command
+from apps.appointment.models import Patient, Doctor
+from apps.authentication.models import Role
+
+
 # class TimeSliceViewTest(TestCase):
 #     @classmethod
 #     def setUpTestData(cls):
@@ -43,3 +43,28 @@
 #         })
 #
 #         self.assertEqual(response.status_code, 200)
+
+#
+# class DoctorListView(TestCase):
+#     @classmethod
+#     def setUpTestData(cls):
+#         call_command(command_name='create_roles')
+#         Doctor.objects.create(first_name='محمد', last_name='محمدی', national_id='4314314312',
+#                               phone_no='4314314312', birthdate='2002-12-23', gender='m',
+#                               role=Role.objects.get(name='doctor'), slice=40, description='',
+#                               medical_system_number=585989).save()
+#
+#         Doctor.objects.create(first_name='مهدی', last_name='عقیلی', national_id='1235621324',
+#                               phone_no='1235621324', birthdate='2002-12-23', gender='m',
+#                               role=Role.objects.get(name='doctor'), slice=40, description='',
+#                               medical_system_number=978457).save()
+#
+#         Doctor.objects.create(first_name='علی', last_name='علوی', national_id='4690012345',
+#                               phone_no='4690012345', birthdate='2002-12-23', gender='m',
+#                               role=Role.objects.get(name='doctor'), slice=40, description='',
+#                               medical_system_number=754874).save()
+#
+#     def test_set_doctor_time_slices(self):
+#         response = self.client.get('/api/v1/doctors')
+#         self.assertEqual(response.status_code, 200)
+#         self.assertEqual(len(response.json()), 3)

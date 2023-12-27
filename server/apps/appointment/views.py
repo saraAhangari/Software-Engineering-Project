@@ -62,8 +62,8 @@ class DoctorListView(ListAPIView):
         speciality_name = request.GET.get('speciality_name', '')
 
         (query_builder.by_first_name(first_name)
-                      .by_last_name(last_name)
-                      .by_speciality_name(speciality_name))
+         .by_last_name(last_name)
+         .by_speciality_name(speciality_name))
 
         doctors = Doctor.objects.filter(query_builder.build())
 
@@ -261,6 +261,7 @@ class AppointmentPatientView(generics.CreateAPIView):
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
+        try:
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
 
@@ -302,9 +303,10 @@ class AppointmentPatientView(generics.CreateAPIView):
             appointment.save()
 
             return Response(AppointmentDetailSerializer(appointment).data, status=status.HTTP_201_CREATED)
-        # except Exception as e:
-        #     print(e)
-        #     return Response({'ok': False, 'message': 'internal error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            print(e)
+            return Response({'ok': False, 'message': 'internal error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request, appointment_id=None, *args, **kwargs):
         serializer = AppointmentDetailSerializer(request.user.patient.appointments, many=True)

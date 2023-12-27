@@ -118,7 +118,7 @@ class AuthenticationViewTest(TestCase):
         person['otp'] = cache.get(person['phone_no'])
         response = self.client.post('/api/v1/register', data=person)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.json())
         self.assertIsNotNone(response.json()['id'])
         self.assertEqual(response.json()['first_name'], person['first_name'])
