@@ -1,0 +1,51 @@
+.DIcontainer{
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    margin-top :3vh;
+gap: 2vh;
+}
+.DIBox{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dname{
+    font-size: 3vh;
+    border-bottom: 2px solid black;
+    padding: 2vh;
+}
+.dinfor{
+    display: flex;
+    justify-content: space-between;
+}
+.dinforr{
+    display: flex;
+    flex-direction: column;
+    gap: 3vh;
+}
+.dinforitem{
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    color: #7A7A7A;
+}
+.dinformitemdata{
+    background-color: #F9F9F9;
+    width: 30vw;
+    height: 6vh;
+    border-radius: 10px;
+    border: 2px solid #CBCBCB;
+}
+.backContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.backbtndd{
+    background-color: #23408E;
+    padding:0.5vh 3vh;
+    color: white;
+    border-radius: 10px;
+    margin-top: 4vh;
+}
