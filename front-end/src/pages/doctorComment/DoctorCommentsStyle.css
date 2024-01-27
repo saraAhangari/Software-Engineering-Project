@@ -1,0 +1,32 @@
+.DCcontainer{
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid gray;
+    padding: 3vh 6vh;
+}
+.DCCitem{
+    display: flex;
+}
+.DCCitemtop{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.DCCitemtopR{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1vh;
+}
+.DCCitemtopRI{
+    width: 3vh;
+}
+.dcRate{
+    background-color: #00A049;
+    padding: 0.5vh 2vh;
+    color: white;
+    border-radius: 5px;
+}
+.dccd{
+    gap: 0 !important; 
+}
