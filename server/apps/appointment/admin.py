@@ -76,7 +76,7 @@ class PatientAdmin(admin.ModelAdmin):
 
 @admin.register(Medicine)
 class MedicineAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'generic_name', 'infant_safe',)
+    list_display = ('id', 'generic_name', )
     search_fields = ('generic_name',)
 
     class Meta:
