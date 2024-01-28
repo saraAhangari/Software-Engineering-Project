@@ -22,6 +22,12 @@ class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer(required=False)
     appointments = AppointmentDetailSerializer(many=True, read_only=True, required=False)
     assurance = serializers.PrimaryKeyRelatedField(queryset=Assurance.objects.all(), required=False)
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -54,7 +60,7 @@ class PatientSerializer(serializers.ModelSerializer):
         model = Patient
         fields = ['id', 'first_name', 'last_name', 'national_id',
                   'phone_no', 'birthdate', 'assurance', 'gender',
-                  'medical_history', 'appointments']
+                  'medical_history', 'appointments', 'full_name']
 
         extra_kwargs = {
             'first_name': {
