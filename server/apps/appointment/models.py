@@ -89,8 +89,7 @@ class Patient(User):
 
 
 class Medicine(models.Model):
-    generic_name = models.CharField(null=False, blank=False, unique=True)
-    infant_safe = models.BooleanField(default=True)
+    generic_name = models.CharField(null=True, blank=True, unique=True)
 
     def __str__(self):
         return f'{self.generic_name}'
