@@ -9,6 +9,7 @@ function PrimaryButton(
         style = {},
         onButtonClicked = () => {},
         isLoading = undefined,
+        disabled = undefined,
     }
 ) {
     const theme = useTheme()
@@ -27,7 +28,7 @@ function PrimaryButton(
     return (
         <Button
             ref={buttonRef}
-            disabled={isLoading}
+            disabled={isLoading || disabled}
             style={
                 {
                     backgroundColor: theme.palette.primary.main,

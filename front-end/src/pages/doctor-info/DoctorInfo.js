@@ -65,55 +65,24 @@ export default function DoctorInfo(props) { // Container
     }
 
     const {info, isLoading, errors} = useDoctorInfo(doctor_id);
+    console.log(info);
     // TODO: use the info instead of hard-coded data
 
     const doctor = {
-        id: '1',
-        name: 'دکتر محمد محمدی',
-        expertise: 'متخصص جراحی استخوان و مفاصل',
+        id: doctor_id,
+        name: info?.name,
+        expertise: info?.speciality,
     }
 
     const biography = {
         title: 'بیوگرافی',
-        content: '-بالای 20 سال سابقه در بخش فوق تخصص گوارش بیمارستان میلاد \n' +
-            '-آندوسکوپی کولونوسکوپی\n' +
-            '-لاغری با تزریق بوتاکس معده بدون عمل جراحی\n' +
-            '-درمان فیشر مخرج با تزریق بوتاکس بدون عمل جراحی \n' +
-            '-عمل پلیپکتومی برای کسانی ک پلیپ روده دارند\n' +
-            ' -درمان آشالازی با تزریق بوتاکس و بالن بدون عمل جراحی \n' +
-            '-درمان تنگی دوازدهه بدون عمل جراحی '
+        content: info ? '- ' + info.biography.replaceAll('\n', '\n- ') : undefined,
     }
 
-    const comments = [
-        {
-            rate: 5,
-            date: '1402-01-23',
-            content: 'دکتر بسیار با تجربه و خوش اخلاق، من تحت درمانم فعلا تا الان خیلی خوب بوده',
-        },
-        {
-            rate: 3.3,
-            date: '1402-01-23',
-            content: 'دکتر بسیار با تجربه و خوش اخلاق، من تحت درمانم فعلا تا الان خیلی خوب بوده',
-        },
-        {
-            rate: 2.5,
-            date: '1402-01-23',
-            content: 'دکتر بسیار با تجربه و خوش اخلاق، من تحت درمانم فعلا تا الان خیلی خوب بوده',
-        },
-        {
-            rate: 1.3,
-            date: '1402-01-23',
-            content: 'دکتر بسیار با تجربه و خوش اخلاق، من تحت درمانم فعلا تا الان خیلی خوب بوده',
-        },
-        {
-            rate: 0.7,
-            date: '1402-01-23',
-            content: 'دکتر بسیار با تجربه و خوش اخلاق، من تحت درمانم فعلا تا الان خیلی خوب بوده',
-        },
-    ]
+    const comments = info?.comment
 
     return (
-        <DoctorInfoPresenter
+        isLoading ? <></> : <DoctorInfoPresenter
             onButtonClicked={navigateToHome}
             doctor={doctor}
             biography={biography}
@@ -123,6 +92,7 @@ export default function DoctorInfo(props) { // Container
 }
 
 function DoctorInfoPresenter(props) {
+    const {doctor} = props;
     const doctorInfoRef = useRef(null);
     const [appointmentChooserMinHeight, setAppointmentChooserMinHeight] = useState(undefined);
     useEffect(
@@ -186,8 +156,8 @@ function DoctorInfoPresenter(props) {
                                 maxWidth: "450px",
                             }
                         }
-                        title={props.biography.title}
-                        content={props.biography.content}
+                        title={props.biography?.title}
+                        content={props.biography?.content}
                     />
                 </div>
 
@@ -198,6 +168,7 @@ function DoctorInfoPresenter(props) {
                         }
                     }
                     title={"نوبت دهی"}
+                    doctorId={doctor.id}
                 />
             </div>
 
