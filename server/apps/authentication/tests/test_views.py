@@ -9,6 +9,7 @@ from apps.authentication.models import Role
 class RoleViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
+        print('running')
         call_command(command_name='create_roles')
 
     def test_view_url_exists_at_desired_location(self):
