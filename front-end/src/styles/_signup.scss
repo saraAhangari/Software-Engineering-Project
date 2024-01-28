@@ -1,0 +1,16 @@
+.signup-page {
+  width: 100%;
+  display: flex;
+  padding: 20px 0;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+
+  .title {
+    color: black;
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+}

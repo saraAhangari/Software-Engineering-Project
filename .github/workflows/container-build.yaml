@@ -8,17 +8,26 @@ on:
 
 jobs:
   test_django:
-    uses: your-username/your-repo/.github/workflows/django-test.yaml@main
+    uses: saraAhangari/software-engineering-project/.github/workflows/django-test.yaml@master
   container_builder:
     runs-on: ubuntu-latest
     needs: [test_django]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Load .env.base
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" > ./server/.env.base  
+          echo "${{ secrets.PANEL_API_KEY }}" > ./server/.env.base  
+          echo "${{ secrets.DEBUG_MODE }}" > ./server/.env.base  
+          echo "${{ secrets.DB_NAME }}" > ./server/.env.base  
+          echo "${{ secrets.POSTGRES_USER }}" > ./server/.env.base  
+          echo "${{ secrets.POSTGRES_PASSWORD }}" > ./server/.env.base  
+          echo "${{ secrets.DB_HOST }}" > ./server/.env.base  
+          echo "${{ secrets.DB_PORT }}" > ./server/.env.base  
+          echo "${{ secrets.REDIS_URI }}" > ./server/.env.base  
+
       - name: Build container image
         run: |
-          docker build \
-          -t your-username/your-image-name:${GITHUB_SHA::7} \
-          -t your-username/your-image-name:latest \
-          .
-
+          docker-compose -f ./server/docker-compose.yml build

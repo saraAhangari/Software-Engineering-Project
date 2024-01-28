@@ -1,0 +1,61 @@
+.wtB{
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+.vtcon{
+    width: 30%;
+    padding: 4vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    margin-top: 4vh;
+    border-radius: 10px;
+}
+.wttitle{
+    border-bottom: 2px solid gray;
+    padding-bottom: 2vh;
+}
+.wtitleday{
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+.wtitleday input{
+    background-color: #D9D9D9;
+    border: none;
+    height: 5vh;
+    border-radius: 5px;
+    text-align: center;
+}
+.wttime{
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+.wttimein{
+    display: flex;
+    justify-content: space-around;
+}
+.wttimein input{
+    background-color: #D9D9D9;
+    border: none;
+    height: 5vh;
+    border-radius: 5px;
+    text-align: center;
+}
+.confirmBox{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.confirmbtn{
+    width: fit-content;
+    padding: 0.5vh 4vh;
+    border-radius: 10px;
+    background-color: #228E2E;
+    color: white;
+}

@@ -1,0 +1,17 @@
+// use other *.scss files here.
+// for example: @use '_other-file.scss';
+
+@use "reset";
+@use "font";
+@use "card";
+@use "search-bar";
+@use "home";
+@use "login";
+@use "signup";
+@use "template";
+@use "patient-panel";
+@use "animation";
+
+* {
+  font-family: 'IRYekan', sans-serif;
+}
