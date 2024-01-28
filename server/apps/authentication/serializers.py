@@ -22,12 +22,6 @@ class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer(required=False)
     appointments = AppointmentDetailSerializer(many=True, read_only=True, required=False)
     assurance = serializers.PrimaryKeyRelatedField(queryset=Assurance.objects.all(), required=False)
-    full_name = serializers.SerializerMethodField()
-
-    def get_full_name(self, obj):
-        print(obj)
-        return f"{obj['first_name']} {obj['last_name']}"
-
 
 
     def to_representation(self, instance):
