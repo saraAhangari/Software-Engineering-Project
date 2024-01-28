@@ -15,7 +15,6 @@ django-extensions==3.2.3
 django-import-export==3.3.3
 django-nose==1.4.7
 django-redis==5.4.0
-django-schema-graph==3.1.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.0
 drf-spectacular==0.27.0
