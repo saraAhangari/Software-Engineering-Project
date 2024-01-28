@@ -14,6 +14,7 @@ jobs:
     defaults:
       run:
         working-directory: ./server
+    
     services:
       postgres_main:
         image: postgres:12
@@ -41,6 +42,18 @@ jobs:
       - name: Install requirements
         run: |
           pip install -r requirements.txt
+      - name: Load .env.base
+        run: |
+          echo "${{ secrets.SECRET_KEY }}" > ./server/.env  
+          echo "${{ secrets.PANEL_API_KEY }}" > ./server/.env  
+          echo "${{ secrets.DEBUG_MODE }}" > ./server/.env  
+          echo "${{ secrets.DB_NAME }}" > ./server/.env  
+          echo "${{ secrets.POSTGRES_USER }}" > ./server/.env  
+          echo "${{ secrets.POSTGRES_PASSWORD }}" > ./server/.env  
+          echo "${{ secrets.DB_HOST }}" > ./server/.env  
+          echo "${{ secrets.DB_PORT }}" > ./server/.env  
+          echo "${{ secrets.REDIS_URI }}" > ./server/.env 
+
       - name: Run Tests
         # Step specific environment variables
         env:
