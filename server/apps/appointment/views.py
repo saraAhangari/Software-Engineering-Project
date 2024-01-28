@@ -14,7 +14,8 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .permissions import IsPermittedToComment
 from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSerializer, MedicalHistorySerializer,
                           AppointmentDetailSerializer, TimeSliceListSerializer,
-                          AppointmentSerializer, PrescriptionSerializer, MedicineSerializer)
+                          AppointmentSerializer, PrescriptionSerializer, MedicineSerializer,
+                          DoctorRetrieveUpdateSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer, AssuranceSerializer
 from .utils import time_to_minutes, minutes_to_time
@@ -372,3 +373,13 @@ class MedicineView(generics.CreateAPIView):
     def get(self, request, *args, **kwargs):
         serializer = self.serializer_class(Medicine.objects.all(), many=True)
         return Response({'medicines': serializer.data})
+
+
+@extend_schema(tags=['doctor'])
+class DoctorUpdateAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
+    serializer_class = DoctorRetrieveUpdateSerializer
+
+    def get_object(self):
+        return self.request.user.doctor
+

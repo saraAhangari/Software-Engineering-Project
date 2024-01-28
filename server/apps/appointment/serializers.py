@@ -117,5 +117,14 @@ class AppointmentSerializer(serializers.ModelSerializer):
         fields = ['doctor_id', 'status', 'description', 'type', 'appointment_time']
 
 
+class DoctorRetrieveUpdateSerializer(serializers.ModelSerializer):
+    speciality = serializers.SerializerMethodField()
 
+    def get_speciality(self, obj):
+        return SpecialitySerializer(obj.speciality.all(), many=True).data
 
+    class Meta:
+        model = Doctor
+        fields = ['first_name', 'last_name', 'national_id',  'medical_system_number',
+                  'speciality', 'phone_no', 'birthdate', 'gender']
+        read_only_fields = ('medical_system_number', 'national_id', 'speciality', 'phone_no')
