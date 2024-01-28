@@ -52,16 +52,8 @@ jobs:
           echo "${{ secrets.DB_HOST }}" > ./.env  
           echo "${{ secrets.DB_PORT }}" > ./.env  
           echo "${{ secrets.REDIS_URI }}" > ./.env      
-      - name: Run Tests
-        # Step specific environment variables
-        env:
-          DEBUG: ${{ secrets.DEBUG_MODE }}
-          DJANGO_SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DB_USERNAME: ${{ secrets.POSTGRES_USER }}
-          DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_DATABASE: ${{ secrets.DB_NAME }}
-          DB_PORT: ${{ secrets.DB_PORT }}
+      - name: Run Tests      
         run: |
-          python manage.py test
+          pip install -U python-dotenv
+          python -m dotenv .env python manage.py test
 
