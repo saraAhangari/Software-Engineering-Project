@@ -14,23 +14,13 @@ jobs:
     defaults:
       run:
         working-directory: ./server
-    env:
-      SECRET_KEY: 'django-dummy-secret-key'
-      PANEL_API_KEY: '-___-'
-      DEBUG_MODE: True
-      DB_NAME: hospital_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      DB_HOST: 127.0.0.1
-      DB_PORT: 5432
-      REDIS_URI: redis://redis:6379/0
     services:
       postgres_main:
         image: postgres:12
         env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
         ports:
           - 5432:5432
         options: >-
@@ -54,13 +44,13 @@ jobs:
       - name: Run Tests
         # Step specific environment variables
         env:
-          DEBUG: ${{ env.DEBUG_MODE }}
-          DJANGO_SECRET_KEY: ${{ env.SECRET_KEY }}
-          DB_USERNAME: ${{ env.POSTGRES_USER }}
-          DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          DB_HOST: ${{ env.DB_HOST }}
-          DB_DATABASE: ${{ env.DB_NAME }}
-          DB_PORT: ${{ env.DB_PORT }}
+          DEBUG: ${{ secrets.DEBUG_MODE }}
+          DJANGO_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DB_USERNAME: ${{ secrets.POSTGRES_USER }}
+          DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_DATABASE: ${{ secrets.DB_NAME }}
+          DB_PORT: ${{ secrets.DB_PORT }}
         run: |
           python manage.py test
 
