@@ -94,7 +94,7 @@ services:
       - db
       - redis
 
-    restart: always
+    restart: always # for network
 
 networks:
     djangonetwork:
