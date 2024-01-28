@@ -344,7 +344,7 @@ class PrescriptionDoctorView(generics.CreateAPIView):
         prescription.medicines.set(serializer.validated_data.get('medicines', []))
         prescription.save()
 
-        return Response(PrescriptionSerializer(prescription).data, status=status.HTTP_201_CREATED)
+        return Response(self.serializer_class(prescription).data, status=status.HTTP_201_CREATED)
 
     def get(self, request, appointment_id=None, *args, **kwargs):
         appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id,
@@ -392,3 +392,64 @@ class DoctorCommentListView(generics.ListAPIView):
     def get_queryset(self):
         doctor = self.request.user.doctor
         return Comment.objects.filter(doctor_id=doctor.id)
+
+
+@extend_schema(tags=['prescription'])
+class DoctorAppointmentView(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
+    serializer_class = PatientSerializer
+
+    def get_prescription_info(self,patient_info, prescription):
+
+        prescription_serializer = PrescriptionSerializer(prescription) if prescription else None
+
+        if prescription_serializer:
+            patient_info.update({
+                'date_prescribed': prescription.date,
+                'prescription': prescription_serializer.data
+            })
+
+        return patient_info
+
+    def get(self, request, appointment_id=None, *args, **kwargs):
+        appointment = get_object_or_404(Appointment, id=appointment_id, doctor_id=request.user.id)
+        patient = get_object_or_404(Patient, national_id=appointment.patient_id)
+        patient_serializer = PatientSerializer(patient)
+        patient_info = {
+            'full_name': patient_serializer.get_full_name(patient),
+            'birth_date': patient_serializer.data['birthdate'],
+            'national_id': patient_serializer.data['national_id'],
+            'doctor_last_name': self.request.user.doctor.last_name,
+        }
+
+        try:
+            prescription = Prescription.objects.get(appointment_id=appointment)
+        except Prescription.DoesNotExist:
+            patient_info .update({
+                'message': 'No prescription found for this appointment'
+            })
+            return Response(patient_info, status=status.HTTP_404_NOT_FOUND)
+
+        patient_prescription_info = self.get_prescription_info(patient_info, prescription)
+        return Response(patient_prescription_info, status=status.HTTP_200_OK)
+
+    # def get(self, request, appointment_id=None, *args, **kwargs):
+    #     appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id,
+    #                                     doctor_id__exact=request.user.id)
+    #
+    #     patient = get_object_or_404(Patient.objects.all(), national_id=appointment.patient_id)
+    #     prescription = get_object_or_404(Prescription.objects.all(), appointment_id=appointment)
+    #
+    #     patient_serializer = PatientSerializer(patient)
+    #     prescription_serializer = PrescriptionSerializer(prescription)
+    #
+    #     patient_prescription_info = {
+    #         'full_name': patient_serializer.get_full_name(patient),
+    #         'birth_date': patient_serializer.data['birthdate'],
+    #         'national_id': patient_serializer.data['national_id'],
+    #         'doctor_last_name': request.user.doctor.last_name,
+    #         'date_prescribed': prescription.date,
+    #         'prescription': prescription_serializer.data
+    #     }
+    #
+    #     return Response(patient_prescription_info, status=status.HTTP_200_OK)

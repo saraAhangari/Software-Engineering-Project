@@ -234,6 +234,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/Comment'
           description: ''
+  /api/v1/doctor/{appointment_id}/prescription:
+    get:
+      operationId: api_v1_doctor_prescription_retrieve
+      parameters:
+      - in: path
+        name: appointment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - prescription
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
   /api/v1/doctor/comments:
     get:
       operationId: api_v1_doctor_comments_list
@@ -1071,10 +1091,8 @@ components:
           readOnly: true
         generic_name:
           type: string
-        infant_safe:
-          type: boolean
+          nullable: true
       required:
-      - generic_name
       - id
     NullEnum:
       enum:
@@ -1181,6 +1199,9 @@ components:
           items:
             $ref: '#/components/schemas/AppointmentDetail'
           readOnly: true
+        full_name:
+          type: string
+          readOnly: true
     Patient:
       type: object
       properties:
@@ -1216,10 +1237,14 @@ components:
           items:
             $ref: '#/components/schemas/AppointmentDetail'
           readOnly: true
+        full_name:
+          type: string
+          readOnly: true
       required:
       - appointments
       - birthdate
       - first_name
+      - full_name
       - gender
       - id
       - last_name
