@@ -94,7 +94,7 @@ services:
       - db
       - redis
 
-    restart: on-failure
+    restart: always
 
 volumes:
   redis:
