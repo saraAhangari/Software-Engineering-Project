@@ -8,7 +8,7 @@ on:
 
 jobs:
   test_django:
-    uses: your-username/your-repo/.github/workflows/django-test.yaml@main
+    uses: saraAhangari/Software-Engineering-Project/.github/workflows/django-test.yaml@master
   container_builder:
     runs-on: ubuntu-latest
     needs: [test_django]
@@ -18,7 +18,7 @@ jobs:
       - name: Build container image
         run: |
           docker build \
-          -t your-username/your-image-name:${GITHUB_SHA::7} \
-          -t your-username/your-image-name:latest \
+          -t saraAhangari/app:${GITHUB_SHA::7} \
+          -t saraAhangari/app:latest \
           .
 
