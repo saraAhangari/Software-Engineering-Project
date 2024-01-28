@@ -96,6 +96,10 @@ services:
 
     restart: always
 
+networks:
+    djangonetwork:
+        driver: bridge
+
 volumes:
   redis:
   postgres:
