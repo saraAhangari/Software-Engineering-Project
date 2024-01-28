@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import Navbar from "../../components/Navbar/Navbar";
 import "./DoctorsPatients.css"
 import NOTES from "../../assets/images/icon_notes.svg";
@@ -6,6 +7,28 @@ import DOC from "../../assets/images/🦆 icon _google docs_.svg"
 
 
 function DoctorsPatients(){
+    const [visitHistory, setVisitHistory] = useState([]);
+
+    useEffect(() => {
+        safeApiCall(
+            fetchVisitHistory(),
+            setVisitHistory,
+        )
+    }, [])
+
+    const fetchVisitHistory = async () => {
+        try {
+            const response = await fetch('/appointments');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setVisitHistory(data); 
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
+
     return(
         <div className="">
             <Navbar></Navbar>
@@ -20,8 +43,18 @@ function DoctorsPatients(){
                             <div className="VisitHistoryHeaderItem">سوابق پزشکی</div>
                             <div className="VisitHistoryHeaderItem">نسخه</div>
                         </div>
-          
-                        <div className="VisitHistoryData">
+                        {visitHistory.map((visit, index) => (
+                            <div key={index} className="VisitHistoryData">
+                                <div className="VisitHistoryHeaderItem">{visit.appointment_time.date}</div>
+                                <div className="VisitHistoryHeaderItem">{visit.appointment_time.start}</div>
+                                <div className="VisitHistoryHeaderItem">احسان محسنی</div>
+                                <div className="VisitHistoryHeaderItem">{visit.status}</div>
+                                <img src={DOC} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon VisitHistoryHeaderItemIcon2" />
+                                <img src={NOTES} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon" />
+                            </div>    
+                        ))}
+
+                        {/* <div className="VisitHistoryData">
                             <div className="VisitHistoryHeaderItem">1402-10-12</div>
                             <div className="VisitHistoryHeaderItem">12:30</div>
                             <div className="VisitHistoryHeaderItem"> احسان محسنی</div>
@@ -49,7 +82,7 @@ function DoctorsPatients(){
                             <img src={DOC} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon VisitHistoryHeaderItemIcon2" />
                             <img src={NOTES} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon" />
 
-                        </div>
+                        </div> */}
                  
                      
                     </div>
