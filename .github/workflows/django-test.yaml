@@ -21,7 +21,7 @@ jobs:
       DB_NAME: hospital_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      DB_HOST: db
+      DB_HOST: 127.0.0.1
       DB_PORT: 5432
       REDIS_URI: redis://redis:6379/0
     services:
@@ -54,7 +54,7 @@ jobs:
       - name: Run Tests
         # Step specific environment variables
         env:
-          DEBUG: "0"
+          DEBUG: ${{ env.DEBUG_MODE }}
           DJANGO_SECRET_KEY: ${{ env.SECRET_KEY }}
           DB_USERNAME: ${{ env.POSTGRES_USER }}
           DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
