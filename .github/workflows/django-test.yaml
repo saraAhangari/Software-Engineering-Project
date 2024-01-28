@@ -14,14 +14,23 @@ jobs:
     defaults:
       run:
         working-directory: ./server
-    
+    env:
+      SECRET_KEY: 'django-dummy-secret-key'
+      PANEL_API_KEY: '-___-'
+      DEBUG_MODE: True
+      DB_NAME: hospital_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      REDIS_URI: redis://redis:6379/0
     services:
       postgres_main:
         image: postgres:12
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.DB_HOST }}
         ports:
           - 5432:5432
         options: >-
@@ -31,22 +40,10 @@ jobs:
           --health-retries 5
     strategy:
       matrix:
-        python-version: ["3.10"] # ["3.8", "3.9", "3.10"]
+        python-version: ["3.8"] # ["3.8", "3.9", "3.10"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Load .env
-        run: |
-          echo "${{ secrets.SECRET_KEY }}" > ./server/.env  
-          echo "${{ secrets.PANEL_API_KEY }}" > ./server/.env  
-          echo "${{ secrets.DEBUG_MODE }}" > ./server/.env  
-          echo "${{ secrets.DB_NAME }}" > ./server/.env  
-          echo "${{ secrets.POSTGRES_USER }}" > ./server/.env  
-          echo "${{ secrets.POSTGRES_PASSWORD }}" > ./server/.env  
-          echo "${{ secrets.DB_HOST }}" > ./server/.env  
-          echo "${{ secrets.DB_PORT }}" > ./server/.env  
-          echo "${{ secrets.REDIS_URI }}" > ./server/.env 
-            
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -57,13 +54,13 @@ jobs:
       - name: Run Tests
         # Step specific environment variables
         env:
-          DEBUG: ${{ secrets.DEBUG_MODE }}
-          DJANGO_SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DB_USERNAME: ${{ secrets.POSTGRES_USER }}
-          DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_DATABASE: ${{ secrets.DB_NAME }}
-          DB_PORT: ${{ secrets.DB_PORT }}
+          DEBUG: ${{ env.DEBUG_MODE }}
+          DJANGO_SECRET_KEY: ${{ env.SECRET_KEY }}
+          DB_USERNAME: ${{ env.POSTGRES_USER }}
+          DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          DB_HOST: ${{ env.DB_HOST }}
+          DB_DATABASE: ${{ env.DB_NAME }}
+          DB_PORT: ${{ env.DB_PORT }}
         run: |
           python manage.py test
 
