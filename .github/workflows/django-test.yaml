@@ -35,13 +35,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install requirements
-        run: |
-          pip install -r requirements.txt
       - name: Load .env
         run: |
           echo "${{ secrets.SECRET_KEY }}" > ./server/.env  
@@ -53,7 +46,14 @@ jobs:
           echo "${{ secrets.DB_HOST }}" > ./server/.env  
           echo "${{ secrets.DB_PORT }}" > ./server/.env  
           echo "${{ secrets.REDIS_URI }}" > ./server/.env 
-
+            
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
       - name: Run Tests
         # Step specific environment variables
         env:
