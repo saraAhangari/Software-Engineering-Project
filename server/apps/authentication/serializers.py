@@ -22,12 +22,6 @@ class PatientSerializer(serializers.ModelSerializer):
     medical_history = MedicalHistorySerializer(required=False)
     appointments = AppointmentDetailSerializer(many=True, read_only=True, required=False)
     assurance = serializers.PrimaryKeyRelatedField(queryset=Assurance.objects.all(), required=False)
-    full_name = serializers.SerializerMethodField()
-
-    def get_full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
-
-
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -60,7 +54,7 @@ class PatientSerializer(serializers.ModelSerializer):
         model = Patient
         fields = ['id', 'first_name', 'last_name', 'national_id',
                   'phone_no', 'birthdate', 'assurance', 'gender',
-                  'medical_history', 'appointments', 'full_name']
+                  'medical_history', 'appointments']
 
         extra_kwargs = {
             'first_name': {
@@ -214,3 +208,33 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
+class PatientDetailSerializer(serializers.ModelSerializer):
+    medical_history = MedicalHistorySerializer(required=False)
+    assurance = serializers.PrimaryKeyRelatedField(queryset=Assurance.objects.all(), required=False)
+
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        assurance_id = representation.get('assurance')
+        if assurance_id is None:
+            return representation
+
+        assurance_instance = Assurance.objects.get(id=assurance_id)
+        assurance_data = AssuranceSerializer(assurance_instance).data
+        representation['assurance'] = assurance_data
+        return representation
+
+
+
+    def get_medical_history(self, obj):
+        return MedicalHistorySerializer(obj.medical_history.all()).data
+
+    class Meta:
+        model = Patient
+        fields = ['national_id',
+                  'phone_no', 'birthdate', 'assurance', 'gender',
+                  'medical_history', 'full_name']

@@ -279,7 +279,58 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedAppointmentList'
+                $ref: '#/components/schemas/PaginatedAppointmentDetailList'
+          description: ''
+  /api/v1/doctor/appointments/{patient_name}/medical_record:
+    get:
+      operationId: api_v1_doctor_appointments_medical_record_retrieve
+      parameters:
+      - in: path
+        name: patient_name
+        schema:
+          type: string
+        required: true
+      tags:
+      - medicalHistory
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    post:
+      operationId: api_v1_doctor_appointments_medical_record_create
+      parameters:
+      - in: path
+        name: patient_name
+        schema:
+          type: string
+        required: true
+      tags:
+      - medicalHistory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
           description: ''
   /api/v1/doctor/comments:
     get:
@@ -1124,7 +1175,7 @@ components:
     NullEnum:
       enum:
       - null
-    PaginatedAppointmentList:
+    PaginatedAppointmentDetailList:
       type: object
       properties:
         count:
@@ -1143,7 +1194,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/Appointment'
+            $ref: '#/components/schemas/AppointmentDetail'
     PaginatedCommentList:
       type: object
       properties:

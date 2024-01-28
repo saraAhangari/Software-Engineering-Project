@@ -17,7 +17,7 @@ from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSeria
                           AppointmentSerializer, PrescriptionSerializer, MedicineSerializer,
                           DoctorRetrieveUpdateSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
-from ..authentication.serializers import PatientSerializer, AssuranceSerializer
+from ..authentication.serializers import PatientSerializer, AssuranceSerializer, PatientDetailSerializer
 from .utils import time_to_minutes, minutes_to_time
 
 
@@ -139,7 +139,7 @@ class CommentPermissionView(generics.RetrieveAPIView):
 class PatientDetailView(generics.UpdateAPIView):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPatient]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, ]
 
     def get_object(self):
         return self.request.user.patient
@@ -397,7 +397,7 @@ class DoctorCommentListView(generics.ListAPIView):
 @extend_schema(tags=['doctor'])
 class DoctorPrescriptionView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
-    serializer_class = PatientSerializer
+    serializer_class = PatientDetailSerializer
 
     def get_prescription_info(self, patient_info, prescription):
 
@@ -414,7 +414,7 @@ class DoctorPrescriptionView(generics.RetrieveAPIView):
     def get(self, request, appointment_id=None, *args, **kwargs):
         appointment = get_object_or_404(Appointment, id=appointment_id, doctor_id=request.user.id)
         patient = get_object_or_404(Patient, national_id=appointment.patient_id)
-        patient_serializer = PatientSerializer(patient)
+        patient_serializer = self.serializer_class(patient)
         patient_info = {
             'full_name': patient_serializer.get_full_name(patient),
             'birth_date': patient_serializer.data['birthdate'],
@@ -448,7 +448,7 @@ class DoctorAppointmentView(generics.ListAPIView):
         for appointment_data in appointment_serializer.data:
             patient_id = appointment_data.get('patient_id')
             patient = Patient.objects.get(pk=patient_id)
-            patient_serializer = PatientSerializer(patient)
+            patient_serializer = PatientDetailSerializer(patient)
 
             appointment_details = {
                 'date': appointment_data['appointment_time']['date'],
@@ -460,3 +460,16 @@ class DoctorAppointmentView(generics.ListAPIView):
             doctor_appointments_list.append(appointment_details)
 
         return Response(doctor_appointments_list, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=['medicalHistory'])
+class DoctorMedicalRecordView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
+    serializer_class = PatientDetailSerializer
+
+    def get(self, request, patient_name, *args, **kwargs):
+        first_name, last_name = patient_name.split(' ', 1)
+        patient = Patient.objects.get(first_name=first_name, last_name=last_name)
+        return Response(self.serializer_class(patient).data, status=status.HTTP_200_OK)
+
+
