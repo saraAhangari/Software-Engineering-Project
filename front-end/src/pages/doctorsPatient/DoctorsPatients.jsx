@@ -4,32 +4,41 @@ import "./DoctorsPatients.css"
 import NOTES from "../../assets/images/icon_notes.svg";
 import COMMENT from "../../assets/images/icon_message.svg"
 import DOC from "../../assets/images/🦆 icon _google docs_.svg"
+import { safeApiCall } from "../../data/api/Api";
 
 
-function DoctorsPatients(){
+function DoctorsPatients() {
     const [visitHistory, setVisitHistory] = useState([]);
 
     useEffect(() => {
-        safeApiCall(
-            fetchVisitHistory(),
-            setVisitHistory,
-        )
-    }, [])
+        var token = localStorage.getItem("token")
+        const fetchVisitHistory = async () => {
+            try {
+                var response = await fetch("http://localhost:8000/api/v1/appointments",
+                    {
+                        method: "GET",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    }
 
-    const fetchVisitHistory = async () => {
-        try {
-            const response = await fetch('/appointments');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+                );
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setVisitHistory(data);
+            } catch (error) {
+                console.error('Fetch error:', error);
             }
-            const data = await response.json();
-            setVisitHistory(data); 
-        } catch (error) {
-            console.error('Fetch error:', error);
-        }
-    };
+        };
+    }
 
-    return(
+    )
+
+    return (
         <div className="">
             <Navbar></Navbar>
             <div className="profile-container">
@@ -51,7 +60,7 @@ function DoctorsPatients(){
                                 <div className="VisitHistoryHeaderItem">{visit.status}</div>
                                 <img src={DOC} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon VisitHistoryHeaderItemIcon2" />
                                 <img src={NOTES} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon" />
-                            </div>    
+                            </div>
                         ))}
 
                         {/* <div className="VisitHistoryData">
@@ -83,8 +92,8 @@ function DoctorsPatients(){
                             <img src={NOTES} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon" />
 
                         </div> */}
-                 
-                     
+
+
                     </div>
                 </div>
             </div>

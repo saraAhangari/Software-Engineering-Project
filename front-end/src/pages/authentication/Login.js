@@ -1,19 +1,19 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import MainTemplate from "../../components/container/MainTemplate";
-import {Navigate, useNavigate} from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import CustomCard from "../../components/container/CustomCard";
-import {Divider} from "@mui/material";
+import { Divider } from "@mui/material";
 import PrimaryButton from "../../components/button/PrimaryButton";
 import SecondaryButton from "../../components/button/SecondaryButton";
 import CustomTextFiled from "../../components/text-field/CustomTextField";
-import {safeApiCall} from "../../data/api/Api";
-import {getToken, login} from "../../data/api/AuthenticationApi";
-import {useAuth} from "../../auth/Auth";
+import { safeApiCall } from "../../data/api/Api";
+import { getToken, login } from "../../data/api/AuthenticationApi";
+import { useAuth } from "../../auth/Auth";
 
 function Login() {
     const navigate = useNavigate()
 
-    const {token, loginUser} = useAuth();
+    const { token, loginUser } = useAuth();
 
     const [showOtpField, setShowOtpField] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +96,7 @@ function Login() {
 
                     <h1 className={'title'}>ورود به حساب کاربری</h1>
 
-                    <Divider className={'divider'}/>
+                    <Divider className={'divider'} />
 
                     <div
                         style={
