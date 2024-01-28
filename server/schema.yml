@@ -244,11 +244,89 @@ paths:
           type: integer
         required: true
       tags:
-      - prescription
+      - doctor
       security:
       - jwtAuth: []
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/v1/doctor/appointments:
+    get:
+      operationId: api_v1_doctor_appointments_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - doctor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointmentDetailList'
+          description: ''
+  /api/v1/doctor/appointments/{patient_name}/medical_record:
+    get:
+      operationId: api_v1_doctor_appointments_medical_record_retrieve
+      parameters:
+      - in: path
+        name: patient_name
+        schema:
+          type: string
+        required: true
+      tags:
+      - medicalHistory
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    post:
+      operationId: api_v1_doctor_appointments_medical_record_create
+      parameters:
+      - in: path
+        name: patient_name
+        schema:
+          type: string
+        required: true
+      tags:
+      - medicalHistory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patient'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
           content:
             application/json:
               schema:
@@ -1097,6 +1175,26 @@ components:
     NullEnum:
       enum:
       - null
+    PaginatedAppointmentDetailList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDetail'
     PaginatedCommentList:
       type: object
       properties:
