@@ -15,7 +15,7 @@ class SpecialitySerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['treatment_experience', 'point']
+        fields = ['treatment_experience', 'point', 'created']
 
 
 class DoctorSerializer(serializers.ModelSerializer):
@@ -32,14 +32,18 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 class DoctorDetailSerializer(serializers.ModelSerializer):
     speciality = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
 
     def get_speciality(self, obj):
         return SpecialitySerializer(obj.speciality.all(), many=True).data
 
+    def get_comments(self, obj):
+        return CommentSerializer(obj.comments.all(), many=True).data
+
     class Meta:
         model = Doctor
-        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'medical_system_number',
-                  'speciality', 'phone_no', 'birthdate', 'gender', 'comments']
+        fields = ['first_name', 'last_name', 'description',
+                  'speciality', 'comments']
 
 
 class MedicalHistorySerializer(serializers.ModelSerializer):
@@ -125,6 +129,6 @@ class DoctorRetrieveUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ['first_name', 'last_name', 'national_id',  'medical_system_number',
+        fields = ['first_name', 'last_name', 'national_id', 'medical_system_number',
                   'speciality', 'phone_no', 'birthdate', 'gender']
         read_only_fields = ('medical_system_number', 'national_id', 'speciality', 'phone_no')

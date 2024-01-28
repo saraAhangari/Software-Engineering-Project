@@ -234,6 +234,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/Comment'
           description: ''
+  /api/v1/doctor/comments:
+    get:
+      operationId: api_v1_doctor_comments_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - doctor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentList'
+          description: ''
   /api/v1/doctor/profile:
     get:
       operationId: api_v1_doctor_profile_retrieve
@@ -862,6 +889,12 @@ components:
           type: integer
           maximum: 5
           minimum: 1
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created
     DateTimeSlice:
       type: object
       properties:
@@ -922,49 +955,23 @@ components:
     DoctorDetail:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         first_name:
           type: string
           maxLength: 150
         last_name:
           type: string
           maxLength: 150
-        national_id:
-          type: string
-          maxLength: 10
-          minLength: 10
         description:
           type: string
           nullable: true
-        medical_system_number:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
         speciality:
           type: string
           readOnly: true
-        phone_no:
-          type: string
-          maxLength: 11
-          minLength: 10
-        birthdate:
-          type: string
-          format: date
-          nullable: true
-        gender:
-          $ref: '#/components/schemas/GenderEnum'
         comments:
-          type: array
-          items:
-            type: integer
+          type: string
+          readOnly: true
       required:
       - comments
-      - id
-      - medical_system_number
-      - national_id
-      - phone_no
       - speciality
     DoctorRetrieveUpdate:
       type: object
@@ -1072,6 +1079,26 @@ components:
     NullEnum:
       enum:
       - null
+    PaginatedCommentList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
     PaginatedDoctorList:
       type: object
       properties:

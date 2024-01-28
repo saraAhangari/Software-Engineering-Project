@@ -383,3 +383,12 @@ class DoctorUpdateAPIView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user.doctor
 
+
+@extend_schema(tags=['doctor'])
+class DoctorCommentListView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        doctor = self.request.user.doctor
+        return Comment.objects.filter(doctor_id=doctor.id)
