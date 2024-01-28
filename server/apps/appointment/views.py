@@ -394,12 +394,12 @@ class DoctorCommentListView(generics.ListAPIView):
         return Comment.objects.filter(doctor_id=doctor.id)
 
 
-@extend_schema(tags=['prescription'])
-class DoctorAppointmentView(generics.RetrieveAPIView):
+@extend_schema(tags=['doctor'])
+class DoctorPrescriptionView(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
     serializer_class = PatientSerializer
 
-    def get_prescription_info(self,patient_info, prescription):
+    def get_prescription_info(self, patient_info, prescription):
 
         prescription_serializer = PrescriptionSerializer(prescription) if prescription else None
 
@@ -425,7 +425,7 @@ class DoctorAppointmentView(generics.RetrieveAPIView):
         try:
             prescription = Prescription.objects.get(appointment_id=appointment)
         except Prescription.DoesNotExist:
-            patient_info .update({
+            patient_info.update({
                 'message': 'No prescription found for this appointment'
             })
             return Response(patient_info, status=status.HTTP_404_NOT_FOUND)
@@ -433,23 +433,30 @@ class DoctorAppointmentView(generics.RetrieveAPIView):
         patient_prescription_info = self.get_prescription_info(patient_info, prescription)
         return Response(patient_prescription_info, status=status.HTTP_200_OK)
 
-    # def get(self, request, appointment_id=None, *args, **kwargs):
-    #     appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id,
-    #                                     doctor_id__exact=request.user.id)
-    #
-    #     patient = get_object_or_404(Patient.objects.all(), national_id=appointment.patient_id)
-    #     prescription = get_object_or_404(Prescription.objects.all(), appointment_id=appointment)
-    #
-    #     patient_serializer = PatientSerializer(patient)
-    #     prescription_serializer = PrescriptionSerializer(prescription)
-    #
-    #     patient_prescription_info = {
-    #         'full_name': patient_serializer.get_full_name(patient),
-    #         'birth_date': patient_serializer.data['birthdate'],
-    #         'national_id': patient_serializer.data['national_id'],
-    #         'doctor_last_name': request.user.doctor.last_name,
-    #         'date_prescribed': prescription.date,
-    #         'prescription': prescription_serializer.data
-    #     }
-    #
-    #     return Response(patient_prescription_info, status=status.HTTP_200_OK)
+
+@extend_schema(tags=['doctor'])
+class DoctorAppointmentView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated, IsNotInBlackedList, IsDoctor)
+    serializer_class = AppointmentDetailSerializer
+
+    def get(self, request, *args, **kwargs):
+        appointments = request.user.doctor.appointments.all()
+        appointment_serializer = self.serializer_class(appointments, many=True)
+
+        doctor_appointments_list = []
+
+        for appointment_data in appointment_serializer.data:
+            patient_id = appointment_data.get('patient_id')
+            patient = Patient.objects.get(pk=patient_id)
+            patient_serializer = PatientSerializer(patient)
+
+            appointment_details = {
+                'date': appointment_data['appointment_time']['date'],
+                'clock': appointment_data['appointment_time']['start'],
+                'patient_name': patient_serializer.get_full_name(patient),
+                'status': appointment_data['status'],
+            }
+
+            doctor_appointments_list.append(appointment_details)
+
+        return Response(doctor_appointments_list, status=status.HTTP_200_OK)

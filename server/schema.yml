@@ -244,7 +244,7 @@ paths:
           type: integer
         required: true
       tags:
-      - prescription
+      - doctor
       security:
       - jwtAuth: []
       responses:
@@ -253,6 +253,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/v1/doctor/appointments:
+    get:
+      operationId: api_v1_doctor_appointments_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - doctor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointmentList'
           description: ''
   /api/v1/doctor/comments:
     get:
@@ -1097,6 +1124,26 @@ components:
     NullEnum:
       enum:
       - null
+    PaginatedAppointmentList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
     PaginatedCommentList:
       type: object
       properties:

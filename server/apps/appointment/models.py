@@ -107,7 +107,7 @@ class Appointment(models.Model):
         ('online', 'online')
     ]
     patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')
-    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    doctor_id = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='appointments')
     description = models.TextField(null=True, blank=True, default='-')
     status = models.CharField(choices=APPOINTMENT_STATUS, default='reserved')
     type = models.CharField(choices=APPOINTMENT_TYPE, default='face to face')
