@@ -1,10 +1,13 @@
-name: Build
+name: Sonar Build
 on:
   push:
     branches:
       - master
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - master
+      
 jobs:
   sonarcloud:
     name: Sonar Analyzer
