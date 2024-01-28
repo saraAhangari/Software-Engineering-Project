@@ -234,6 +234,68 @@ paths:
               schema:
                 $ref: '#/components/schemas/Comment'
           description: ''
+  /api/v1/doctor/profile:
+    get:
+      operationId: api_v1_doctor_profile_retrieve
+      tags:
+      - doctor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorRetrieveUpdate'
+          description: ''
+    put:
+      operationId: api_v1_doctor_profile_update
+      tags:
+      - doctor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorRetrieveUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoctorRetrieveUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoctorRetrieveUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorRetrieveUpdate'
+          description: ''
+    patch:
+      operationId: api_v1_doctor_profile_partial_update
+      tags:
+      - doctor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorRetrieveUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorRetrieveUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctorRetrieveUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorRetrieveUpdate'
+          description: ''
   /api/v1/doctors:
     get:
       operationId: api_v1_doctors_list
@@ -374,32 +436,6 @@ paths:
       - {}
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Medicine'
-          description: ''
-    post:
-      operationId: api_v1_medicine_create
-      tags:
-      - Medicine
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Medicine'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Medicine'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Medicine'
-        required: true
-      security:
-      - jwtAuth: []
-      - {}
-      responses:
-        '201':
           content:
             application/json:
               schema:
@@ -930,6 +966,38 @@ components:
       - national_id
       - phone_no
       - speciality
+    DoctorRetrieveUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        national_id:
+          type: string
+          readOnly: true
+        medical_system_number:
+          type: integer
+          readOnly: true
+        speciality:
+          type: string
+          readOnly: true
+        phone_no:
+          type: string
+          readOnly: true
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          $ref: '#/components/schemas/GenderEnum'
+      required:
+      - medical_system_number
+      - national_id
+      - phone_no
+      - speciality
     GenderEnum:
       enum:
       - m
@@ -1024,6 +1092,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Doctor'
+    PatchedDoctorRetrieveUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        national_id:
+          type: string
+          readOnly: true
+        medical_system_number:
+          type: integer
+          readOnly: true
+        speciality:
+          type: string
+          readOnly: true
+        phone_no:
+          type: string
+          readOnly: true
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          $ref: '#/components/schemas/GenderEnum'
     PatchedPatient:
       type: object
       properties:
