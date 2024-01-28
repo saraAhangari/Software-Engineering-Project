@@ -139,7 +139,7 @@ class CommentPermissionView(generics.RetrieveAPIView):
 class PatientDetailView(generics.UpdateAPIView):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated, IsNotInBlackedList, ]
+    permission_classes = [IsAuthenticated, IsNotInBlackedList, IsPatient]
 
     def get_object(self):
         return self.request.user.patient
