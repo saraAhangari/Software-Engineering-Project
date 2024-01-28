@@ -16,9 +16,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build container image
-        run: |
-          docker build \
-          -t saraAhangari/app:${GITHUB_SHA::7} \
-          -t saraAhangari/app:latest \
-          .
+        run: docker compose up --build
 
