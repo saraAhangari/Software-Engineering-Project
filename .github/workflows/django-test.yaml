@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
     env:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
