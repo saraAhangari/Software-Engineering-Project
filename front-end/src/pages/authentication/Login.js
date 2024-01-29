@@ -39,7 +39,11 @@ function Login() {
     }
 
     if (token) {
-        navigate('/patient-panel');
+        if (isDoctorLogin) {
+            navigate('/?????');
+        } else {
+            navigate('/patient-panel');
+        }
     }
 
     function navigateToSignUp() {
