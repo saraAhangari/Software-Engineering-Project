@@ -31,21 +31,14 @@ function PatientPanel(props) {
             icon: ICON_CALENDAR,
             title: 'نوبت ها',
             onClick: () => {
-                // TODO: handle
-            },
-        },
-        {
-            icon: ICON_NOTES,
-            title: 'نسخه ها',
-            onClick: () => {
-                // TODO: handle
+                navigate('/history')
             },
         },
         {
             icon: ICON_MESSAGE,
             title: 'نظرات من',
             onClick: () => {
-                // TODO: handle
+                navigate('my-comments')
             },
         },
         {

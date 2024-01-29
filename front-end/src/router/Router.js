@@ -17,11 +17,13 @@ import Prescription from "../pages/Prescription/prescription";
 import DoctorsPatients from "../pages/doctorsPatient/DoctorsPatients";
 import DoctorInformation from "../pages/doctorInformation/DoctorInformation";
 import WorkTime from "../pages/workTime/WorkTime";
+import DoctorPrescription from '../pages/doctor-prescription/doctor-prescription';
 
 function Router() {
     return (
         <BrowserRouter>
             <Routes>
+                <Route path='/doctor-prescription' element={<DoctorPrescription />} />
                 <Route path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='/signup' element={<SignUp />} />

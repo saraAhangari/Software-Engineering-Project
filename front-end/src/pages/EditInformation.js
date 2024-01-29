@@ -1,9 +1,9 @@
-import React, {useRef, useState} from "react";
+import React, { useRef, useState } from "react";
 import MainTemplate from "../components/container/MainTemplate";
 import CustomTextFiled from "../components/text-field/CustomTextField";
 import Selector from "../components/text-field/Selector";
 import JalaliDatePicker from "../components/text-field/JalaliDatePicker";
-import {useTheme} from "@mui/material";
+import { useTheme } from "@mui/material";
 import PrimaryButton from "../components/button/PrimaryButton";
 
 function EditInformation(props) {
