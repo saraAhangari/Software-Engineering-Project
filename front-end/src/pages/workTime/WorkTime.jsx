@@ -50,26 +50,28 @@ function WorkTime() {
             <MainTemplate>
                 <div className="wtB">
                     <div className="vtcon">
-                        <div className="wttitle">زمان های  حضور </div>
-                        <form onSubmit={handleSubmit}></form>
-                        <div className="wtitleday">
-                            <div>انتخاب روز</div>
-                            <input type="date" name="date" value={formData.date} onChange={handleChange} />
-                        </div>
-                        <div className="wttime">
-                            <div>انتخاب ساعت شروع</div>
-                            <div className="wttimein">
-                                <input type="time" name="start" value={formData.start} onChange={handleChange} />
+                        <div className="vtcoon">
+                            <div className="wttitle">زمان های  حضور </div>
+                            <form onSubmit={handleSubmit}></form>
+                            <div className="wtitleday">
+                                <div>انتخاب روز</div>
+                                <input type="date" name="date" value={formData?.date} onChange={handleChange} />
                             </div>
-                        </div>
-                        <div className="wttime">
-                            <div>انتخاب ساعت پایان</div>
-                            <div className="wttimein">
-                                <input type="time" name="end" value={formData.end} onChange={handleChange} />
+                            <div className="wttime">
+                                <div>انتخاب ساعت شروع</div>
+                                <div className="wttimein">
+                                    <input type="time" name="start" value={formData?.start} onChange={handleChange} />
+                                </div>
                             </div>
-                        </div>
-                        <div className="confirmBox">
-                            <button type="submit" className="confirmbtn">ثبت</button>
+                            <div className="wttime">
+                                <div>انتخاب ساعت پایان</div>
+                                <div className="wttimein">
+                                    <input type="time" name="end" value={formData?.end} onChange={handleChange} />
+                                </div>
+                            </div>
+                            <div className="confirmBox">
+                                <button type="submit" className="confirmbtn">ثبت</button>
+                            </div>
                         </div>
                     </div>
                 </div>
