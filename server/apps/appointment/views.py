@@ -490,6 +490,7 @@ class DoctorMedicalRecordView(generics.CreateAPIView):
     serializer_class = PatientDetailSerializer
 
     def get(self, request, patient_name, *args, **kwargs):
+        dummy = 'salam'
         first_name, last_name = patient_name.split(' ', 1)
         patient = Patient.objects.get(first_name=first_name, last_name=last_name)
         return Response(self.serializer_class(patient).data, status=status.HTTP_200_OK)
