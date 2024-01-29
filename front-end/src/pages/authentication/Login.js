@@ -40,7 +40,7 @@ function Login() {
 
     if (token) {
         if (isDoctorLogin) {
-            navigate('/?????');
+            navigate('/doctor-panel');
         } else {
             navigate('/patient-panel');
         }

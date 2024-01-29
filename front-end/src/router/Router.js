@@ -32,7 +32,7 @@ function Router() {
                 <Route path='/doctor-info/:doctor_id?' element={<DoctorInfo />} />
                 <Route path='/doctor-panel' element={<DoctorPanel />} />
                 <Route path='/doctor-patients' element={<DoctorsPatients />} />
-                <Route path='/my-comments' element={<MyComments />} />
+                <Route path='/patient-panel/my-comments' element={<MyComments />} />
                 <Route path='/edit-information' element={<EditInformation />} />
                 <Route path='/doctor-information' element={<DoctorInformation />} />
                 <Route path='/doctor-comments' element={<DoctorComments />} />
