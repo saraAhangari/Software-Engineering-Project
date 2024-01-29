@@ -1,8 +1,11 @@
 from django.urls import path
-from .views import AssuranceView, DoctorDetailView, DoctorListView, PatientDetailView, AddCommentView, \
-    GetCommentView, CommentPermissionView, MedicalHistoryView, DoctorTimeSliceView, \
-    TimeSliceView, AppointmentPatientView, PrescriptionDoctorView, PrescriptionPatientView, MedicineView, \
-    DoctorUpdateAPIView, DoctorCommentListView, DoctorPrescriptionView, DoctorAppointmentView, DoctorMedicalRecordView
+from .views import (AssuranceView, DoctorDetailView, DoctorListView, PatientDetailView, AddCommentView, \
+                    GetCommentView, CommentPermissionView, MedicalHistoryView, DoctorTimeSliceView, \
+                    TimeSliceView, AppointmentPatientView, PrescriptionDoctorView, PrescriptionPatientView,
+                    MedicineView, \
+                    DoctorUpdateAPIView, DoctorCommentListView, DoctorPrescriptionView, DoctorAppointmentView,
+                    DoctorMedicalRecordView,
+                    GetDoctorCommentView)
 
 urlpatterns = [
     # assurance
@@ -13,7 +16,8 @@ urlpatterns = [
     path('doctors', DoctorListView.as_view(), name='doctor-list'),
 
     # comment
-    path('comment/<int:doctor_id>/', AddCommentView.as_view(), name='save_comment'),
+    path('comment/<int:doctor_id>/', AddCommentView.as_view(http_method_names=['post']), name='save_comment'),
+    path('comment/<int:doctor_id>/', GetDoctorCommentView.as_view(http_method_names=['get']), name='get doctor comments'),
     path('comments', GetCommentView.as_view(), name='get_comment'),
     path('comment/<int:doctor_id>/permission', CommentPermissionView.as_view(), name='comment_add_permission'),
 

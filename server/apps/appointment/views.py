@@ -114,6 +114,18 @@ class AddCommentView(generics.CreateAPIView):
 
 
 @extend_schema(tags=['comment'])
+class GetDoctorCommentView(generics.CreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated, IsNotInBlackedList]
+
+    def get(self, request, doctor_id, *args, **kwargs):
+        comments = Comment.objects.get(doctor_id=doctor_id)
+        serializer = self.serializer_class(comments)
+
+        return Response(serializer.data)
+
+
+@extend_schema(tags=['comment'])
 class GetCommentView(generics.RetrieveAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList]
@@ -471,5 +483,3 @@ class DoctorMedicalRecordView(generics.CreateAPIView):
         first_name, last_name = patient_name.split(' ', 1)
         patient = Patient.objects.get(first_name=first_name, last_name=last_name)
         return Response(self.serializer_class(patient).data, status=status.HTTP_200_OK)
-
-
