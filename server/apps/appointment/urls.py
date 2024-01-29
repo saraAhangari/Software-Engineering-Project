@@ -46,7 +46,6 @@ urlpatterns = [
     path('doctor/appointments', DoctorAppointmentView.as_view(), name='doctor-appointments'),
     path('doctor/appointments/<str:patient_name>/medical_record', DoctorMedicalRecordView.as_view(), name='doctor'
                                                                                                           '-medical'
-                                                                                                          '-records'
-         )
+                                                                                                          '-records'),
 
 ]

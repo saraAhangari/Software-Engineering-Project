@@ -26,8 +26,16 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ['id', 'first_name', 'last_name', 'national_id', 'description', 'medical_system_number',
-                  'speciality', 'phone_no', 'birthdate', 'gender']
+        fields = ['id', 'first_name', 'last_name', 'description',
+                  'speciality', 'birthdate', 'gender']
+
+
+class CommentDetailSerializer(CommentSerializer):
+    doctor_id = DoctorSerializer()
+
+    class Meta:
+        model = Comment
+        fields = CommentSerializer.Meta.fields + ['doctor_id']
 
 
 class DoctorDetailSerializer(serializers.ModelSerializer):
