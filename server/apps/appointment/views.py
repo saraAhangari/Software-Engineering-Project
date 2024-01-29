@@ -15,7 +15,7 @@ from .permissions import IsPermittedToComment
 from .serializers import (DoctorDetailSerializer, CommentSerializer, DoctorSerializer, MedicalHistorySerializer,
                           AppointmentDetailSerializer, TimeSliceListSerializer,
                           AppointmentSerializer, PrescriptionSerializer, MedicineSerializer,
-                          DoctorRetrieveUpdateSerializer)
+                          DoctorRetrieveUpdateSerializer, CommentDetailSerializer)
 from ..authentication.permissions import IsNotInBlackedList, IsPatient, IsDoctor
 from ..authentication.serializers import PatientSerializer, AssuranceSerializer, PatientDetailSerializer
 from .utils import time_to_minutes, minutes_to_time
@@ -127,13 +127,13 @@ class GetDoctorCommentView(generics.CreateAPIView):
 
 @extend_schema(tags=['comment'])
 class GetCommentView(generics.RetrieveAPIView):
-    serializer_class = CommentSerializer
+    serializer_class = CommentDetailSerializer
     permission_classes = [IsAuthenticated, IsNotInBlackedList]
 
     def get(self, request, *args, **kwargs):
         patient_id = request.user.id
         comments = Comment.objects.filter(patient_id=patient_id)
-        serializer = CommentSerializer(comments, many=True)
+        serializer = self.serializer_class(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -183,7 +183,7 @@ class MedicalHistoryView(generics.CreateAPIView):
         user.medical_history = medical_history
         user.save()
 
-        return Response({'ok': True, 'message': 'medical history saved'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'سوابق پزشکی ذخیره شد'}, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=['appointment'])
@@ -374,8 +374,18 @@ class PrescriptionPatientView(generics.RetrieveAPIView):
     def get(self, request, appointment_id=None, *args, **kwargs):
         appointment = get_object_or_404(Appointment.objects.all(), id=appointment_id, patient_id__exact=request.user.id)
         prescription = get_object_or_404(Prescription.objects.all(), appointment_id=appointment, )
+        date = prescription.date
+        last_name = appointment.doctor_id.last_name
 
-        return Response(PrescriptionSerializer(prescription).data)
+        prescription_data = self.serializer_class(prescription).data
+
+        prescription_info = {
+            'prescription': prescription_data,
+            'date': date,
+            "last_name":last_name
+        }
+
+        return Response(prescription_info, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['Medicine'])

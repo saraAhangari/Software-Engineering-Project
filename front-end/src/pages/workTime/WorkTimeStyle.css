@@ -12,10 +12,22 @@
     display: flex;
     flex-direction: column;
     gap: 2vh;
-    background-color: white;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     margin-top: 4vh;
     border-radius: 10px;
+    background-color: #f2f2f2;
+}
+
+.vtcoon {
+    width: 30%;
+    padding: 4vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    margin-top: 4vh;
+    border-radius: 10px;
+    background-color: #f2f2f2;
 }
 
 .wttitle {
