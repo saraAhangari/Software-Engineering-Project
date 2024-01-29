@@ -1,13 +1,14 @@
-import {Button, useTheme} from "@mui/material";
-import {buttonHorizontalPadding, buttonVerticalPadding} from "./Variables";
+import React from 'react';
+import { Button, useTheme } from "@mui/material";
+import { buttonHorizontalPadding, buttonVerticalPadding } from "./Variables";
 import Spinner from "../animation/Spinner";
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 
 function PrimaryButton(
     {
         text = undefined,
         style = {},
-        onButtonClicked = () => {},
+        onButtonClicked = () => { },
         isLoading = undefined,
     }
 ) {
@@ -38,7 +39,7 @@ function PrimaryButton(
                 }
             }
             onClick={onButtonClicked}
-        >{isLoading ? <Spinner/> : text}</Button>
+        >{isLoading ? <Spinner /> : text}</Button>
     )
 }
 

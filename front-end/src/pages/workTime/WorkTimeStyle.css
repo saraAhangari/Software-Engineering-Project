@@ -1,61 +1,78 @@
-.wtB{
+.wtB {
     min-height: 40vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    
+    font-size: 18px;
 }
-.vtcon{
+
+.vtcon {
     width: 30%;
     padding: 4vh;
     display: flex;
     flex-direction: column;
     gap: 2vh;
+    background-color: white;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     margin-top: 4vh;
     border-radius: 10px;
 }
-.wttitle{
+
+.wttitle {
     border-bottom: 2px solid gray;
     padding-bottom: 2vh;
+    font-size: 24px;
 }
-.wtitleday{
+
+.wtitleday {
     display: flex;
     flex-direction: column;
     gap: 1vh;
+    font-size: 18px;
 }
-.wtitleday input{
+
+.wtitleday input {
     background-color: #D9D9D9;
     border: none;
     height: 5vh;
     border-radius: 5px;
     text-align: center;
+    font-size: 18px;
 }
-.wttime{
+
+.wttime {
     display: flex;
     flex-direction: column;
     gap: 1vh;
+    font-size: 18px;
 }
-.wttimein{
+
+.wttimein {
     display: flex;
     justify-content: space-around;
+    font-size: 18px;
 }
-.wttimein input{
+
+.wttimein input {
     background-color: #D9D9D9;
     border: none;
     height: 5vh;
     border-radius: 5px;
     text-align: center;
+    font-size: 18px;
 }
-.confirmBox{
+
+.confirmBox {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.confirmbtn{
+
+.confirmbtn {
     width: fit-content;
     padding: 0.5vh 4vh;
     border-radius: 10px;
     background-color: #228E2E;
     color: white;
+    font-size: 24px;
 }

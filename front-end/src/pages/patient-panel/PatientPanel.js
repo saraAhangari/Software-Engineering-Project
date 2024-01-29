@@ -1,6 +1,6 @@
 import React from "react";
 import PatientPanelItem from "../../components/item/PatientPanelItem";
-import {useNavigate, useParams, Navigate} from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
 import ICON_CALENDAR from "../../assets/images/icon_calendar.svg";
 import ICON_DOCUMENT from "../../assets/images/icon_docs.svg";
 import ICON_EDIT_PENCIL from "../../assets/images/icon_edit_pencil.svg";
@@ -8,11 +8,11 @@ import ICON_MESSAGE from "../../assets/images/icon_message.svg";
 import ICON_NOTES from "../../assets/images/icon_notes.svg";
 import MainTemplate from "../../components/container/MainTemplate";
 import SearchBar from "../../components/searchbar/SearchBar";
-import {useAuth} from "../../auth/Auth";
+import { useAuth } from "../../auth/Auth";
 import PrimaryButton from "../../components/button/PrimaryButton";
 
 function PatientPanel(props) {
-    const {token} = useAuth();
+    const { token } = useAuth();
     const navigate = useNavigate();
 
     if (!token) {
@@ -24,7 +24,7 @@ function PatientPanel(props) {
             icon: ICON_DOCUMENT,
             title: 'سوابق پزشکی',
             onClick: () => {
-                // TODO: handle
+                navigate('/profile')
             },
         },
         {

@@ -2,6 +2,8 @@ import "./NavbarStyle.css"
 import ICON_HOME from "../../assets/images/icon_home.svg";
 import ICON_LOGOUT from "../../assets/images/icon_logout.svg";
 import ICON_PROFILE from "../../assets/images/icon_profile_circled.svg"
+import { useNavigate } from "react-router-dom";
+import React from "react";
 
 
 function Navbar() {

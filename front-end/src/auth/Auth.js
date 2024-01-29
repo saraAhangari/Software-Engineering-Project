@@ -1,11 +1,12 @@
-import {createContext, useContext, useEffect, useMemo, useState} from "react";
-import {API} from "../data/api/Api";
+import React from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { API } from "../data/api/Api";
 
 
 const AuthContext = createContext();
 
 function AuthProvider(props) {
-    const {children} = props;
+    const { children } = props;
 
     const [token, setToken] = useState(localStorage.getItem("token"));
 
@@ -21,7 +22,7 @@ function AuthProvider(props) {
         () => {
             if (token) {
                 API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-                localStorage.setItem('token',token);
+                localStorage.setItem('token', token);
             } else {
                 delete API.defaults.headers.common["Authorization"];
                 localStorage.removeItem('token')
