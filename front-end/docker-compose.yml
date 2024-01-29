@@ -2,9 +2,21 @@ version: '3'
 
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: 'front'
+
+    command: >
+      sh -c "npm start"
     ports:
-      - "80:80"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
+
+    volumes:
+      - .:/react/volumes
     restart: always
+
+
