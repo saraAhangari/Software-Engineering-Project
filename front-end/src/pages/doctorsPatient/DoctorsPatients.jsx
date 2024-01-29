@@ -4,11 +4,12 @@ import "./DoctorsPatients.css"
 import NOTES from "../../assets/images/icon_notes.svg";
 import COMMENT from "../../assets/images/icon_message.svg"
 import DOC from "../../assets/images/🦆 icon _google docs_.svg"
-import { safeApiCall } from "../../data/api/Api";
+import { useNavigate, Navigate } from "react-router-dom";
 
 
 function DoctorsPatients() {
     const [visitHistory, setVisitHistory] = useState([]);
+    const navigate = useNavigate()
 
     useEffect(() => {
         var token = localStorage.getItem("token")
@@ -34,9 +35,19 @@ function DoctorsPatients() {
                 console.error('Fetch error:', error);
             }
         };
+        if (visitHistory == null)
+            fetchVisitHistory();
     }
 
     )
+
+    const onclickHistory = () => {
+        navigate('/history')
+    }
+
+    const onclickprescription = () => {
+        navigate('/doctor-prescription')
+    }
 
     return (
         <div className="">
@@ -58,8 +69,14 @@ function DoctorsPatients() {
                                 <div className="VisitHistoryHeaderItem">{visit.appointment_time.start}</div>
                                 <div className="VisitHistoryHeaderItem">احسان محسنی</div>
                                 <div className="VisitHistoryHeaderItem">{visit.status}</div>
-                                <img src={DOC} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon VisitHistoryHeaderItemIcon2" />
-                                <img src={NOTES} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon" />
+                                <img
+                                    src={DOC}
+                                    className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon VisitHistoryHeaderItemIcon2"
+                                    onClick={onclickHistory} />
+                                <img
+                                    src={NOTES}
+                                    className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon"
+                                    onClick={onclickprescription} />
                             </div>
                         ))}
 

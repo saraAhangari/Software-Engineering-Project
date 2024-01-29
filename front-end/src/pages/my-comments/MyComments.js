@@ -2,7 +2,7 @@ import React from "react";
 import Comments from "../../components/comment/Comments";
 import MainTemplate from "../../components/container/MainTemplate";
 
-function MyComments(props) {
+function MyComments() {
     const comments = [
         {
             rate: 5,

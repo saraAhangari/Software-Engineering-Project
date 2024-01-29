@@ -1,0 +1,138 @@
+.profile-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profiel-box {
+    background-color: #F2F5F9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80vw;
+    gap: 1vh;
+    border-left: 2px solid #ECEEF0;
+    border-right: 2px solid #ECEEF0;
+    margin-top: 1vh;
+}
+
+.profile-item {
+    width: 60vw;
+    background-color: white;
+    padding: 2vh;
+    border-radius: 5px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.profileHeader {
+    padding-bottom: 1vh;
+    border-bottom: 2px solid #606060;
+    font-size: 26px;
+}
+
+.profileData {
+    display: flex;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    flex-wrap: wrap;
+    gap: 3vh;
+}
+
+.profileData-Item {
+    font-size: 1.8vh;
+    width: 28vw;
+    overflow: hidden;
+
+}
+
+.profile-VisitHistory {
+    background-color: #F2F5F9;
+    margin-top: 1vh;
+    color: #737171;
+
+}
+
+.profile-VisitHistoryHeader {
+    font-size: 1.5vh;
+    display: flex;
+    padding: 1vh 2vh;
+    border-bottom: 1.5px solid;
+}
+
+.profile-VisitHistoryHeader-item {
+    width: 27vw;
+
+}
+
+.profile-VisitHistoryHeader-noskhe {
+    width: 1vw;
+}
+
+.profile-VisitHistoryItem {
+    border-bottom: 1px solid #606060;
+}
+
+.vtcon {
+    width: 96%;
+    padding: 7vh;
+    display: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2vh;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
+    margin-top: 4vh;
+    border-radius: 10px;
+}
+
+.drug-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #606060;
+    background-color: #F2F5F9;
+    padding: 1vh;
+}
+
+.drug-title {
+    font-size: 20px;
+}
+
+.plus-icon {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+}
+
+.dropdown_arrow {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+}
+
+.dropdown-arrow-container {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropdown-list {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 5vh;
+    border-radius: 5px;
+    z-index: 100;
+}
+
+.dropdown-list div {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.dropdown-list div:hover {
+    background-color: #f0f0f0;
+}
