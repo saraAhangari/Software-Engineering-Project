@@ -1,12 +1,15 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {useTheme} from "@mui/material";
 import CustomTextFiled from "../text-field/CustomTextField";
 import JalaliDatePicker from "../text-field/JalaliDatePicker";
 import Selector from "../text-field/Selector";
 import PrimaryButton from "../button/PrimaryButton";
+import {getTimeSlicesOfDoctor} from "../../data/api/TimeSliceApi";
+import {safeApiCall} from "../../data/api/Api";
+import {postAppointment} from "../../data/api/AppointmentsApi";
 
 function AppointmentChooser(props) {
-    const {title, style} = props;
+    const {title, style, doctorId} = props;
     const theme = useTheme();
 
     const pTagStyle = {
@@ -14,23 +17,47 @@ function AppointmentChooser(props) {
         marginBottom:'10px',
     }
 
-    const availableTimes = [
-        '12:00',
-        '12:30',
-        '13:00',
-        '13:30',
-        '14:00',
-        '14:30',
-        '15:00',
-        '15:30',
-    ]
+    const [selectedDate, setSelectedDate] = useState(getNowDate);
+    const [availableTimes, setAvailableTimes] = useState([]);
+    const [selectedSlice, setSelectedSlice] = useState(undefined);
 
-    function handlePickedTime(time) {
-        // TODO: handle the picked time
+    function getNowDate() {
+        const now = new Date();
+        return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
     }
 
+    useEffect( () => {
+        getTimeSlicesOfDoctor(doctorId, selectedDate).then(slices => {
+            setAvailableTimes(slices);
+        }).catch(error => {
+            console.log(error);
+            alert('زمان های نوبت بندی مشخص نیستن. دوباره تلاش کنید.')
+        });
+    }, [selectedDate])
+
+    function handlePickedTime(time) {
+        const [start, end] = time.split(' - ')
+        setSelectedSlice({
+            "date": selectedDate,
+            "start": start,
+            "end": end
+        })
+    }
+
+    const [isLoading, setIsLoading] = useState(false)
+
     function handleOnButtonClicked() {
-        // TODO
+        safeApiCall(
+            postAppointment(doctorId, selectedSlice.date, selectedSlice.start, selectedSlice.end),
+            setIsLoading,
+            (error) => {
+                alert('نوبت دهی انجام نشد')
+                console.log(error);
+            },
+            () => {
+                alert('نوبت دهی با موفقیت انجام شد')
+            }
+        )
     }
 
     return (
@@ -69,6 +96,9 @@ function AppointmentChooser(props) {
             <JalaliDatePicker
                 type={'date'}
                 name={'birthday'}
+                onDateChanged={(date) => {
+                    setSelectedDate(`${date.$y}-${date.$M + 1}-${date.$D}`);
+                }}
             />
 
             <p
@@ -86,8 +116,9 @@ function AppointmentChooser(props) {
                     }
                 }
                 name={'hour'}
-                menuItems={availableTimes}
                 onValueChanged={handlePickedTime}
+                disabled={availableTimes?.length === 0}
+                menuItems={availableTimes.map(item => `${item.start} - ${item.end}`)}
             />
 
             <PrimaryButton
@@ -98,6 +129,8 @@ function AppointmentChooser(props) {
                     }
                 }
                 text={'رزرو نوبت'}
+                isLoading={isLoading}
+                disabled={!selectedSlice}
                 onButtonClicked={handleOnButtonClicked}
             />
         </div>

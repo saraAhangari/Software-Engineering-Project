@@ -69,6 +69,12 @@ function Comments(props) {
                     }
                 )
             }
+            {
+                comments?.length === 0 && <p>کامنتی وجود ندارد.</p>
+            }
+            {
+                !comments && <p>شما به کامنت ها دسترسی ندارید.</p>
+            }
         </div>
     )
 }
