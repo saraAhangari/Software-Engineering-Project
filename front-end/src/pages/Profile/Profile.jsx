@@ -55,10 +55,10 @@ function Profile() {
                         <div className="profile-item">
                             <div className="profileHeader">اطلاعات پزشکی</div>
                             <div className="profileData">
-                                <div className="profileData-Item">گروه خونی:{userData?.medical_history.blood_group} </div>
-                                <div className="profileData-Item">قد:{userData?.medical_history.height} </div>
-                                <div className="profileData-Item">فشار خون:{userData?.medical_history.blood_pressure} </div>
-                                <div className="profileData-Item">وزن:{userData?.medical_history.weight} </div>
+                                <div className="profileData-Item">گروه خونی:{userData?.medical_history?.blood_group} </div>
+                                <div className="profileData-Item">قد:{userData?.medical_history?.height} </div>
+                                <div className="profileData-Item">فشار خون:{userData?.medical_history?.blood_pressure} </div>
+                                <div className="profileData-Item">وزن:{userData?.medical_history?.weight} </div>
                             </div>
                         </div>
                         <div className="profile-item">
@@ -71,12 +71,12 @@ function Profile() {
                                 </div>
                                 <div className="profile-VisitHistoryHeader profile-VisitHistoryItem">
                                     <div className="profile-VisitHistoryHeader-item">پزشک بیمارستان</div>
-                                    <div className="profile-VisitHistoryHeader-item">{userData?.appointments.appointment_time} </div>
+                                    <div className="profile-VisitHistoryHeader-item">{userData?.appointments?.appointment_time} </div>
                                     <img className="profile-VisitHistoryHeader-noskhe" src={NOTES} />
                                 </div>
                                 <div className="profile-VisitHistoryHeader profile-VisitHistoryItem">
                                     <div className="profile-VisitHistoryHeader-item">پزشک بیمارستان</div>
-                                    <div className="profile-VisitHistoryHeader-item">{userData?.appointments.appointment_time} </div>
+                                    <div className="profile-VisitHistoryHeader-item">{userData?.appointments?.appointment_time} </div>
                                     <img className="profile-VisitHistoryHeader-noskhe" src={NOTES} />
                                 </div>
                             </div>
