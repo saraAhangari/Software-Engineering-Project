@@ -1,13 +1,16 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import MainTemplate from "../components/container/MainTemplate";
 import CustomTextFiled from "../components/text-field/CustomTextField";
 import Selector from "../components/text-field/Selector";
 import JalaliDatePicker from "../components/text-field/JalaliDatePicker";
 import { useTheme } from "@mui/material";
 import PrimaryButton from "../components/button/PrimaryButton";
+import { useNavigate, Navigate } from "react-router-dom";
+import { safeApiCall } from "../data/api/Api";
 
 function EditInformation(props) {
     const theme = useTheme();
+    const navigate = useNavigate();
 
     const inputFieldStyle = {
         flexGrow: '1',
@@ -57,10 +60,61 @@ function EditInformation(props) {
             })
         )
     }
+    const [accessToken, setAccessToken] = useState(null);
 
-    const handleButtonClicked = () => {
-        // TODO
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        setAccessToken(token);
+    }, []);
+
+    const handleButtonClicked = async () => {
+        if (!accessToken) {
+            // Handle authentication error, e.g., redirect to login page
+            console.error('Access token is missing. Redirect to login page.');
+            return;
+        }
+        const apiUrl = "http://localhost:8000/api/v1/patient/profile";
+
+        // Create the request headers with the access token
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+        };
+        const requestBody = {
+            first_name: inputs.name,
+            last_name: inputs.family,
+            national_id: currentValues.national_code,
+            phone_no: currentValues.phone,
+            birthdate: inputs.birthday,
+            assurance: inputs.assurance,
+            gender: inputs.gender,
+            medical_history: {
+                height: inputs.height,
+                weight: inputs.weight,
+                blood_group: inputs.blood_type,
+                blood_pressure: inputs.blood_pressure,
+            },
+        };
+
+        fetch(apiUrl, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify(requestBody),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Handle success response, e.g., show a success message
+                console.log('Patient data updated successfully.');
+            })
+            .catch((error) => {
+                console.error('Fetch error:', error);
+                // Handle error, e.g., show an error message
+                console.error('Error updating patient data.');
+            });
     }
+
 
     const bloodTypes = [
         '+O',

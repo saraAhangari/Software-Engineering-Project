@@ -62,7 +62,7 @@ function VisitHistory() {
                             <div className="VisitHistoryHeaderItem">ثبت نظر</div>
                             <div className="VisitHistoryHeaderItem">نسخه</div>
                         </div>
-                        {/* {appointments.map((appointment, index) => (
+                        {appointments.map((appointment, index) => (
                             <div key={index} className="VisitHistoryData">
                                 <div className="VisitHistoryHeaderItem">{appointment?.appointment_time.date}</div>
                                 <div className="VisitHistoryHeaderItem">{appointment?.appointment_time.start}</div>
@@ -80,7 +80,7 @@ function VisitHistory() {
                                 <img src={COMMENT} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon" />
                                 <img src={NOTES} className="VisitHistoryHeaderItem VisitHistoryHeaderItemIcon" />
                             </div>
-                        ))} */}
+                        ))}
                         <div className="VisitHistoryData">
                             <div className="VisitHistoryHeaderItem">1402-10-12</div>
                             <div className="VisitHistoryHeaderItem">12:30</div>
